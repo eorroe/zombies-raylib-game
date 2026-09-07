@@ -22,7 +22,7 @@ static void SpawnWave(Game *game) {
     game->zombiesRemaining = 5 + game->round * 3;
     for (int i = 0; i < game->zombiesRemaining; i++) {
         float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 20.0f + rand() % 10;
+        float radius = 15.0f + rand() % 10;  // was 20.0f + rand() % 10;
         Vector3 pos = {
             cosf(angle) * radius,
             0,

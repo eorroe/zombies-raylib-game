@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set SCRIPT_DIR=%~dp0
+set "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%"
 
 echo === Zombie Shooter - AAA Edition ===
@@ -22,7 +22,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-if not exist "raylib_src" (
+if not exist "raylib_src\src\raylib.h" (
     echo [1/4] Cloning raylib...
     git clone --depth 1 https://github.com/raysan5/raylib.git raylib_src
     if %errorlevel% neq 0 (
@@ -36,17 +36,19 @@ if not exist "raylib_src" (
 
 if not exist "raylib_src\build\raylib\raylib.lib" if not exist "raylib_src\build\raylib\libraylib.a" (
     echo [2/4] Building raylib...
-    mkdir raylib_src\build 2>nul
-    cd raylib_src\build
+    mkdir "raylib_src\build" 2>nul
+    cd /d "raylib_src\build"
     cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release
     if %errorlevel% neq 0 (
         echo ERROR: CMake configuration failed for raylib.
+        cd /d "%SCRIPT_DIR%"
         pause
         exit /b 1
     )
     cmake --build . --config Release --target raylib
     if %errorlevel% neq 0 (
         echo ERROR: raylib build failed.
+        cd /d "%SCRIPT_DIR%"
         pause
         exit /b 1
     )
@@ -63,6 +65,7 @@ cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 if %errorlevel% neq 0 (
     echo ERROR: CMake configuration failed for ZombieShooter.
+    cd /d "%SCRIPT_DIR%"
     pause
     exit /b 1
 )
@@ -70,6 +73,7 @@ if %errorlevel% neq 0 (
 cmake --build . --config Release
 if %errorlevel% neq 0 (
     echo ERROR: ZombieShooter build failed.
+    cd /d "%SCRIPT_DIR%"
     pause
     exit /b 1
 )

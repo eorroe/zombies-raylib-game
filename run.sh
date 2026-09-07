@@ -18,7 +18,7 @@ if ! command -v cmake >/dev/null 2>&1; then
     exit 1
 fi
 
-if [ ! -d "raylib_src" ]; then
+if [ ! -f "raylib_src/src/raylib.h" ]; then
     echo "[1/4] Cloning raylib..."
     git clone --depth 1 https://github.com/raysan5/raylib.git raylib_src
 else

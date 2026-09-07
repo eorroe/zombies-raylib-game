@@ -1,0 +1,31 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include "raylib.h"
+
+#define PLAYER_SPEED 5.0f
+#define PLAYER_HEALTH 100.0f
+#define PLAYER_HEIGHT 1.8f
+#define PLAYER_RADIUS 0.5f
+
+typedef struct {
+    Vector3 position;
+    Vector3 velocity;
+    float health;
+    float maxHealth;
+    float yaw;
+    float pitch;
+    Model model;
+    bool isMoving;
+    float footstepTimer;
+} Player;
+
+void PlayerInit(Player *player, Vector3 startPos);
+void PlayerUpdate(Player *player, float dt);
+void PlayerRender(Player *player, Shader shader);
+void PlayerShutdown(Player *player);
+void PlayerTakeDamage(Player *player, float damage);
+Vector3 PlayerGetForward(Player *player);
+Vector3 PlayerGetRight(Player *player);
+
+#endif

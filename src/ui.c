@@ -2,17 +2,20 @@
 #include "game.h"
 #include "raymath.h"
 #include <string.h>
+#include <stdio.h>
 
 static void UIHandleUploadGallery(MenuState *menu, InputState *input, Game *game) {
     if (!menu->showUploadPrompt) return;
     
     if (input->menuPressed || input->escapePressed) {
         menu->showUploadPrompt = false;
+        menu->lastUploadError[0] = '\0';
         return;
     }
     
     if (IsFileDropped()) {
         FilePathList files = LoadDroppedFiles();
+        menu->lastUploadError[0] = '\0';
         for (int i = 0; i < files.count && menu->uploadedImageCount < MAX_UPLOADED_IMAGES; i++) {
             if (IsFileExtension(files.paths[i], ".png") || IsFileExtension(files.paths[i], ".jpg") || IsFileExtension(files.paths[i], ".bmp")) {
                 UIAddUploadedImage(menu, files.paths[i]);
@@ -64,6 +67,7 @@ void UIInit(MenuState *menu, int screenWidth, int screenHeight) {
     menu->fadeAlpha = 0.0f;
     menu->screenWidth = screenWidth;
     menu->screenHeight = screenHeight;
+    menu->lastUploadError[0] = '\0';
     memset(menu->uploadedImages, 0, sizeof(menu->uploadedImages));
     memset(menu->imagePaths, 0, sizeof(menu->imagePaths));
 }
@@ -104,6 +108,7 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
                     break;
                 case MENU_ITEM_UPLOAD:
                     menu->showUploadPrompt = true;
+                    menu->lastUploadError[0] = '\0';
                     break;
                 case MENU_ITEM_QUIT:
                     game->state = GAME_STATE_GAMEOVER;
@@ -154,6 +159,10 @@ void UIRender(const MenuState *menu) {
         DrawText("UPLOAD GALLERY", menu->screenWidth / 2 - MeasureText("UPLOAD GALLERY", 40) / 2, 20, 40, WHITE);
         DrawText("Drag and drop images here to upload", menu->screenWidth / 2 - MeasureText("Drag and drop images here to upload", 20) / 2, 60, 20, GRAY);
         DrawText("Press ESC to close", menu->screenWidth / 2 - MeasureText("Press ESC to close", 20) / 2, menu->screenHeight - 40, 20, GRAY);
+        
+        if (menu->lastUploadError[0] != '\0') {
+            DrawText(menu->lastUploadError, menu->screenWidth / 2 - MeasureText(menu->lastUploadError, 20) / 2, 75, 20, RED);
+        }
         
         int cols = menu->screenWidth / (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING);
         if (cols < 1) cols = 1;
@@ -206,12 +215,27 @@ bool UIIsImageUploadRequested(const MenuState *menu) {
 }
 
 void UIAddUploadedImage(MenuState *menu, const char *path) {
-    if (menu->uploadedImageCount >= MAX_UPLOADED_IMAGES) return;
-    strncpy(menu->imagePaths[menu->uploadedImageCount], path, MAX_IMAGE_PATH - 1);
-    menu->uploadedImages[menu->uploadedImageCount] = LoadTexture(path);
-    if (menu->uploadedImages[menu->uploadedImageCount].id != 0) {
-        menu->uploadedImageCount++;
+    if (menu->uploadedImageCount >= MAX_UPLOADED_IMAGES) {
+        snprintf(menu->lastUploadError, sizeof(menu->lastUploadError), "Maximum %d images allowed", MAX_UPLOADED_IMAGES);
+        return;
     }
+    
+    Texture2D tex = LoadTexture(path);
+    if (tex.id == 0) {
+        snprintf(menu->lastUploadError, sizeof(menu->lastUploadError), "Failed to load image: %s", path);
+        return;
+    }
+    
+    if (tex.width > MAX_IMAGE_DIMENSION || tex.height > MAX_IMAGE_DIMENSION) {
+        UnloadTexture(tex);
+        snprintf(menu->lastUploadError, sizeof(menu->lastUploadError), "Image too large: %dx%d (max %dx%d)", tex.width, tex.height, MAX_IMAGE_DIMENSION, MAX_IMAGE_DIMENSION);
+        return;
+    }
+    
+    menu->uploadedImages[menu->uploadedImageCount] = tex;
+    strncpy(menu->imagePaths[menu->uploadedImageCount], path, MAX_IMAGE_PATH - 1);
+    menu->uploadedImageCount++;
+    menu->lastUploadError[0] = '\0';
 }
 
 void UIClearUploadedImages(MenuState *menu) {

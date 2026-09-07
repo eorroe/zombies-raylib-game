@@ -7,6 +7,7 @@
 
 #define MAX_UPLOADED_IMAGES 16
 #define MAX_IMAGE_PATH 256
+#define MAX_IMAGE_DIMENSION 2048
 #define UPLOAD_GALLERY_PADDING 20
 #define UPLOAD_THUMB_SIZE 128
 
@@ -50,6 +51,7 @@ typedef struct {
     float fadeAlpha;
     int screenWidth;
     int screenHeight;
+    char lastUploadError[384];
 } MenuState;
 
 void UIInit(MenuState *menu, int screenWidth, int screenHeight);

@@ -61,6 +61,7 @@ void RendererDrawScope(Game *game) {
 
 void RendererEnd(Game *game) {
     EndMode3D();
+    RendererDrawHUD(game);
     EndTextureMode();
     
     BeginTextureMode(game->postProcessTarget);

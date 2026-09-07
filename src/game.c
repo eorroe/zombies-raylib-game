@@ -13,6 +13,7 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type) {
     int texIdx = 0;
     if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieHeadTextureCount > 0) {
         texIdx = rand() % game->zombieHeadTextureCount;
+        DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
     ZombieInit(&game->zombies[idx], pos, type, texIdx);
 }
@@ -63,6 +64,9 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
         for (int i = 0; i < game->zombieHeadTextureCount && i < 16; i++) {
             game->zombieHeadTextures[i] = game->menu.uploadedImages[i];
         }
+        DebugLogf(&game->debug, DEBUG_SUCCESS, "Loaded %d zombie head textures", game->zombieHeadTextureCount);
+    } else {
+        DebugLog(&game->debug, "No zombie head textures uploaded", DEBUG_WARN);
     }
     
     SpawnWave(game);
@@ -144,7 +148,6 @@ void GameRender(Game *game) {
     RendererDrawZombies(game, game->shaders.pbr);
     RendererDrawPlayer(&game->player, game->shaders.pbr);
     RendererDrawParticles(game->particles, game->particleCount);
-    RendererDrawHUD(game);
     RendererEnd(game);
     
     if (game->debug.enabled) DebugRender(&game->debug, 1280, 720);

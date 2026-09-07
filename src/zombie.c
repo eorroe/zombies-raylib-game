@@ -38,7 +38,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     
     Vector3 headPos = Vector3Add(zombie->position, (Vector3){ 0, 1.9f, 0 });
     if (zombie->type == ZOMBIE_TYPE_IMAGE_HEAD && headTextureCount > 0 && zombie->textureIndex < headTextureCount) {
-        DrawBillboard(camera, headTextures[zombie->textureIndex], headPos, 0.8f, WHITE);
+        DrawBillboard(camera, headTextures[zombie->textureIndex], headPos, 1.2f, WHITE);
     } else {
         DrawSphere(headPos, 0.35f, (Color){ 90, 110, 80, 255 });
     }

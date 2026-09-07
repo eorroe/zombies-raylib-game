@@ -56,7 +56,8 @@ if not exist "raylib_src\build\raylib\raylib.lib" if not exist "raylib_src\build
 )
 
 echo [3/4] Building ZombieShooter...
-if not exist build mkdir build
+if exist build rmdir /s /q build
+mkdir build
 cd build
 
 cmake .. -DCMAKE_BUILD_TYPE=Release

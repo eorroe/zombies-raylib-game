@@ -31,7 +31,7 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt) {
     if (zombie->attackCooldown > 0) zombie->attackCooldown -= dt;
 }
 
-void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader) {
+void ZombieRender(Zombie *zombie, Texture2D *headTextures, int headTextureCount, Shader shader) {
     if (!zombie->active) return;
     float bob = sinf(zombie->animTime) * 0.1f;
     DrawModelEx(zombie->model, Vector3Add(zombie->position, (Vector3){ 0, ZOMBIE_HALF_HEIGHT + bob, 0 }), (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1.2f, 1 }, (Color){ 80, 100, 70, 255 });

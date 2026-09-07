@@ -94,7 +94,7 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
             switch (menu->selectedItem) {
                 case MENU_ITEM_START:
                     menu->active = false;
-                    GameInit(game);
+                    GameInit(game, menu->screenWidth, menu->screenHeight);
                     break;
                 case MENU_ITEM_MODE:
                     menu->mode = (menu->mode == GAME_MODE_ROUNDS) ? GAME_MODE_ENDLESS : GAME_MODE_ROUNDS;
@@ -122,7 +122,7 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
                     switch (i) {
                         case MENU_ITEM_START:
                             menu->active = false;
-                            GameInit(game);
+                            GameInit(game, menu->screenWidth, menu->screenHeight);
                             break;
                         case MENU_ITEM_MODE:
                             menu->mode = (menu->mode == GAME_MODE_ROUNDS) ? GAME_MODE_ENDLESS : GAME_MODE_ROUNDS;

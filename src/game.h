@@ -46,7 +46,7 @@ typedef struct Game {
     MenuState menu;
 } Game;
 
-void GameInit(Game *game);
+void GameInit(Game *game, int screenWidth, int screenHeight);
 void GameUpdate(Game *game, float dt);
 void GameRender(Game *game);
 void GameShutdown(Game *game);

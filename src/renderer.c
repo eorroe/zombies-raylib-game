@@ -27,8 +27,9 @@ void RendererDrawScene(Game *game) {
 
 void RendererDrawZombies(Game *game, Shader shader) {
     (void)shader;
+    Camera3D cam = CameraGetCamera(&game->camera);
     for (int i = 0; i < game->zombieCount; i++) {
-        ZombieRender(&game->zombies[i], game->zombieHeadTextures, game->zombieHeadTextureCount, shader);
+        ZombieRender(&game->zombies[i], cam, game->zombieHeadTextures, game->zombieHeadTextureCount, shader);
     }
 }
 

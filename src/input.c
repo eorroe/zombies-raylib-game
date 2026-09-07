@@ -1,6 +1,6 @@
 #include "input.h"
 
-void InputUpdate(InputState *input) {
+void InputUpdate(InputState *input, bool menuActive) {
     input->mouseDelta = GetMouseDelta();
     input->mouseLeftDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
     input->mouseLeftPressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
@@ -12,6 +12,9 @@ void InputUpdate(InputState *input) {
     input->menuPressed = IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_P);
     input->escapePressed = IsKeyPressed(KEY_ESCAPE);
     input->scrollDelta = GetMouseWheelMove();
+    input->upPressed = IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W);
+    input->downPressed = IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S);
+    input->enterPressed = IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE);
 }
 
 bool InputIsKeyPressed(InputState *input, int key) {

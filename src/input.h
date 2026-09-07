@@ -14,10 +14,13 @@ typedef struct {
     bool interactPressed;
     bool menuPressed;
     bool escapePressed;
+    bool upPressed;
+    bool downPressed;
+    bool enterPressed;
     float scrollDelta;
 } InputState;
 
-void InputUpdate(InputState *input);
+void InputUpdate(InputState *input, bool menuActive);
 bool InputIsKeyPressed(InputState *input, int key);
 bool InputIsMouseButtonPressed(InputState *input, int button);
 Vector2 InputGetMouseDelta(InputState *input);

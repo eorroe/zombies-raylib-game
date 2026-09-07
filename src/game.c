@@ -165,7 +165,7 @@ int main(void) {
     InputState input;
     
     while (!WindowShouldClose()) {
-        InputUpdate(&input);
+        InputUpdate(&input, game.menu.active);
         UIUpdate(&game.menu, &input, &game);
         
         if (game.state == GAME_STATE_PLAYING) {

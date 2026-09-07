@@ -25,6 +25,35 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
     }
     
     if (menu->active) {
+        if (input->upPressed) {
+            menu->selectedItem = (menu->selectedItem - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
+        }
+        
+        if (input->downPressed) {
+            menu->selectedItem = (menu->selectedItem + 1) % MENU_ITEM_COUNT;
+        }
+        
+        if (input->enterPressed) {
+            switch (menu->selectedItem) {
+                case MENU_ITEM_START:
+                    menu->active = false;
+                    GameInit(game);
+                    break;
+                case MENU_ITEM_MODE:
+                    menu->mode = (menu->mode == GAME_MODE_ROUNDS) ? GAME_MODE_ENDLESS : GAME_MODE_ROUNDS;
+                    break;
+                case MENU_ITEM_ZOMBIE_MODE:
+                    menu->zombieMode = (menu->zombieMode == ZOMBIE_MODE_MIXED) ? ZOMBIE_MODE_ALL_IMAGES : ZOMBIE_MODE_MIXED;
+                    break;
+                case MENU_ITEM_UPLOAD:
+                    menu->showUploadPrompt = true;
+                    break;
+                case MENU_ITEM_QUIT:
+                    game->state = GAME_STATE_GAMEOVER;
+                    break;
+            }
+        }
+        
         if (input->mouseLeftPressed) {
             Vector2 mouse = GetMousePosition();
             int itemH = 50;

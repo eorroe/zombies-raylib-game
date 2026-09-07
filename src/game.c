@@ -76,7 +76,7 @@ void GameUpdate(Game *game, float dt) {
     if (game->state != GAME_STATE_PLAYING) return;
     
     game->gameTime += dt;
-    PlayerUpdate(&game->player, dt);
+    PlayerUpdate(&game->player, CameraGetCamera(&game->camera), dt);
     CameraUpdate(&game->camera, &game->player, dt);
     WeaponUpdate(&game->weapon, game->camera.camera, dt);
     

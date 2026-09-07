@@ -14,34 +14,32 @@ void PlayerInit(Player *player, Vector3 startPos) {
     player->footstepTimer = 0.0f;
 }
 
-void PlayerUpdate(Player *player, float dt) {
+void PlayerUpdate(Player *player, Camera3D camera, float dt) {
     player->velocity = (Vector3){ 0 };
     player->isMoving = false;
     
-    if (IsKeyDown(KEY_W)) { player->velocity.z = 1.0f; player->isMoving = true; }
-    if (IsKeyDown(KEY_S)) { player->velocity.z = -1.0f; player->isMoving = true; }
-    if (IsKeyDown(KEY_A)) { player->velocity.x = -1.0f; player->isMoving = true; }
-    if (IsKeyDown(KEY_D)) { player->velocity.x = 1.0f; player->isMoving = true; }
+    Vector3 cameraForward = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
+    cameraForward.y = 0;
+    if (Vector3Length(cameraForward) > 0.001f) cameraForward = Vector3Normalize(cameraForward);
+    else cameraForward = (Vector3){ 0, 0, 1 };
+    Vector3 cameraRight = Vector3Normalize(Vector3CrossProduct(cameraForward, (Vector3){ 0, 1, 0 }));
+    
+    Vector3 moveDir = { 0 };
+    if (IsKeyDown(KEY_W)) { moveDir = Vector3Add(moveDir, cameraForward); player->isMoving = true; }
+    if (IsKeyDown(KEY_S)) { moveDir = Vector3Subtract(moveDir, cameraForward); player->isMoving = true; }
+    if (IsKeyDown(KEY_A)) { moveDir = Vector3Subtract(moveDir, cameraRight); player->isMoving = true; }
+    if (IsKeyDown(KEY_D)) { moveDir = Vector3Add(moveDir, cameraRight); player->isMoving = true; }
+    
+    if (player->isMoving) {
+        moveDir = Vector3Normalize(moveDir);
+        player->velocity = Vector3Scale(moveDir, PLAYER_SPEED);
+        player->position = Vector3Add(player->position, Vector3Scale(player->velocity, dt));
+    }
     
     Vector2 mouseDelta = GetMouseDelta();
     player->yaw -= mouseDelta.x * 0.003f;
     player->pitch -= mouseDelta.y * 0.003f;
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
-    
-    if (player->isMoving) {
-        player->velocity = Vector3Normalize(player->velocity);
-        player->velocity.x *= PLAYER_SPEED;
-        player->velocity.z *= PLAYER_SPEED;
-        
-        float cosY = cosf(player->yaw);
-        float sinY = sinf(player->yaw);
-        Vector3 moved = {
-            player->velocity.x * cosY - player->velocity.z * sinY,
-            0,
-            player->velocity.x * sinY + player->velocity.z * cosY
-        };
-        player->position = Vector3Add(player->position, Vector3Scale(moved, dt));
-    }
 }
 
 void PlayerRender(Player *player, Shader shader) {

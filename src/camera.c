@@ -21,7 +21,6 @@ void CameraUpdate(GameCamera *cam, Player *player, float dt) {
     desiredPos.y += cam->height;
     cam->camera.position = Vector3Lerp(cam->camera.position, desiredPos, cam->smoothSpeed * dt);
     cam->camera.target = Vector3Lerp(cam->camera.target, Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 }), cam->smoothSpeed * dt);
-    cam->camera.position = Vector3Add(cam->camera.position, (Vector3){ 0, 0.5f, 0 });
 }
 
 void CameraApplyScope(GameCamera *cam, bool active) {

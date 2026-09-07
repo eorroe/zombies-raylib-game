@@ -53,14 +53,8 @@ void RendererDrawHUD(Game *game) {
 
 void RendererDrawScope(Game *game) {
     if (!game->scopeActive) return;
-    DrawTexture(game->sceneTarget.texture, 0, 0, WHITE);
     BeginShaderMode(game->shaders.scope);
-    DrawCircle(game->sceneTarget.texture.width / 2, game->sceneTarget.texture.height / 2, 100, ColorAlpha(BLACK, 0.7f));
-    DrawCircleLines(game->sceneTarget.texture.width / 2, game->sceneTarget.texture.height / 2, 100, BLACK);
-    DrawLine(game->sceneTarget.texture.width / 2 - 20, game->sceneTarget.texture.height / 2,
-             game->sceneTarget.texture.width / 2 + 20, game->sceneTarget.texture.height / 2, RED);
-    DrawLine(game->sceneTarget.texture.width / 2, game->sceneTarget.texture.height / 2 - 20,
-             game->sceneTarget.texture.width / 2, game->sceneTarget.texture.height / 2 + 20, RED);
+    DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
     EndShaderMode();
 }
 
@@ -72,7 +66,13 @@ void RendererEnd(Game *game) {
     DrawTexture(game->sceneTarget.texture, 0, 0, WHITE);
     EndTextureMode();
     
-    DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
+    if (game->scopeActive) {
+        BeginShaderMode(game->shaders.scope);
+        DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
+        EndShaderMode();
+    } else {
+        DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
+    }
 }
 
 void RendererShutdown(Game *game) {

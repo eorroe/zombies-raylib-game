@@ -145,7 +145,6 @@ void GameRender(Game *game) {
     RendererDrawPlayer(&game->player, game->shaders.pbr);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererDrawHUD(game);
-    RendererDrawScope(game);
     RendererEnd(game);
     
     if (game->debug.enabled) DebugRender(&game->debug, 1280, 720);
@@ -201,7 +200,7 @@ int main(void) {
         } else if (game.state == GAME_STATE_GAMEOVER) {
             DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, RED);
             DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, WHITE);
-            if (IsKeyPressed(KEY_ENTER)) {
+            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
                 GameShutdown(&game);
                 UIInit(&game.menu, screenWidth, screenHeight);
                 game.state = GAME_STATE_MENU;

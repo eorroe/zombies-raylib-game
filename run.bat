@@ -2,35 +2,88 @@
 setlocal enabledelayedexpansion
 
 set SCRIPT_DIR=%~dp0
-set RAYLIB_DIR=%SCRIPT_DIR%raylib_src
+cd /d "%SCRIPT_DIR%"
 
 echo === Zombie Shooter - AAA Edition ===
 echo.
 
-if not exist "%RAYLIB_DIR%" (
-    echo [1/3] Cloning raylib...
-    git clone --depth 1 https://github.com/raysan5/raylib.git "%RAYLIB_DIR%"
-) else (
-    echo [1/3] raylib source found.
+where git >nul 2>nul
+if %errorlevel% neq 0 (
+    echo ERROR: git is not installed or not in PATH.
+    pause
+    exit /b 1
 )
 
-if not exist "%RAYLIB_DIR%\build\raylib\raylib.lib" (
-    echo [2/3] Building raylib...
-    mkdir "%RAYLIB_DIR%\build"
-    cd /d "%RAYLIB_DIR%\build"
+where cmake >nul 2>nul
+if %errorlevel% neq 0 (
+    echo ERROR: cmake is not installed or not in PATH.
+    echo Please install CMake from https://cmake.org/download/
+    pause
+    exit /b 1
+)
+
+if not exist "raylib_src" (
+    echo [1/4] Cloning raylib...
+    git clone --depth 1 https://github.com/raysan5/raylib.git raylib_src
+    if %errorlevel% neq 0 (
+        echo ERROR: Failed to clone raylib.
+        pause
+        exit /b 1
+    )
+) else (
+    echo [1/4] raylib source found.
+)
+
+if not exist "raylib_src\build\raylib\raylib.lib" if not exist "raylib_src\build\raylib\libraylib.a" (
+    echo [2/4] Building raylib...
+    mkdir raylib_src\build 2>nul
+    cd raylib_src\build
     cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release
+    if %errorlevel% neq 0 (
+        echo ERROR: CMake configuration failed for raylib.
+        pause
+        exit /b 1
+    )
     cmake --build . --config Release --target raylib
+    if %errorlevel% neq 0 (
+        echo ERROR: raylib build failed.
+        pause
+        exit /b 1
+    )
     cd /d "%SCRIPT_DIR%"
 ) else (
-    echo [2/3] raylib already built.
+    echo [2/4] raylib already built.
 )
 
-echo [3/3] Building ZombieShooter...
+echo [3/4] Building ZombieShooter...
 if not exist build mkdir build
 cd build
-cmake .. -G "Visual Studio 18 2026" -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release
 
-echo.
-echo Build complete! Running ZombieShooter...
-Release\ZombieShooter.exe
+cmake .. -DCMAKE_BUILD_TYPE=Release
+if %errorlevel% neq 0 (
+    echo ERROR: CMake configuration failed for ZombieShooter.
+    pause
+    exit /b 1
+)
+
+cmake --build . --config Release
+if %errorlevel% neq 0 (
+    echo ERROR: ZombieShooter build failed.
+    pause
+    exit /b 1
+)
+
+cd /d "%SCRIPT_DIR%"
+
+echo [4/4] Running ZombieShooter...
+if exist "build\Release\ZombieShooter.exe" (
+    build\Release\ZombieShooter.exe
+) else if exist "build\ZombieShooter.exe" (
+    build\ZombieShooter.exe
+) else (
+    echo ERROR: ZombieShooter.exe not found after build.
+    pause
+    exit /b 1
+)
+
+endlocal

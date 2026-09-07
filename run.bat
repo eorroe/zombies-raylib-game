@@ -34,7 +34,13 @@ if not exist "raylib_src\src\raylib.h" (
     echo [1/4] raylib source found.
 )
 
-if not exist "raylib_src\build\raylib\raylib.lib" if not exist "raylib_src\build\raylib\libraylib.a" (
+set RAYLIB_BUILT=0
+if exist "raylib_src\build\raylib\raylib.lib" set RAYLIB_BUILT=1
+if exist "raylib_src\build\raylib\libraylib.a" set RAYLIB_BUILT=1
+if exist "raylib_src\build\raylib\Release\raylib.lib" set RAYLIB_BUILT=1
+if exist "raylib_src\build\raylib\Release\libraylib.a" set RAYLIB_BUILT=1
+
+if %RAYLIB_BUILT%==0 (
     echo [2/4] Building raylib...
     mkdir "raylib_src\build" 2>nul
     cd /d "raylib_src\build"

@@ -7,15 +7,16 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(RAYLIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/raylib_src")
 set(RAYLIB_INCLUDE_SEARCH_DIR "${RAYLIB_DIR}/src")
 set(RAYLIB_LIBRARY_SEARCH_DIR "${RAYLIB_DIR}/build/raylib")
+set(RAYLIB_LIBRARY_RELEASE_DIR "${RAYLIB_DIR}/build/raylib/Release")
 
 find_path(RAYLIB_INCLUDE_DIR NAMES raylib.h PATHS "${RAYLIB_INCLUDE_SEARCH_DIR}" NO_DEFAULT_PATH)
 if(NOT RAYLIB_INCLUDE_DIR)
     message(FATAL_ERROR "raylib.h not found under: ${RAYLIB_INCLUDE_SEARCH_DIR}\nEnsure raylib_src exists and is a valid raylib checkout.")
 endif()
 
-find_library(RAYLIB_LIBRARY NAMES raylib libraylib PATHS "${RAYLIB_LIBRARY_SEARCH_DIR}" NO_DEFAULT_PATH)
+find_library(RAYLIB_LIBRARY NAMES raylib libraylib PATHS "${RAYLIB_LIBRARY_SEARCH_DIR}" "${RAYLIB_LIBRARY_RELEASE_DIR}" NO_DEFAULT_PATH)
 if(NOT RAYLIB_LIBRARY)
-    message(FATAL_ERROR "raylib library not found under: ${RAYLIB_LIBRARY_SEARCH_DIR}\nBuild raylib first (run run.bat or run.sh).")
+    message(FATAL_ERROR "raylib library not found under: ${RAYLIB_LIBRARY_SEARCH_DIR} or ${RAYLIB_LIBRARY_RELEASE_DIR}\nBuild raylib first (run run.bat or run.sh).")
 endif()
 
 include_directories(${RAYLIB_INCLUDE_DIR})

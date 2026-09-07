@@ -96,6 +96,43 @@ CMakeFiles/ZombieShooter.dir/src/camera.c.o: ../src/camera.c \
   /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls.h
 
+CMakeFiles/ZombieShooter.dir/src/debug.c.o: ../src/debug.c \
+  /usr/include/stdc-predef.h \
+  ../src/debug.h \
+  ../raylib_src/src/raylib.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
+  ../raylib_src/src/raymath.h \
+  /usr/include/math.h \
+  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+  /usr/include/features.h \
+  /usr/include/features-time64.h \
+  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+  /usr/include/x86_64-linux-gnu/bits/timesize.h \
+  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+  /usr/include/x86_64-linux-gnu/bits/long-double.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+  /usr/include/x86_64-linux-gnu/bits/types.h \
+  /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+  /usr/include/x86_64-linux-gnu/bits/time64.h \
+  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/floatn.h \
+  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/string.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
+  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+  /usr/include/strings.h \
+  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
+  /usr/include/x86_64-linux-gnu/bits/string_fortified.h
+
 CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/stdc-predef.h \
   ../src/game.h \
@@ -113,6 +150,7 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   ../src/shader.h \
   ../src/particle.h \
   ../src/audio.h \
+  ../src/debug.h \
   ../src/renderer.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
@@ -361,6 +399,7 @@ CMakeFiles/ZombieShooter.dir/src/renderer.c.o: ../src/renderer.c \
   ../src/shader.h \
   ../src/particle.h \
   ../src/audio.h \
+  ../src/debug.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -471,6 +510,7 @@ CMakeFiles/ZombieShooter.dir/src/ui.c.o: ../src/ui.c \
   ../src/shader.h \
   ../src/particle.h \
   ../src/audio.h \
+  ../src/debug.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -606,17 +646,9 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
 
 ../src/shader.c:
 
-/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
-
-/usr/include/x86_64-linux-gnu/bits/strings_fortified.h:
-
-/usr/include/strings.h:
-
 ../src/player.c:
 
 ../src/image_upload.c:
-
-/usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 
@@ -629,6 +661,14 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
 ../src/input.h:
 
 ../src/ui.h:
+
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
+
+/usr/include/x86_64-linux-gnu/bits/strings_fortified.h:
+
+/usr/include/strings.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
 
 ../raylib_src/src/raymath.h:
 
@@ -760,6 +800,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
+../src/debug.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
 
 /usr/include/x86_64-linux-gnu/bits/select2.h:
@@ -767,6 +809,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
+
+../src/debug.c:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
 

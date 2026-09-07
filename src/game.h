@@ -13,6 +13,7 @@
 #include "particle.h"
 #include "audio.h"
 #include "input.h"
+#include "debug.h"
 
 typedef struct Game {
     GameState state;
@@ -40,6 +41,7 @@ typedef struct Game {
     AudioManager audio;
     ProceduralTextures textures;
     ImageUpload imageUpload;
+    DebugState debug;
     
     MenuState menu;
 } Game;

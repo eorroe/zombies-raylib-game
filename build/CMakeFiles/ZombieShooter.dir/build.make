@@ -97,10 +97,24 @@ CMakeFiles/ZombieShooter.dir/src/camera.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ZombieShooter.dir/src/camera.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/camera.c -o CMakeFiles/ZombieShooter.dir/src/camera.c.s
 
+CMakeFiles/ZombieShooter.dir/src/debug.c.o: CMakeFiles/ZombieShooter.dir/flags.make
+CMakeFiles/ZombieShooter.dir/src/debug.c.o: ../src/debug.c
+CMakeFiles/ZombieShooter.dir/src/debug.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/ZombieShooter.dir/src/debug.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/debug.c.o -MF CMakeFiles/ZombieShooter.dir/src/debug.c.o.d -o CMakeFiles/ZombieShooter.dir/src/debug.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/debug.c
+
+CMakeFiles/ZombieShooter.dir/src/debug.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ZombieShooter.dir/src/debug.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/debug.c > CMakeFiles/ZombieShooter.dir/src/debug.c.i
+
+CMakeFiles/ZombieShooter.dir/src/debug.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ZombieShooter.dir/src/debug.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/debug.c -o CMakeFiles/ZombieShooter.dir/src/debug.c.s
+
 CMakeFiles/ZombieShooter.dir/src/game.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c
 CMakeFiles/ZombieShooter.dir/src/game.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/ZombieShooter.dir/src/game.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/ZombieShooter.dir/src/game.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/game.c.o -MF CMakeFiles/ZombieShooter.dir/src/game.c.o.d -o CMakeFiles/ZombieShooter.dir/src/game.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/game.c
 
 CMakeFiles/ZombieShooter.dir/src/game.c.i: cmake_force
@@ -114,7 +128,7 @@ CMakeFiles/ZombieShooter.dir/src/game.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: ../src/image_upload.c
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/ZombieShooter.dir/src/image_upload.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/ZombieShooter.dir/src/image_upload.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/image_upload.c.o -MF CMakeFiles/ZombieShooter.dir/src/image_upload.c.o.d -o CMakeFiles/ZombieShooter.dir/src/image_upload.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/image_upload.c
 
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.i: cmake_force
@@ -128,7 +142,7 @@ CMakeFiles/ZombieShooter.dir/src/image_upload.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/input.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/input.c.o: ../src/input.c
 CMakeFiles/ZombieShooter.dir/src/input.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/ZombieShooter.dir/src/input.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/ZombieShooter.dir/src/input.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/input.c.o -MF CMakeFiles/ZombieShooter.dir/src/input.c.o.d -o CMakeFiles/ZombieShooter.dir/src/input.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/input.c
 
 CMakeFiles/ZombieShooter.dir/src/input.c.i: cmake_force
@@ -142,7 +156,7 @@ CMakeFiles/ZombieShooter.dir/src/input.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/particle.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/particle.c.o: ../src/particle.c
 CMakeFiles/ZombieShooter.dir/src/particle.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/ZombieShooter.dir/src/particle.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/ZombieShooter.dir/src/particle.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/particle.c.o -MF CMakeFiles/ZombieShooter.dir/src/particle.c.o.d -o CMakeFiles/ZombieShooter.dir/src/particle.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/particle.c
 
 CMakeFiles/ZombieShooter.dir/src/particle.c.i: cmake_force
@@ -156,7 +170,7 @@ CMakeFiles/ZombieShooter.dir/src/particle.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/player.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c
 CMakeFiles/ZombieShooter.dir/src/player.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/ZombieShooter.dir/src/player.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/ZombieShooter.dir/src/player.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/player.c.o -MF CMakeFiles/ZombieShooter.dir/src/player.c.o.d -o CMakeFiles/ZombieShooter.dir/src/player.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/player.c
 
 CMakeFiles/ZombieShooter.dir/src/player.c.i: cmake_force
@@ -170,7 +184,7 @@ CMakeFiles/ZombieShooter.dir/src/player.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/renderer.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/renderer.c.o: ../src/renderer.c
 CMakeFiles/ZombieShooter.dir/src/renderer.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/ZombieShooter.dir/src/renderer.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/ZombieShooter.dir/src/renderer.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/renderer.c.o -MF CMakeFiles/ZombieShooter.dir/src/renderer.c.o.d -o CMakeFiles/ZombieShooter.dir/src/renderer.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/renderer.c
 
 CMakeFiles/ZombieShooter.dir/src/renderer.c.i: cmake_force
@@ -184,7 +198,7 @@ CMakeFiles/ZombieShooter.dir/src/renderer.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/shader.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/shader.c.o: ../src/shader.c
 CMakeFiles/ZombieShooter.dir/src/shader.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/ZombieShooter.dir/src/shader.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/ZombieShooter.dir/src/shader.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/shader.c.o -MF CMakeFiles/ZombieShooter.dir/src/shader.c.o.d -o CMakeFiles/ZombieShooter.dir/src/shader.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/shader.c
 
 CMakeFiles/ZombieShooter.dir/src/shader.c.i: cmake_force
@@ -198,7 +212,7 @@ CMakeFiles/ZombieShooter.dir/src/shader.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/texture.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/texture.c.o: ../src/texture.c
 CMakeFiles/ZombieShooter.dir/src/texture.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/ZombieShooter.dir/src/texture.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/ZombieShooter.dir/src/texture.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/texture.c.o -MF CMakeFiles/ZombieShooter.dir/src/texture.c.o.d -o CMakeFiles/ZombieShooter.dir/src/texture.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/texture.c
 
 CMakeFiles/ZombieShooter.dir/src/texture.c.i: cmake_force
@@ -212,7 +226,7 @@ CMakeFiles/ZombieShooter.dir/src/texture.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/ui.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/ui.c.o: ../src/ui.c
 CMakeFiles/ZombieShooter.dir/src/ui.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/ZombieShooter.dir/src/ui.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/ZombieShooter.dir/src/ui.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/ui.c.o -MF CMakeFiles/ZombieShooter.dir/src/ui.c.o.d -o CMakeFiles/ZombieShooter.dir/src/ui.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/ui.c
 
 CMakeFiles/ZombieShooter.dir/src/ui.c.i: cmake_force
@@ -226,7 +240,7 @@ CMakeFiles/ZombieShooter.dir/src/ui.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/weapon.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/weapon.c.o: ../src/weapon.c
 CMakeFiles/ZombieShooter.dir/src/weapon.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/ZombieShooter.dir/src/weapon.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/ZombieShooter.dir/src/weapon.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/weapon.c.o -MF CMakeFiles/ZombieShooter.dir/src/weapon.c.o.d -o CMakeFiles/ZombieShooter.dir/src/weapon.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/weapon.c
 
 CMakeFiles/ZombieShooter.dir/src/weapon.c.i: cmake_force
@@ -240,7 +254,7 @@ CMakeFiles/ZombieShooter.dir/src/weapon.c.s: cmake_force
 CMakeFiles/ZombieShooter.dir/src/zombie.c.o: CMakeFiles/ZombieShooter.dir/flags.make
 CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c
 CMakeFiles/ZombieShooter.dir/src/zombie.c.o: CMakeFiles/ZombieShooter.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/ZombieShooter.dir/src/zombie.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/ZombieShooter.dir/src/zombie.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ZombieShooter.dir/src/zombie.c.o -MF CMakeFiles/ZombieShooter.dir/src/zombie.c.o.d -o CMakeFiles/ZombieShooter.dir/src/zombie.c.o -c /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/zombie.c
 
 CMakeFiles/ZombieShooter.dir/src/zombie.c.i: cmake_force
@@ -255,6 +269,7 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.s: cmake_force
 ZombieShooter_OBJECTS = \
 "CMakeFiles/ZombieShooter.dir/src/audio.c.o" \
 "CMakeFiles/ZombieShooter.dir/src/camera.c.o" \
+"CMakeFiles/ZombieShooter.dir/src/debug.c.o" \
 "CMakeFiles/ZombieShooter.dir/src/game.c.o" \
 "CMakeFiles/ZombieShooter.dir/src/image_upload.c.o" \
 "CMakeFiles/ZombieShooter.dir/src/input.c.o" \
@@ -272,6 +287,7 @@ ZombieShooter_EXTERNAL_OBJECTS =
 
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/audio.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/camera.c.o
+ZombieShooter: CMakeFiles/ZombieShooter.dir/src/debug.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/game.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/image_upload.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/input.c.o
@@ -286,7 +302,7 @@ ZombieShooter: CMakeFiles/ZombieShooter.dir/src/zombie.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/build.make
 ZombieShooter: ../raylib_src/build/raylib/libraylib.a
 ZombieShooter: CMakeFiles/ZombieShooter.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking C executable ZombieShooter"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking C executable ZombieShooter"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ZombieShooter.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

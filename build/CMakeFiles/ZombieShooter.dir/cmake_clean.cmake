@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ZombieShooter.dir/src/audio.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/camera.c.o"
   "CMakeFiles/ZombieShooter.dir/src/camera.c.o.d"
+  "CMakeFiles/ZombieShooter.dir/src/debug.c.o"
+  "CMakeFiles/ZombieShooter.dir/src/debug.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/game.c.o"
   "CMakeFiles/ZombieShooter.dir/src/game.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/image_upload.c.o"

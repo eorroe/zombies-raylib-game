@@ -1,4 +1,5 @@
 #include "game.h"
+#include "debug.h"
 #include "input.h"
 #include "renderer.h"
 #include "audio.h"
@@ -38,6 +39,7 @@ static void SpawnWave(Game *game) {
 }
 
 void GameInit(Game *game) {
+    DebugLog(&game->debug, "Game started", DEBUG_SUCCESS);
     game->state = GAME_STATE_PLAYING;
     game->score = 0;
     game->round = 0;
@@ -53,6 +55,7 @@ void GameInit(Game *game) {
     
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
+    DebugInit(&game->debug, 10.0f);
     
     if (game->menu.uploadedImageCount > 0) {
         game->zombieHeadTextureCount = game->menu.uploadedImageCount;
@@ -65,12 +68,19 @@ void GameInit(Game *game) {
 }
 
 void GameUpdate(Game *game, float dt) {
+    DebugUpdate(&game->debug, dt);
+    if (IsKeyPressed(KEY_F1)) DebugToggle(&game->debug);
+    if (IsKeyPressed(KEY_F2)) DebugClear(&game->debug);
+    
     if (game->state != GAME_STATE_PLAYING) return;
     
     game->gameTime += dt;
     PlayerUpdate(&game->player, dt);
     CameraUpdate(&game->camera, &game->player, dt);
     WeaponUpdate(&game->weapon, game->camera.camera, dt);
+    
+    DebugLogf(&game->debug, DEBUG_INFO, "Player health: %.1f", game->player.health);
+    DebugLogf(&game->debug, DEBUG_INFO, "Zombies alive: %d", game->zombieCount);
     
     for (int i = 0; i < game->zombieCount; i++) {
         ZombieUpdate(&game->zombies[i], game->player.position, dt);
@@ -97,6 +107,7 @@ void GameUpdate(Game *game, float dt) {
             ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
             if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
                 game->score += 100;
+                DebugLogf(&game->debug, DEBUG_INFO, "Score: %d", game->score);
                 AudioPlayZombieGrowl(&game->audio);
             }
             for (int p = 0; p < 5; p++) {
@@ -135,6 +146,8 @@ void GameRender(Game *game) {
     RendererDrawHUD(game);
     RendererDrawScope(game);
     RendererEnd(game);
+    
+    if (game->debug.enabled) DebugRender(&game->debug, 1280, 720);
 }
 
 void GameShutdown(Game *game) {
@@ -145,6 +158,7 @@ void GameShutdown(Game *game) {
     WeaponShutdown(&game->weapon);
     AudioShutdown(&game->audio);
     TextureShutdown(&game->textures);
+    DebugShutdown(&game->debug);
     RendererShutdown(game);
 }
 
@@ -160,11 +174,14 @@ int main(void) {
     
     Game game = { 0 };
     UIInit(&game.menu, screenWidth, screenHeight);
+    DebugInit(&game.debug, 10.0f);
     game.state = GAME_STATE_MENU;
     
     InputState input;
     
     while (!WindowShouldClose()) {
+        if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);
+        if (IsKeyPressed(KEY_F2)) DebugClear(&game.debug);
         InputUpdate(&input, game.menu.active);
         UIUpdate(&game.menu, &input, &game);
         
@@ -177,6 +194,7 @@ int main(void) {
         
         if (game.state == GAME_STATE_MENU) {
             UIRender(&game.menu);
+            if (game.debug.enabled) DebugRender(&game.debug, screenWidth, screenHeight);
         } else if (game.state == GAME_STATE_PLAYING) {
             GameRender(&game);
         } else if (game.state == GAME_STATE_GAMEOVER) {
@@ -187,6 +205,7 @@ int main(void) {
                 UIInit(&game.menu, screenWidth, screenHeight);
                 game.state = GAME_STATE_MENU;
             }
+            if (game.debug.enabled) DebugRender(&game.debug, screenWidth, screenHeight);
         }
         
         EndDrawing();

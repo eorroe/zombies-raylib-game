@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/audio.c" "CMakeFiles/ZombieShooter.dir/src/audio.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/audio.c.o.d"
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/camera.c" "CMakeFiles/ZombieShooter.dir/src/camera.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/camera.c.o.d"
+  "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/debug.c" "CMakeFiles/ZombieShooter.dir/src/debug.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/debug.c.o.d"
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/game.c" "CMakeFiles/ZombieShooter.dir/src/game.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/game.c.o.d"
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/image_upload.c" "CMakeFiles/ZombieShooter.dir/src/image_upload.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/image_upload.c.o.d"
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/input.c" "CMakeFiles/ZombieShooter.dir/src/input.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/input.c.o.d"

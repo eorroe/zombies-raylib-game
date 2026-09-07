@@ -177,6 +177,30 @@ src/camera.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/camera.c.s
 .PHONY : src/camera.c.s
 
+src/debug.o: src/debug.c.o
+.PHONY : src/debug.o
+
+# target to build an object file
+src/debug.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/debug.c.o
+.PHONY : src/debug.c.o
+
+src/debug.i: src/debug.c.i
+.PHONY : src/debug.i
+
+# target to preprocess a source file
+src/debug.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/debug.c.i
+.PHONY : src/debug.c.i
+
+src/debug.s: src/debug.c.s
+.PHONY : src/debug.s
+
+# target to generate assembly for a file
+src/debug.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/debug.c.s
+.PHONY : src/debug.c.s
+
 src/game.o: src/game.c.o
 .PHONY : src/game.o
 
@@ -456,6 +480,9 @@ help:
 	@echo "... src/camera.o"
 	@echo "... src/camera.i"
 	@echo "... src/camera.s"
+	@echo "... src/debug.o"
+	@echo "... src/debug.i"
+	@echo "... src/debug.s"
 	@echo "... src/game.o"
 	@echo "... src/game.i"
 	@echo "... src/game.s"

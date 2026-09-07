@@ -3,6 +3,57 @@
 #include "raymath.h"
 #include <string.h>
 
+static void UIHandleUploadGallery(MenuState *menu, InputState *input, Game *game) {
+    if (!menu->showUploadPrompt) return;
+    
+    if (input->menuPressed || input->escapePressed) {
+        menu->showUploadPrompt = false;
+        return;
+    }
+    
+    if (IsFileDropped()) {
+        FilePathList files = LoadDroppedFiles();
+        for (int i = 0; i < files.count && menu->uploadedImageCount < MAX_UPLOADED_IMAGES; i++) {
+            if (IsFileExtension(files.paths[i], ".png") || IsFileExtension(files.paths[i], ".jpg") || IsFileExtension(files.paths[i], ".bmp")) {
+                UIAddUploadedImage(menu, files.paths[i]);
+                DebugLogf(&game->debug, DEBUG_SUCCESS, "Uploaded: %s", files.paths[i]);
+            }
+        }
+        UnloadDroppedFiles(files);
+    }
+    
+    if (input->mouseLeftPressed) {
+        Vector2 mouse = GetMousePosition();
+        int cols = menu->screenWidth / (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING);
+        if (cols < 1) cols = 1;
+        
+        for (int i = 0; i < menu->uploadedImageCount; i++) {
+            int col = i % cols;
+            int row = i / cols;
+            float x = UPLOAD_GALLERY_PADDING + col * (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING);
+            float y = 80 + UPLOAD_GALLERY_PADDING + row * (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING + 30);
+            
+            Rectangle thumbRect = { x, y, (float)UPLOAD_THUMB_SIZE, (float)UPLOAD_THUMB_SIZE };
+            if (CheckCollisionPointRec(mouse, thumbRect)) {
+                DebugLog(&game->debug, "Image clicked (no action yet)", DEBUG_INFO);
+                break;
+            }
+            
+            Rectangle deleteBtn = { x + UPLOAD_THUMB_SIZE - 24, y, 24, 24 };
+            if (CheckCollisionPointRec(mouse, deleteBtn)) {
+                UnloadTexture(menu->uploadedImages[i]);
+                for (int j = i; j < menu->uploadedImageCount - 1; j++) {
+                    menu->uploadedImages[j] = menu->uploadedImages[j + 1];
+                    memcpy(menu->imagePaths[j], menu->imagePaths[j + 1], MAX_IMAGE_PATH);
+                }
+                menu->uploadedImageCount--;
+                DebugLog(&game->debug, "Image deleted", DEBUG_WARN);
+                break;
+            }
+        }
+    }
+}
+
 void UIInit(MenuState *menu, int screenWidth, int screenHeight) {
     menu->active = true;
     menu->selectedItem = 0;
@@ -14,10 +65,16 @@ void UIInit(MenuState *menu, int screenWidth, int screenHeight) {
     menu->screenWidth = screenWidth;
     menu->screenHeight = screenHeight;
     memset(menu->uploadedImages, 0, sizeof(menu->uploadedImages));
+    memset(menu->imagePaths, 0, sizeof(menu->imagePaths));
 }
 
 void UIUpdate(MenuState *menu, InputState *input, Game *game) {
     if (menu->fadeAlpha < 1.0f) menu->fadeAlpha += 0.05f;
+    
+    if (menu->showUploadPrompt) {
+        UIHandleUploadGallery(menu, input, game);
+        return;
+    }
     
     if (input->menuPressed && !menu->active) {
         menu->active = true;
@@ -84,12 +141,6 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
                 }
             }
         }
-        
-        if (menu->showUploadPrompt) {
-            if (input->interactPressed) {
-                menu->showUploadPrompt = false;
-            }
-        }
     }
 }
 
@@ -97,6 +148,38 @@ void UIRender(const MenuState *menu) {
     if (!menu->active) return;
     
     DrawRectangle(0, 0, menu->screenWidth, menu->screenHeight, ColorAlpha(BLACK, 0.7f * menu->fadeAlpha));
+    
+    if (menu->showUploadPrompt) {
+        DrawRectangle(0, 0, menu->screenWidth, menu->screenHeight, ColorAlpha(BLACK, 0.9f));
+        DrawText("UPLOAD GALLERY", menu->screenWidth / 2 - MeasureText("UPLOAD GALLERY", 40) / 2, 20, 40, WHITE);
+        DrawText("Drag and drop images here to upload", menu->screenWidth / 2 - MeasureText("Drag and drop images here to upload", 20) / 2, 60, 20, GRAY);
+        DrawText("Press ESC to close", menu->screenWidth / 2 - MeasureText("Press ESC to close", 20) / 2, menu->screenHeight - 40, 20, GRAY);
+        
+        int cols = menu->screenWidth / (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING);
+        if (cols < 1) cols = 1;
+        
+        for (int i = 0; i < menu->uploadedImageCount; i++) {
+            int col = i % cols;
+            int row = i / cols;
+            float x = UPLOAD_GALLERY_PADDING + col * (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING);
+            float y = 80 + UPLOAD_GALLERY_PADDING + row * (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING + 30);
+            
+            DrawTexturePro(menu->uploadedImages[i],
+                (Rectangle){ 0, 0, (float)menu->uploadedImages[i].width, (float)menu->uploadedImages[i].height },
+                (Rectangle){ x, y, (float)UPLOAD_THUMB_SIZE, (float)UPLOAD_THUMB_SIZE },
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+            DrawRectangleLines(x, y, UPLOAD_THUMB_SIZE, UPLOAD_THUMB_SIZE, WHITE);
+            
+            DrawRectangle(x + UPLOAD_THUMB_SIZE - 24, y, 24, 24, RED);
+            DrawText("X", x + UPLOAD_THUMB_SIZE - 18, y + 4, 16, WHITE);
+        }
+        
+        if (menu->uploadedImageCount == 0) {
+            DrawText("No images uploaded yet. Drag and drop images onto this window.", menu->screenWidth / 2 - 300, menu->screenHeight / 2 - 20, 20, WHITE);
+        }
+        
+        return;
+    }
     
     int itemH = 50;
     int startY = menu->screenHeight / 2 - 100;
@@ -111,10 +194,6 @@ void UIRender(const MenuState *menu) {
         DrawRectangleLinesEx(btn, 2, ColorAlpha(col, 0.8f * menu->fadeAlpha));
         int textW = MeasureText(items[i], 20);
         DrawText(items[i], menu->screenWidth / 2 - textW / 2, startY + i * itemH + 10, 20, WHITE);
-    }
-    
-    if (menu->showUploadPrompt) {
-        DrawText("Drag and drop images here or press I to open file picker", menu->screenWidth / 2 - 300, menu->screenHeight - 100, 20, YELLOW);
     }
 }
 

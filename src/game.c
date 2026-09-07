@@ -39,6 +39,7 @@ static void SpawnWave(Game *game) {
 }
 
 void GameInit(Game *game) {
+    DebugInit(&game->debug, 10.0f);
     DebugLog(&game->debug, "Game started", DEBUG_SUCCESS);
     game->state = GAME_STATE_PLAYING;
     game->score = 0;
@@ -55,7 +56,6 @@ void GameInit(Game *game) {
     
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
-    DebugInit(&game->debug, 10.0f);
     
     if (game->menu.uploadedImageCount > 0) {
         game->zombieHeadTextureCount = game->menu.uploadedImageCount;

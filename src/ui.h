@@ -7,17 +7,10 @@
 
 #define MAX_UPLOADED_IMAGES 16
 #define MAX_IMAGE_PATH 256
+#define UPLOAD_GALLERY_PADDING 20
+#define UPLOAD_THUMB_SIZE 128
 
 typedef struct Game Game;
-
-typedef enum {
-    MENU_ITEM_START,
-    MENU_ITEM_MODE,
-    MENU_ITEM_ZOMBIE_MODE,
-    MENU_ITEM_UPLOAD,
-    MENU_ITEM_QUIT,
-    MENU_ITEM_COUNT
-} MenuItem;
 
 typedef enum {
     GAME_STATE_MENU,
@@ -35,6 +28,15 @@ typedef enum {
     ZOMBIE_MODE_MIXED,
     ZOMBIE_MODE_ALL_IMAGES
 } ZombieMode;
+
+typedef enum {
+    MENU_ITEM_START,
+    MENU_ITEM_MODE,
+    MENU_ITEM_ZOMBIE_MODE,
+    MENU_ITEM_UPLOAD,
+    MENU_ITEM_QUIT,
+    MENU_ITEM_COUNT
+} MenuItem;
 
 typedef struct {
     bool active;

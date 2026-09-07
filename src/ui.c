@@ -33,34 +33,25 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
                 Rectangle btn = { menu->screenWidth / 2 - 150, startY + i * itemH, 300, 40 };
                 if (CheckCollisionPointRec(mouse, btn)) {
                     menu->selectedItem = i;
+                    switch (i) {
+                        case MENU_ITEM_START:
+                            menu->active = false;
+                            GameInit(game);
+                            break;
+                        case MENU_ITEM_MODE:
+                            menu->mode = (menu->mode == GAME_MODE_ROUNDS) ? GAME_MODE_ENDLESS : GAME_MODE_ROUNDS;
+                            break;
+                        case MENU_ITEM_ZOMBIE_MODE:
+                            menu->zombieMode = (menu->zombieMode == ZOMBIE_MODE_MIXED) ? ZOMBIE_MODE_ALL_IMAGES : ZOMBIE_MODE_MIXED;
+                            break;
+                        case MENU_ITEM_UPLOAD:
+                            menu->showUploadPrompt = true;
+                            break;
+                        case MENU_ITEM_QUIT:
+                            game->state = GAME_STATE_GAMEOVER;
+                            break;
+                    }
                     break;
-                }
-            }
-        }
-        
-        if (input->mouseLeftDown) {
-            Vector2 mouse = GetMousePosition();
-            int itemH = 50;
-            int startY = menu->screenHeight / 2 - 100;
-            Rectangle btn = { menu->screenWidth / 2 - 150, startY + menu->selectedItem * itemH, 300, 40 };
-            if (CheckCollisionPointRec(mouse, btn)) {
-                switch (menu->selectedItem) {
-                    case MENU_ITEM_START:
-                        menu->active = false;
-                        GameInit(game);
-                        break;
-                    case MENU_ITEM_MODE:
-                        menu->mode = (menu->mode == GAME_MODE_ROUNDS) ? GAME_MODE_ENDLESS : GAME_MODE_ROUNDS;
-                        break;
-                    case MENU_ITEM_ZOMBIE_MODE:
-                        menu->zombieMode = (menu->zombieMode == ZOMBIE_MODE_MIXED) ? ZOMBIE_MODE_ALL_IMAGES : ZOMBIE_MODE_MIXED;
-                        break;
-                    case MENU_ITEM_UPLOAD:
-                        menu->showUploadPrompt = true;
-                        break;
-                    case MENU_ITEM_QUIT:
-                        game->state = GAME_STATE_GAMEOVER;
-                        break;
                 }
             }
         }

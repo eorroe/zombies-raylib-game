@@ -155,7 +155,7 @@ int main(void) {
     
     InitWindow(screenWidth, screenHeight, "Zombie Shooter - AAA Edition");
     SetTargetFPS(60);
-    DisableCursor();
+    EnableCursor();
     
     Game game = { 0 };
     UIInit(&game.menu, screenWidth, screenHeight);
@@ -166,6 +166,12 @@ int main(void) {
     while (!WindowShouldClose()) {
         InputUpdate(&input);
         UIUpdate(&game.menu, &input, &game);
+        
+        if (game.state == GAME_STATE_MENU || game.state == GAME_STATE_GAMEOVER) {
+            EnableCursor();
+        } else if (game.state == GAME_STATE_PLAYING) {
+            DisableCursor();
+        }
         
         if (game.state == GAME_STATE_PLAYING) {
             GameUpdate(&game, GetFrameTime());
@@ -182,7 +188,6 @@ int main(void) {
             DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, RED);
             DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, WHITE);
             if (IsKeyPressed(KEY_ENTER)) {
-                GameShutdown(&game);
                 UIInit(&game.menu, screenWidth, screenHeight);
                 game.state = GAME_STATE_MENU;
             }

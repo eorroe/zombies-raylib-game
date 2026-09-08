@@ -58,6 +58,8 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
     RendererInit(game, screenWidth, screenHeight);
+    game->mode = game->menu.mode;
+    game->zombieMode = game->menu.zombieMode;
     
     if (game->menu.uploadedImageCount > 0) {
         game->zombieHeadTextureCount = game->menu.uploadedImageCount;

@@ -37,17 +37,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     DrawModelEx(zombie->model, Vector3Add(zombie->position, (Vector3){ 0, ZOMBIE_HALF_HEIGHT + bob, 0 }), (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1.2f, 1 }, (Color){ 80, 100, 70, 255 });
     
     Vector3 headPos = Vector3Add(zombie->position, (Vector3){ 0, 2.75f, 0 });
-    if (zombie->type == ZOMBIE_TYPE_IMAGE_HEAD && headTextureCount > 0 && zombie->textureIndex < headTextureCount) {
-        if (headTextures[zombie->textureIndex].id != 0) {
-            rlDisableDepthTest();
-            DrawBillboard(camera, headTextures[zombie->textureIndex], headPos, 1.0f, WHITE);
-            rlEnableDepthTest();
-        } else {
-            DrawSphere(headPos, 0.35f, (Color){ 90, 110, 80, 255 });
-        }
-    } else {
-        DrawSphere(headPos, 0.35f, (Color){ 90, 110, 80, 255 });
-    }
+    DrawSphere(headPos, 0.35f, (Color){ 90, 110, 80, 255 });
 }
 
 void ZombieShutdown(Zombie *zombie) {

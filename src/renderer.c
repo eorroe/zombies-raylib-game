@@ -33,6 +33,28 @@ void RendererDrawZombies(Game *game, Shader shader) {
     }
 }
 
+void RendererDrawZombieHeads(Game *game) {
+    Camera3D cam = CameraGetCamera(&game->camera);
+    int w = game->sceneTarget.texture.width;
+    int h = game->sceneTarget.texture.height;
+    for (int i = 0; i < game->zombieCount; i++) {
+        Zombie *z = &game->zombies[i];
+        if (!z->active) continue;
+        if (z->type != ZOMBIE_TYPE_IMAGE_HEAD) continue;
+        if (game->zombieHeadTextureCount <= 0) continue;
+        if (z->textureIndex < 0 || z->textureIndex >= game->zombieHeadTextureCount) continue;
+        Texture2D tex = game->zombieHeadTextures[z->textureIndex];
+        if (tex.id == 0) continue;
+        
+        Vector3 headPos = Vector3Add(z->position, (Vector3){ 0, 2.75f, 0 });
+        Vector2 screenPos = GetWorldToScreen(headPos, cam);
+        float size = 100.0f;
+        Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
+        Rectangle dst = { screenPos.x - size / 2, screenPos.y - size / 2, size, size };
+        DrawTexturePro(tex, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    }
+}
+
 void RendererDrawPlayer(Player *player, Shader shader) {
     (void)shader;
     PlayerRender(player, shader);
@@ -61,6 +83,7 @@ void RendererDrawScope(Game *game) {
 
 void RendererEnd(Game *game) {
     EndMode3D();
+    RendererDrawZombieHeads(game);
     RendererDrawHUD(game);
     EndTextureMode();
     

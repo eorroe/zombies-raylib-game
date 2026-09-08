@@ -10,6 +10,7 @@ void RendererInit(Game *game, int screenWidth, int screenHeight);
 void RendererBegin(Game *game, Camera3D camera);
 void RendererDrawScene(Game *game);
 void RendererDrawZombies(Game *game, Shader shader);
+void RendererDrawZombieHeads(Game *game);
 void RendererDrawPlayer(Player *player, Shader shader);
 void RendererDrawParticles(Particle *particles, int count);
 void RendererDrawHUD(Game *game);

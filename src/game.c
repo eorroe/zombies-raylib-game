@@ -181,12 +181,25 @@ int main(void) {
     game.state = GAME_STATE_MENU;
     
     InputState input;
+    int frameCount = 0;
+    const char *screenshotPath = getenv("ZOMBIE_SHOT");
+    int autoQuitMs = -1;
+    const char *autoQuitStr = getenv("ZOMBIE_AUTO_QUIT_MS");
+    if (autoQuitStr) autoQuitMs = atoi(autoQuitStr);
+    double startTime = GetTime();
+    bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
+    int autoStartFrame = 30;
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);
         if (IsKeyPressed(KEY_F2)) DebugClear(&game.debug);
         InputUpdate(&input, game.menu.active);
         UIUpdate(&game.menu, &input, &game);
+        
+        if (autoStart && frameCount == autoStartFrame && game.state == GAME_STATE_MENU) {
+            game.state = GAME_STATE_PLAYING;
+            GameInit(&game, screenWidth, screenHeight);
+        }
         
         if (game.state == GAME_STATE_PLAYING) {
             GameUpdate(&game, GetFrameTime());
@@ -212,6 +225,13 @@ int main(void) {
         }
         
         EndDrawing();
+        
+        if (screenshotPath && frameCount == 60) {
+            TakeScreenshot(screenshotPath);
+        }
+        frameCount++;
+        
+        if (autoQuitMs > 0 && (GetTime() - startTime) * 1000.0 > autoQuitMs) break;
     }
     
     if (game.state == GAME_STATE_PLAYING) {

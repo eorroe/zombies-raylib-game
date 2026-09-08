@@ -48,7 +48,8 @@ void RendererDrawZombieHeads(Game *game) {
         
         Vector3 headPos = Vector3Add(z->position, (Vector3){ 0, 2.75f, 0 });
         Vector2 screenPos = GetWorldToScreen(headPos, cam);
-        float size = 100.0f;
+        float dist = Vector3Length(Vector3Subtract(cam.position, headPos));
+        float size = 120.0f * 8.0f / dist;
         Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
         Rectangle dst = { screenPos.x - size / 2, screenPos.y - size / 2, size, size };
         DrawTexturePro(tex, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);

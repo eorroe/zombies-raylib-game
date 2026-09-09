@@ -48,7 +48,7 @@ typedef struct {
 } Zombie;
 
 void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants);
-void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt);
+void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired);
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader);
 void ZombieShutdown(Zombie *zombie);
 bool ZombieIsAlive(Zombie *zombie);

@@ -57,16 +57,18 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     SetModelTexture(&zombie->rightLowerLeg, pants);
 }
 
-void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt) {
+void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired) {
     if (!zombie->active) return;
     zombie->animTime += dt * 3.0f;
-    zombie->walkCycle += dt * 6.0f;
-    Vector3 dir = Vector3Subtract(playerPos, zombie->position);
-    float dist = Vector3Length(dir);
-    if (dist > 0.1f) {
-        dir = Vector3Normalize(dir);
-        zombie->velocity = Vector3Scale(dir, ZOMBIE_SPEED_BASE);
-        zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
+    if (firstShotFired) {
+        zombie->walkCycle += dt * 6.0f;
+        Vector3 dir = Vector3Subtract(playerPos, zombie->position);
+        float dist = Vector3Length(dir);
+        if (dist > 0.1f) {
+            dir = Vector3Normalize(dir);
+            zombie->velocity = Vector3Scale(dir, ZOMBIE_SPEED_BASE);
+            zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
+        }
     }
     if (zombie->attackCooldown > 0) zombie->attackCooldown -= dt;
 }

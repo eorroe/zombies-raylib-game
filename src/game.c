@@ -47,6 +47,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->round = 0;
     game->gameTime = 0.0f;
     game->scopeActive = false;
+    game->firstShotFired = false;
     game->zombieCount = 0;
     game->particleCount = 0;
     game->bloodDecalCount = 0;
@@ -300,7 +301,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     bool invincible = game->gameTime < 8.0f;
     
     for (int i = 0; i < game->zombieCount; i++) {
-        ZombieUpdate(&game->zombies[i], game->player.position, dt);
+        ZombieUpdate(&game->zombies[i], game->player.position, dt, game->firstShotFired);
         if (!invincible && ZombieIsAlive(&game->zombies[i]) && game->zombies[i].attackCooldown <= 0) {
             float dist = Vector3Length(Vector3Subtract(game->zombies[i].position, game->player.position));
             if (dist < 2.0f) {
@@ -325,6 +326,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         CameraSetAiming(&game->camera, false);
+        game->firstShotFired = true;
         
         RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
         if (hit.hit) {

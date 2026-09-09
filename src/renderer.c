@@ -232,8 +232,13 @@ void RendererDrawHUD(Game *game) {
     DrawText(TextFormat("Kills: %d", game->totalDeadZombies), 140, 20, 30, WHITE);
     DrawText(TextFormat("Health: %.0f", game->player.health), 200, 20, 30, WHITE);
     DrawText(TextFormat("Ammo: %d", game->weapon.ammo), 400, 20, 30, WHITE);
+    const char *modeText = (game->mode == GAME_MODE_ROUNDS) ? "Rounds" : "Endless";
+    DrawText(TextFormat("Mode: %s", modeText), 520, 20, 30, WHITE);
+    if (game->mode == GAME_MODE_ROUNDS) {
+        DrawText(TextFormat("Round: %d", game->round), 700, 20, 30, WHITE);
+    }
     if (game->weapon.reloading) {
-        DrawText("RELOADING...", 600, 20, 30, YELLOW);
+        DrawText("RELOADING...", 860, 20, 30, YELLOW);
     }
     
     if (CameraGetFirstPersonBlend(&game->camera) > 0.5f) {

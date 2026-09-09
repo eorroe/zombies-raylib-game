@@ -206,11 +206,12 @@ void WeaponApplyRecoil(Weapon *weapon) {
 RayHitInfo WeaponRaycast(Weapon *weapon, Camera3D camera, Zombie *zombies, int zombieCount) {
     RayHitInfo result = { 0 };
     Vector3 dir = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
-    Ray ray = { weapon->position, dir };
+    Ray ray = { camera.position, dir };
     float minDist = WEAPON_RANGE;
     for (int i = 0; i < zombieCount; i++) {
         if (!ZombieIsAlive(&zombies[i])) continue;
-        RayCollision col = GetRayCollisionSphere(ray, zombies[i].position, 1.0f);
+        Vector3 zombieCenter = Vector3Add(zombies[i].position, (Vector3){ 0, 1.0f, 0 });
+        RayCollision col = GetRayCollisionSphere(ray, zombieCenter, 1.0f);
         if (col.hit && col.distance < minDist) {
             minDist = col.distance;
             result.hit = true;

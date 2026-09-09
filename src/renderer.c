@@ -160,26 +160,38 @@ void RendererDrawZombieHeads(Game *game) {
         float bob = sinf(z->animTime) * 0.05f;
         float headY = z->position.y + bob + LEG_UPPER_LEN + LEG_LOWER_LEN + TORSO_HEIGHT + HEAD_RADIUS * 0.9f;
         Vector3 headPos = (Vector3){ z->position.x, headY, z->position.z };
-        Vector2 screenPos = GetWorldToScreen(headPos, cam);
         
         if (z->type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieHeadTextureCount > 0 && z->textureIndex >= 0 && z->textureIndex < game->zombieHeadTextureCount) {
             Texture2D tex = game->zombieHeadTextures[z->textureIndex];
             if (tex.id == 0) continue;
             
-            float dist = Vector3Length(Vector3Subtract(cam.position, headPos));
-            float size = 120.0f * 8.0f / dist;
-            Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
-            Rectangle dst = { screenPos.x - size / 2, screenPos.y - size / 2, size, size };
-            DrawTexturePro(tex, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);
-            
-            float barHeight = 6.0f;
-            float barWidth = size;
-            float barX = screenPos.x - size / 2;
-            float barY = screenPos.y - size / 2 - barHeight - 4.0f;
-            float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
-            DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
-            DrawRectangle(barX, barY, barWidth * healthPct, barHeight, RED);
+            if (z->dying) {
+                float deathProgress = 1.0f - (z->deathTimer / 1.0f);
+                if (deathProgress > 1.0f) deathProgress = 1.0f;
+                Vector3 groundHeadPos = (Vector3){ z->position.x, 0.15f, z->position.z };
+                Vector2 screenPos = GetWorldToScreen(groundHeadPos, cam);
+                float size = 120.0f * 8.0f / Vector3Length(Vector3Subtract(cam.position, groundHeadPos));
+                Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
+                Rectangle dst = { screenPos.x - size / 2, screenPos.y - size / 2, size, size };
+                DrawTexturePro(tex, src, dst, (Vector2){ 0, 0 }, 90.0f, WHITE);
+            } else {
+                Vector2 screenPos = GetWorldToScreen(headPos, cam);
+                float dist = Vector3Length(Vector3Subtract(cam.position, headPos));
+                float size = 120.0f * 8.0f / dist;
+                Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
+                Rectangle dst = { screenPos.x - size / 2, screenPos.y - size / 2, size, size };
+                DrawTexturePro(tex, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);
+                
+                float barHeight = 6.0f;
+                float barWidth = size;
+                float barX = screenPos.x - size / 2;
+                float barY = screenPos.y - size / 2 - barHeight - 4.0f;
+                float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
+                DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
+                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, RED);
+            }
         } else {
+            Vector2 screenPos = GetWorldToScreen(headPos, cam);
             float barWidth = 40.0f;
             float barHeight = 4.0f;
             float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;

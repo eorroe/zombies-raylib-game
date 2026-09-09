@@ -82,16 +82,17 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     float walk = sinf(zombie->walkCycle);
     float feetY = zombie->position.y + bob;
 
-    Color skinColor = (Color){ 255, 200, 150, 255 };
-    Color shirtColor = (Color){ 220, 50, 50, 255 };
-    Color pantsColor = (Color){ 50, 50, 120, 255 };
+    Color skinColor = (Color){ 255, 100, 100, 255 };
+    Color shirtColor = (Color){ 255, 30, 30, 255 };
+    Color pantsColor = (Color){ 30, 30, 255, 255 };
     
     float hipY = feetY + LEG_UPPER_LEN + LEG_LOWER_LEN;
     float torsoCenterY = hipY + TORSO_HEIGHT * 0.5f;
     float headCenterY = hipY + TORSO_HEIGHT + HEAD_RADIUS * 0.9f;
 
     Vector3 torsoPos = (Vector3){ zombie->position.x, torsoCenterY, zombie->position.z };
-    DrawModelEx(zombie->bodyModel, torsoPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
+    DrawModelEx(zombie->bodyModel, torsoPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 50, 50, 255 });
 
     Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };
     if (zombie->type == ZOMBIE_TYPE_IMAGE_HEAD && headTextureCount > 0 && zombie->textureIndex < headTextureCount) {
@@ -103,7 +104,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     } else {
         SetModelTexture(&zombie->headModel, zombie->skinTex);
     }
-    DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 80, 80, 255 });
 
     Vector3 shoulderL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
     Vector3 shoulderR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };

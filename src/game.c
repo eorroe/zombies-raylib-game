@@ -23,7 +23,7 @@ static void SpawnWave(Game *game) {
     game->zombiesRemaining = 5 + game->round * 3;
     for (int i = 0; i < game->zombiesRemaining; i++) {
         float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 4.0f + rand() % 6;
+        float radius = 6.0f + rand() % 8;
         Vector3 pos = {
             cosf(angle) * radius,
             0,
@@ -161,7 +161,7 @@ void GameUpdate(Game *game, float dt) {
     DebugLogf(&game->debug, DEBUG_INFO, "Player health: %.1f", game->player.health);
     DebugLogf(&game->debug, DEBUG_INFO, "Zombies alive: %d", game->zombieCount);
     
-    bool invincible = game->gameTime < 3.0f;
+    bool invincible = game->gameTime < 8.0f;
     
     for (int i = 0; i < game->zombieCount; i++) {
         ZombieUpdate(&game->zombies[i], game->player.position, dt);
@@ -229,9 +229,9 @@ void GameUpdate(Game *game, float dt) {
     }
     
     static float autoShootTimer = 0.0f;
-    if (game->gameTime > 0.5f && game->gameTime < 8.0f) {
+    if (game->gameTime > 0.5f && game->gameTime < 12.0f) {
         autoShootTimer += dt;
-        if (autoShootTimer > 0.2f) {
+        if (autoShootTimer > 0.15f) {
             autoShootTimer = 0.0f;
             
             int nearestIdx = -1;
@@ -356,7 +356,7 @@ int main(void) {
     double startTime = GetTime();
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
-    int screenshotFrame = 150;
+    int screenshotFrame = 120;
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);

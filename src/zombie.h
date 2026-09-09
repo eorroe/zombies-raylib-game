@@ -6,14 +6,14 @@
 
 #define MAX_ZOMBIES 64
 #define ZOMBIE_SPEED_BASE 2.0f
-#define LIMB_RADIUS 0.09f
-#define TORSO_WIDTH 0.45f
-#define TORSO_HEIGHT 0.75f
-#define HEAD_RADIUS 0.22f
-#define ARM_UPPER_LEN 0.55f
-#define ARM_LOWER_LEN 0.50f
-#define LEG_UPPER_LEN 0.60f
-#define LEG_LOWER_LEN 0.60f
+#define LIMB_RADIUS 0.12f
+#define TORSO_WIDTH 0.55f
+#define TORSO_HEIGHT 0.80f
+#define HEAD_RADIUS 0.25f
+#define ARM_UPPER_LEN 0.65f
+#define ARM_LOWER_LEN 0.60f
+#define LEG_UPPER_LEN 0.70f
+#define LEG_LOWER_LEN 0.70f
 #define REACH_DIST 4.0f
 
 typedef enum {

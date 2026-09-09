@@ -58,10 +58,10 @@ void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
     BeginTextureMode(game->sceneTarget);
-    ClearBackground((Color){ 30, 30, 40, 255 });
+    ClearBackground((Color){ 60, 60, 80, 255 });
 
-    DrawRectangleGradientV(0, 0, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 20, 20, 60, 255 }, (Color){ 60, 40, 80, 255 });
-    DrawRectangleGradientV(0, game->sceneTarget.texture.height / 2, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 60, 40, 80, 255 }, (Color){ 20, 15, 30, 255 });
+    DrawRectangleGradientV(0, 0, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 80, 60, 100, 255 }, (Color){ 120, 80, 140, 255 });
+    DrawRectangleGradientV(0, game->sceneTarget.texture.height / 2, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 120, 80, 140, 255 }, (Color){ 60, 40, 70, 255 });
 
     BeginMode3D(camera);
 }
@@ -69,59 +69,59 @@ void RendererBegin(Game *game, Camera3D camera) {
 void RendererDrawScene(Game *game) {
     (void)game;
 
-    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 200, 200, 210, 255 });
+    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 120, 120, 140, 255 });
     DrawGrid(50, 1.0f);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
         float angle = i * PI * 0.25f;
-        float radius = 12.0f;
+        float radius = 5.0f + (i % 3) * 3.0f;
         Vector3 cratePos = {
             cosf(angle) * radius,
             0.3f,
             sinf(angle) * radius
         };
-        DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 220, 200, 170, 255 });
-        DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 140, 125, 105, 255 });
+        DrawCube(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 200, 180, 160, 255 });
+        DrawCubeWires(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 255, 100, 100, 255 });
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 10; i++) {
         float angle = i * PI * 0.5f + 0.3f;
-        float radius = 8.0f;
+        float radius = 3.0f + (i % 2) * 3.0f;
         Vector3 barrelPos = {
             cosf(angle) * radius,
             0.4f,
             sinf(angle) * radius
         };
-        DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 230, 210, 180, 255 });
-        DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 150, 140, 125, 255 });
+        DrawCylinder(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 220, 200, 170, 255 });
+        DrawCylinderWires(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 255, 140, 140, 255 });
     }
 
-    for (int i = 0; i < 5; i++) {
-        float x = -10.0f + i * 5.0f;
+    for (int i = 0; i < 10; i++) {
+        float x = -18.0f + i * 4.0f;
         Vector3 wallPos = { x, 0.75f, -10.0f };
-        DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 220, 215, 210, 255 });
-        DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 140, 135, 130, 255 });
+        DrawCube(wallPos, 4.0f, 1.5f, 0.6f, (Color){ 180, 175, 170, 255 });
+        DrawCubeWires(wallPos, 4.0f, 1.5f, 0.6f, (Color){ 255, 80, 80, 255 });
     }
 
-    for (int i = 0; i < 6; i++) {
-        float x = -8.0f + i * 3.5f;
-        float z = 8.0f;
+    for (int i = 0; i < 12; i++) {
+        float x = -12.0f + i * 4.0f;
+        float z = 10.0f;
         float h = 1.5f + (i % 3) * 1.0f;
         Vector3 bldPos = { x, h * 0.5f, z };
-        Color bldColor = (Color){ 210, 210, 220, 255 };
-        if (i % 3 == 1) bldColor = (Color){ 230, 220, 210, 255 };
-        else if (i % 3 == 2) bldColor = (Color){ 200, 210, 230, 255 };
-        DrawCube(bldPos, 2.5f, h, 2.5f, bldColor);
-        DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 130, 130, 140, 255 });
+        Color bldColor = (Color){ 160, 160, 170, 255 };
+        if (i % 3 == 1) bldColor = (Color){ 180, 170, 160, 255 };
+        else if (i % 3 == 2) bldColor = (Color){ 160, 170, 190, 255 };
+        DrawCube(bldPos, 3.5f, h, 3.5f, bldColor);
+        DrawCubeWires(bldPos, 3.5f, h, 3.5f, (Color){ 255, 120, 120, 255 });
 
-        for (int w = 0; w < 3; w++) {
-            float wx = x - 0.6f + w * 0.6f;
+        for (int w = 0; w < 5; w++) {
+            float wx = x - 1.0f + w * 1.0f;
             float wy = h * 0.5f + 0.3f;
-            DrawCube((Vector3){ wx, wy, z + 1.26f }, 0.3f, 0.3f, 0.05f, (Color){ 100, 100, 110, 255 });
+            DrawCube((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 255, 50, 50, 255 });
         }
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 8; i++) {
         float angle = i * PI * 0.5f + PI * 0.25f;
         float radius = 18.0f;
         Vector3 lampPos = {
@@ -129,8 +129,9 @@ void RendererDrawScene(Game *game) {
             2.0f,
             sinf(angle) * radius
         };
-        DrawCylinder(lampPos, 0.1f, 0.1f, 2.0f, 8, (Color){ 100, 100, 105, 255 });
-        DrawSphere((Vector3){ lampPos.x, lampPos.y + 1.0f, lampPos.z }, 0.3f, (Color){ 255, 240, 200, 255 });
+        DrawCylinder(lampPos, 0.2f, 0.2f, 3.0f, 8, (Color){ 120, 120, 130, 255 });
+        DrawSphere((Vector3){ lampPos.x, lampPos.y + 1.5f, lampPos.z }, 0.5f, (Color){ 255, 240, 200, 255 });
+        DrawSphere((Vector3){ lampPos.x, 0.05f, lampPos.z }, 3.0f, (Color){ 255, 200, 100, 60 });
     }
 }
 
@@ -138,8 +139,8 @@ void RendererDrawBloodDecals(Game *game) {
     if (game->bloodDecalCount <= 0) return;
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
-        pos.y = 0.02f;
-        DrawPlane(pos, (Vector2){ 6.0f, 6.0f }, (Color){ 255, 0, 0, 240 });
+        pos.y = 0.03f;
+        DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){ 255, 0, 0, 220 });
     }
 }
 
@@ -184,18 +185,18 @@ void RendererDrawParticles(Particle *particles, int count) {
     
     for (int i = 0; i < count; i++) {
         if (particles[i].type == PARTICLE_BLOOD) {
-            DrawSphere(particles[i].position, particles[i].size * 2.0f, particles[i].color);
+            DrawSphere(particles[i].position, particles[i].size * 4.0f, particles[i].color);
         }
     }
     
-    for (int i = 0; i < 200; i++) {
-        float t = GetTime() * 0.25f + i * 2.17f;
-        float x = sinf(t * 1.3f) * 22.0f;
-        float y = 0.5f + fmodf(t * 0.6f, 6.0f);
-        float z = cosf(t * 0.9f) * 22.0f;
+    for (int i = 0; i < 500; i++) {
+        float t = GetTime() * 0.4f + i * 2.17f;
+        float x = sinf(t * 1.3f) * 28.0f;
+        float y = 0.8f + fmodf(t * 0.8f, 8.0f);
+        float z = cosf(t * 0.9f) * 28.0f;
         Vector3 dustPos = { x, y, z };
-        float alpha = 0.6f + sinf(t + i) * 0.4f;
-        DrawSphere(dustPos, 0.2f, (Color){ 255, 255, 240, (unsigned char)(alpha * 255) });
+        float alpha = 0.8f + sinf(t + i) * 0.2f;
+        DrawSphere(dustPos, 0.3f, (Color){ 255, 255, 240, (unsigned char)(alpha * 255) });
     }
 }
 
@@ -207,40 +208,20 @@ void RendererDrawHUD(Game *game) {
     if (game->weapon.reloading) {
         DrawText("RELOADING...", 600, 20, 30, YELLOW);
     }
-    
-    int cx = game->sceneTarget.texture.width / 2;
-    int cy = game->sceneTarget.texture.height / 2;
-    DrawCircle(cx, cy, 2, WHITE);
-    DrawLine(cx - 10, cy, cx - 5, cy, WHITE);
-    DrawLine(cx + 5, cy, cx + 10, cy, WHITE);
-    DrawLine(cx, cy - 10, cx, cy - 5, WHITE);
-    DrawLine(cx, cy + 5, cx, cy + 10, WHITE);
 }
 
 void RendererDrawScope(Game *game) {
-    if (!game->scopeActive) return;
-    BeginShaderMode(game->shaders.scope);
-    DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
-    EndShaderMode();
+    (void)game;
 }
 
 void RendererEnd(Game *game) {
+    (void)game;
+    EndTextureMode();
     EndMode3D();
-    RendererDrawZombieHeads(game);
-    RendererDrawHUD(game);
-    EndTextureMode();
-    
-    BeginTextureMode(game->postProcessTarget);
+
+    BeginShaderMode(game->shaders.postProcess);
     DrawTexture(game->sceneTarget.texture, 0, 0, WHITE);
-    EndTextureMode();
-    
-    if (game->scopeActive) {
-        BeginShaderMode(game->shaders.scope);
-        DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
-        EndShaderMode();
-    } else {
-        DrawTexture(game->postProcessTarget.texture, 0, 0, WHITE);
-    }
+    EndShaderMode();
 }
 
 void RendererShutdown(Game *game) {

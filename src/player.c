@@ -114,15 +114,15 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
     DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
-    Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
-    Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f * cosYaw, -0.6f, -0.2f * sinYaw });
-    Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f * cosYaw, -0.6f, 0.2f * sinYaw });
+    Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
+    Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
+    Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f * cosYaw, -0.6f, 0.2f * sinYaw });
+    Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f * cosYaw, -0.6f, -0.2f * sinYaw });
 
-    DrawModelEx(player->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, -armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->leftLegModel, leftHip, (Vector3){ 0, 1, 0 }, -legSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightHip, (Vector3){ 0, 1, 0 }, legSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, yawDeg + armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, yawDeg - armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->leftLegModel, leftHip, (Vector3){ 0, 1, 0 }, yawDeg - legSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightLegModel, rightHip, (Vector3){ 0, 1, 0 }, yawDeg + legSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {

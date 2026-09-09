@@ -37,7 +37,7 @@ typedef struct {
 
 void WeaponInit(Weapon *weapon);
 void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt);
-void WeaponRender(Weapon *weapon, Camera3D camera);
+void WeaponRender(Weapon *weapon, Camera3D camera, float yaw);
 void WeaponShoot(Weapon *weapon);
 void WeaponReload(Weapon *weapon);
 bool WeaponCanShoot(Weapon *weapon);

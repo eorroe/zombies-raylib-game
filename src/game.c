@@ -399,7 +399,7 @@ void GameRender(Game *game) {
     if (CameraGetFirstPersonBlend(&game->camera) < 0.5f) {
         RendererDrawPlayer(&game->player, game->shaders.pbr);
     }
-    WeaponRender(&game->weapon, cam);
+    WeaponRender(&game->weapon, cam, game->player.yaw);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
     RendererDrawZombieHeads(game);

@@ -2,6 +2,7 @@
 #include "texture.h"
 #include "shader.h"
 #include "particle.h"
+#include "zombie.h"
 #include "raymath.h"
 
 void RendererInit(Game *game, int screenWidth, int screenHeight) {
@@ -27,11 +28,10 @@ void RendererDrawScene(Game *game) {
 
 void RendererDrawBloodDecals(Game *game) {
     if (game->bloodDecalCount <= 0) return;
-    Texture2D blood = game->textures.bloodDecal;
-    if (blood.id == 0) return;
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
-        DrawPlane(pos, (Vector2){ 1.5f, 1.5f }, (Color){ 120, 0, 0, 180 });
+        pos.y = 0.02f;
+        DrawPlane(pos, (Vector2){ 1.5f, 1.5f }, (Color){ 140, 0, 0, 160 });
     }
 }
 
@@ -45,8 +45,6 @@ void RendererDrawZombies(Game *game, Shader shader) {
 
 void RendererDrawZombieHeads(Game *game) {
     Camera3D cam = CameraGetCamera(&game->camera);
-    int w = game->sceneTarget.texture.width;
-    int h = game->sceneTarget.texture.height;
     for (int i = 0; i < game->zombieCount; i++) {
         Zombie *z = &game->zombies[i];
         if (!z->active) continue;
@@ -56,7 +54,9 @@ void RendererDrawZombieHeads(Game *game) {
         Texture2D tex = game->zombieHeadTextures[z->textureIndex];
         if (tex.id == 0) continue;
         
-        Vector3 headPos = Vector3Add(z->position, (Vector3){ 0, 2.75f, 0 });
+        float bob = sinf(z->animTime) * 0.05f;
+        float headY = z->position.y + bob + LEG_UPPER_LEN + LEG_LOWER_LEN + TORSO_HEIGHT + HEAD_RADIUS * 0.9f;
+        Vector3 headPos = (Vector3){ z->position.x, headY, z->position.z };
         Vector2 screenPos = GetWorldToScreen(headPos, cam);
         float dist = Vector3Length(Vector3Subtract(cam.position, headPos));
         float size = 120.0f * 8.0f / dist;

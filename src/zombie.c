@@ -3,16 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define ZOMBIE_HALF_HEIGHT 0.95f
-#define LIMB_RADIUS 0.12f
-#define TORSO_WIDTH 0.55f
-#define TORSO_HEIGHT 0.75f
-#define HEAD_RADIUS 0.22f
-#define ARM_UPPER_LEN 0.55f
-#define ARM_LOWER_LEN 0.50f
-#define LEG_UPPER_LEN 0.60f
-#define LEG_LOWER_LEN 0.60f
-
 static Model CreateLimbMesh(float radius, float length, int slices) {
     Mesh m = GenMeshCylinder(radius, length, slices);
     Model model = LoadModelFromMesh(m);
@@ -66,7 +56,6 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt) {
 }
 
 static void DrawLimb(Model model, Vector3 origin, Vector3 axis, float angle, float length, Color tint) {
-    Vector3 end = Vector3Add(origin, Vector3Scale(axis, length));
     Vector3 mid = Vector3Add(origin, Vector3Scale(axis, length * 0.5f));
     DrawModelEx(model, mid, (Vector3){ 0, 0, 1 }, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, tint);
 }
@@ -75,45 +64,55 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     if (!zombie->active) return;
     float bob = sinf(zombie->animTime) * 0.05f;
     float walk = sinf(zombie->walkCycle);
-    float baseY = zombie->position.y + bob;
+    float feetY = zombie->position.y + bob;
 
-    Color skinColor = (Color){ 90, 110, 75, 255 };
-    Color shirtColor = (Color){ 55, 60, 50, 255 };
-    Color pantsColor = (Color){ 35, 35, 45, 255 };
+    Color skinColor = (Color){ 100, 120, 85, 255 };
+    Color shirtColor = (Color){ 60, 65, 55, 255 };
+    Color pantsColor = (Color){ 40, 40, 50, 255 };
 
-    Vector3 torsoPos = (Vector3){ zombie->position.x, baseY + TORSO_HEIGHT * 0.5f, zombie->position.z };
+    float hipY = feetY + LEG_UPPER_LEN + LEG_LOWER_LEN;
+    float torsoCenterY = hipY + TORSO_HEIGHT * 0.5f;
+    float headCenterY = hipY + TORSO_HEIGHT + HEAD_RADIUS * 0.9f;
+
+    Vector3 torsoPos = (Vector3){ zombie->position.x, torsoCenterY, zombie->position.z };
     DrawModelEx(zombie->bodyModel, torsoPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, shirtColor);
 
-    Vector3 headPos = (Vector3){ zombie->position.x, baseY + TORSO_HEIGHT + HEAD_RADIUS * 0.9f, zombie->position.z };
-    DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, skinColor);
+    Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };
+    if (zombie->type == ZOMBIE_TYPE_IMAGE_HEAD && headTextureCount > 0 && zombie->textureIndex < headTextureCount) {
+        if (headTextures[zombie->textureIndex].id != 0) {
+            // Image head rendered in screen space by RendererDrawZombieHeads
+        } else {
+            DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, skinColor);
+        }
+    } else {
+        DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, skinColor);
+    }
 
-    Vector3 shoulderL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.6f, baseY + TORSO_HEIGHT * 0.85f, zombie->position.z };
-    Vector3 shoulderR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.6f, baseY + TORSO_HEIGHT * 0.85f, zombie->position.z };
-    Vector3 hipL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.35f, baseY, zombie->position.z };
-    Vector3 hipR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.35f, baseY, zombie->position.z };
+    Vector3 shoulderL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
+    Vector3 shoulderR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
+    Vector3 hipL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.35f, hipY, zombie->position.z };
+    Vector3 hipR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.35f, hipY, zombie->position.z };
 
     float armSwing = walk * 0.5f;
     float legSwing = walk * 0.6f;
 
-    DrawLimb(zombie->leftUpperArm, shoulderL, (Vector3){ -0.6f, -0.8f, 0 }, armSwing, ARM_UPPER_LEN, shirtColor);
-    DrawLimb(zombie->leftLowerArm, Vector3Add(shoulderL, (Vector3){ -0.6f * ARM_UPPER_LEN, -0.8f * ARM_UPPER_LEN, 0 }), (Vector3){ -0.5f, -0.85f, 0 }, armSwing * 1.3f, ARM_LOWER_LEN, skinColor);
+    Vector3 playerPos = camera.position;
+    float distToPlayer = Vector3Length(Vector3Subtract(playerPos, zombie->position));
+    bool reaching = distToPlayer < REACH_DIST;
+    float armAngleX = reaching ? -1.2f : -0.6f;
+    float armAngleY = reaching ? 0.3f : -0.8f;
 
-    DrawLimb(zombie->rightUpperArm, shoulderR, (Vector3){ 0.6f, -0.8f, 0 }, -armSwing, ARM_UPPER_LEN, shirtColor);
-    DrawLimb(zombie->rightLowerArm, Vector3Add(shoulderR, (Vector3){ 0.6f * ARM_UPPER_LEN, -0.8f * ARM_UPPER_LEN, 0 }), (Vector3){ 0.5f, -0.85f, 0 }, -armSwing * 1.3f, ARM_LOWER_LEN, skinColor);
+    DrawLimb(zombie->leftUpperArm, shoulderL, (Vector3){ armAngleX, armAngleY, 0 }, armSwing, ARM_UPPER_LEN, shirtColor);
+    DrawLimb(zombie->leftLowerArm, Vector3Add(shoulderL, (Vector3){ armAngleX * ARM_UPPER_LEN, armAngleY * ARM_UPPER_LEN, 0 }), (Vector3){ armAngleX * 0.7f, armAngleY * 0.8f, 0 }, armSwing * 1.3f, ARM_LOWER_LEN, skinColor);
+
+    DrawLimb(zombie->rightUpperArm, shoulderR, (Vector3){ -armAngleX, armAngleY, 0 }, -armSwing, ARM_UPPER_LEN, shirtColor);
+    DrawLimb(zombie->rightLowerArm, Vector3Add(shoulderR, (Vector3){ -armAngleX * ARM_UPPER_LEN, armAngleY * ARM_UPPER_LEN, 0 }), (Vector3){ -armAngleX * 0.7f, armAngleY * 0.8f, 0 }, -armSwing * 1.3f, ARM_LOWER_LEN, skinColor);
 
     DrawLimb(zombie->leftUpperLeg, hipL, (Vector3){ -0.2f, -1.0f, 0 }, -legSwing, LEG_UPPER_LEN, pantsColor);
     DrawLimb(zombie->leftLowerLeg, Vector3Add(hipL, (Vector3){ -0.2f * LEG_UPPER_LEN, -1.0f * LEG_UPPER_LEN, 0 }), (Vector3){ -0.15f, -1.0f, 0 }, -legSwing * 1.2f, LEG_LOWER_LEN, pantsColor);
 
     DrawLimb(zombie->rightUpperLeg, hipR, (Vector3){ 0.2f, -1.0f, 0 }, legSwing, LEG_UPPER_LEN, pantsColor);
     DrawLimb(zombie->rightLowerLeg, Vector3Add(hipR, (Vector3){ 0.2f * LEG_UPPER_LEN, -1.0f * LEG_UPPER_LEN, 0 }), (Vector3){ 0.15f, -1.0f, 0 }, legSwing * 1.2f, LEG_LOWER_LEN, pantsColor);
-
-    if (zombie->type == ZOMBIE_TYPE_IMAGE_HEAD && headTextureCount > 0 && zombie->textureIndex < headTextureCount) {
-        if (headTextures[zombie->textureIndex].id != 0) {
-            rlDisableDepthTest();
-            DrawBillboard(camera, headTextures[zombie->textureIndex], headPos, 1.0f, WHITE);
-            rlEnableDepthTest();
-        }
-    }
 }
 
 void ZombieShutdown(Zombie *zombie) {

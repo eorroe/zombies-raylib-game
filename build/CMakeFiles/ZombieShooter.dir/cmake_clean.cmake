@@ -27,6 +27,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ZombieShooter.dir/src/weapon.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/zombie.c.o"
   "CMakeFiles/ZombieShooter.dir/src/zombie.c.o.d"
+  "CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o"
+  "CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o.d"
   "ZombieShooter"
   "ZombieShooter.pdb"
 )

@@ -43,6 +43,10 @@ typedef struct {
     Model leftLowerLeg;
     Model rightUpperLeg;
     Model rightLowerLeg;
+    Model leftHandModel;
+    Model rightHandModel;
+    Model leftFootModel;
+    Model rightFootModel;
     Texture2D skinTex;
     Texture2D skinNormal;
     Texture2D shirtTex;

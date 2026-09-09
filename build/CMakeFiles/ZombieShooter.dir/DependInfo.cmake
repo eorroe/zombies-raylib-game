@@ -22,6 +22,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/ui.c" "CMakeFiles/ZombieShooter.dir/src/ui.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/ui.c.o.d"
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/weapon.c" "CMakeFiles/ZombieShooter.dir/src/weapon.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/weapon.c.o.d"
   "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/zombie.c" "CMakeFiles/ZombieShooter.dir/src/zombie.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/zombie.c.o.d"
+  "/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/zombie_mesh.c" "CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o" "gcc" "CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o.d"
   )
 
 # Targets to which this target links.

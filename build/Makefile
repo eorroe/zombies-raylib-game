@@ -465,6 +465,30 @@ src/zombie.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/zombie.c.s
 .PHONY : src/zombie.c.s
 
+src/zombie_mesh.o: src/zombie_mesh.c.o
+.PHONY : src/zombie_mesh.o
+
+# target to build an object file
+src/zombie_mesh.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o
+.PHONY : src/zombie_mesh.c.o
+
+src/zombie_mesh.i: src/zombie_mesh.c.i
+.PHONY : src/zombie_mesh.i
+
+# target to preprocess a source file
+src/zombie_mesh.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.i
+.PHONY : src/zombie_mesh.c.i
+
+src/zombie_mesh.s: src/zombie_mesh.c.s
+.PHONY : src/zombie_mesh.s
+
+# target to generate assembly for a file
+src/zombie_mesh.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.s
+.PHONY : src/zombie_mesh.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -516,6 +540,9 @@ help:
 	@echo "... src/zombie.o"
 	@echo "... src/zombie.i"
 	@echo "... src/zombie.s"
+	@echo "... src/zombie_mesh.o"
+	@echo "... src/zombie_mesh.i"
+	@echo "... src/zombie_mesh.s"
 .PHONY : help
 
 

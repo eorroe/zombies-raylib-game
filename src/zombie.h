@@ -46,6 +46,7 @@ typedef struct {
     Texture2D shirtTex;
     Texture2D pantsTex;
     float speed;
+    float damageFlashTimer;
 } Zombie;
 
 void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants);

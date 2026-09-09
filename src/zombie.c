@@ -71,6 +71,7 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
         }
     }
     if (zombie->attackCooldown > 0) zombie->attackCooldown -= dt;
+    if (zombie->damageFlashTimer > 0.0f) zombie->damageFlashTimer -= dt;
 }
 
 static void DrawLimb(Model model, Vector3 origin, Vector3 axis, float angle, float length) {
@@ -84,9 +85,28 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     float walk = sinf(zombie->walkCycle);
     float feetY = zombie->position.y + bob;
 
+    float flash = 0.0f;
+    if (zombie->damageFlashTimer > 0.0f) {
+        flash = (sinf(zombie->damageFlashTimer * 20.0f) > 0.0f) ? 1.0f : 0.0f;
+    }
+    
     Color skinColor = (Color){ 255, 100, 100, 255 };
     Color shirtColor = (Color){ 255, 30, 30, 255 };
     Color pantsColor = (Color){ 30, 30, 255, 255 };
+    Color flashRed = (Color){ 255, 0, 0, 255 };
+    
+    Color bodyColor = (Color){
+        (unsigned char)(shirtColor.r + (flashRed.r - shirtColor.r) * flash),
+        (unsigned char)(shirtColor.g + (flashRed.g - shirtColor.g) * flash),
+        (unsigned char)(shirtColor.b + (flashRed.b - shirtColor.b) * flash),
+        255
+    };
+    Color headColor = (Color){
+        (unsigned char)(skinColor.r + (flashRed.r - skinColor.r) * flash),
+        (unsigned char)(skinColor.g + (flashRed.g - skinColor.g) * flash),
+        (unsigned char)(skinColor.b + (flashRed.b - skinColor.b) * flash),
+        255
+    };
     
     float hipY = feetY + LEG_UPPER_LEN + LEG_LOWER_LEN;
     float torsoCenterY = hipY + TORSO_HEIGHT * 0.5f;
@@ -94,7 +114,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
 
     Vector3 torsoPos = (Vector3){ zombie->position.x, torsoCenterY, zombie->position.z };
     SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
-    DrawModelEx(zombie->bodyModel, torsoPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 50, 50, 255 });
+    DrawModelEx(zombie->bodyModel, torsoPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, bodyColor);
 
     Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };
     if (zombie->type == ZOMBIE_TYPE_IMAGE_HEAD && headTextureCount > 0 && zombie->textureIndex < headTextureCount) {
@@ -106,7 +126,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     } else {
         SetModelTexture(&zombie->headModel, zombie->skinTex);
     }
-    DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 80, 80, 255 });
+    DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, headColor);
 
     Vector3 shoulderL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
     Vector3 shoulderR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
@@ -153,7 +173,9 @@ bool ZombieIsAlive(Zombie *zombie) {
 }
 
 void ZombieTakeDamage(Zombie *zombie, float damage) {
-    zombie->health -= damage;
+    (void)damage;
+    zombie->health -= zombie->maxHealth * 0.25f;
+    zombie->damageFlashTimer = 0.5f;
     if (zombie->health <= 0) {
         zombie->active = false;
     }

@@ -196,6 +196,8 @@ void UIRender(const MenuState *menu) {
     const char *zombieModeText = (menu->zombieMode == ZOMBIE_MODE_MIXED) ? "MIXED" : "ALL IMAGES";
     const char *items[] = { "START GAME", TextFormat("MODE: %s", modeText), TextFormat("ZOMBIE MODE: %s", zombieModeText), "UPLOAD IMAGES", "QUIT" };
     
+    DrawText("Each zombie kill: +100 score | Kills counter tracks total dead zombies", menu->screenWidth / 2 - MeasureText("Each zombie kill: +100 score | Kills counter tracks total dead zombies", 20) / 2, 20, 20, GRAY);
+    
     for (int i = 0; i < MENU_ITEM_COUNT; i++) {
         Rectangle btn = { menu->screenWidth / 2 - 150, startY + i * itemH, 300, 40 };
         Color col = (i == menu->selectedItem) ? RED : LIGHTGRAY;

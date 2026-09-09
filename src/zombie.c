@@ -67,7 +67,7 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
     if (zombie->dying) {
         zombie->deathTimer -= dt;
         if (zombie->deathTimer <= 0.0f) {
-            zombie->dying = false;
+            zombie->deathTimer = 0.0f;
         }
         if (zombie->attackCooldown > 0) zombie->attackCooldown -= dt;
         if (zombie->damageFlashTimer > 0.0f) zombie->damageFlashTimer -= dt;

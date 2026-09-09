@@ -75,7 +75,7 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
     player->isMoving = false;
     
     Vector3 cameraForward = (Vector3){ sinf(player->yaw), 0, cosf(player->yaw) };
-    Vector3 cameraRight = (Vector3){ cosf(player->yaw), 0, -sinf(player->yaw) };
+    Vector3 cameraRight = (Vector3){ -cosf(player->yaw), 0, sinf(player->yaw) };
     
     Vector3 moveDir = { 0 };
     if (input->upPressed) { moveDir = Vector3Add(moveDir, cameraForward); player->isMoving = true; }
@@ -90,7 +90,7 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
         player->animTime += dt * 8.0f;
     }
     
-    player->yaw += input->mouseDelta.x * 0.003f;
+    player->yaw -= input->mouseDelta.x * 0.003f;
     player->pitch -= input->mouseDelta.y * 0.003f;
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }
@@ -140,7 +140,7 @@ void PlayerTakeDamage(Player *player, float damage) {
 Vector3 PlayerGetForward(Player *player) {
     return (Vector3){
         sinf(player->yaw) * cosf(player->pitch),
-        sinf(player->pitch),
+        -sinf(player->pitch),
         cosf(player->yaw) * cosf(player->pitch)
     };
 }

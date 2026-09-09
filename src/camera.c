@@ -12,7 +12,7 @@ void CameraInit(GameCamera *cam, Player *player) {
     cam->target = player->position;
     cam->distance = 4.0f;
     cam->height = 2.0f;
-    cam->smoothSpeed = 8.0f;
+    cam->smoothSpeed = 5.0f;
     cam->firstPersonBlend = 0.0f;
     cam->isAiming = false;
 }
@@ -20,12 +20,17 @@ void CameraInit(GameCamera *cam, Player *player) {
 void CameraUpdate(GameCamera *cam, Player *player, float dt) {
     Vector3 forward = PlayerGetForward(player);
     
-    Vector3 behindOffset = (Vector3){ -sinf(player->yaw) * cam->distance, cam->height, -cosf(player->yaw) * cam->distance };
-    Vector3 tpPos = Vector3Add(player->position, behindOffset);
-    Vector3 tpTarget = Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 });
+    Vector3 desiredPos = Vector3Add(player->position, Vector3Scale(forward, -cam->distance));
+    desiredPos.y += cam->height;
     
+    Vector3 tpTarget = Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 });
     Vector3 fpPos = Vector3Add(player->position, (Vector3){ 0, 1.6f, 0 });
-    Vector3 fpTarget = Vector3Add(fpPos, forward);
+    Vector3 fpForward = (Vector3){
+        sinf(player->yaw) * cosf(player->pitch),
+        sinf(player->pitch),
+        cosf(player->yaw) * cosf(player->pitch)
+    };
+    Vector3 fpTarget = Vector3Add(fpPos, fpForward);
     
     if (cam->isAiming && cam->firstPersonBlend < 1.0f) {
         cam->firstPersonBlend += dt * 6.0f;
@@ -36,7 +41,7 @@ void CameraUpdate(GameCamera *cam, Player *player, float dt) {
     }
     
     float t = cam->firstPersonBlend;
-    cam->camera.position = Vector3Lerp(tpPos, fpPos, t);
+    cam->camera.position = Vector3Lerp(desiredPos, fpPos, t);
     cam->camera.target = Vector3Lerp(tpTarget, fpTarget, t);
 }
 

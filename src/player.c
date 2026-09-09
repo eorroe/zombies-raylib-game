@@ -140,7 +140,7 @@ void PlayerTakeDamage(Player *player, float damage) {
 Vector3 PlayerGetForward(Player *player) {
     return (Vector3){
         sinf(player->yaw) * cosf(player->pitch),
-        -sinf(player->pitch),
+        sinf(player->pitch),
         cosf(player->yaw) * cosf(player->pitch)
     };
 }

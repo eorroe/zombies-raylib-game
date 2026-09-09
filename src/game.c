@@ -212,10 +212,10 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    if (p.x < -24.0f) game->player.position.x = -24.0f;
-    if (p.x > 36.0f) game->player.position.x = 36.0f;
-    if (p.z < -16.0f) game->player.position.z = -16.0f;
-    if (p.z > 14.0f) game->player.position.z = 14.0f;
+    if (p.x < -25.0f) game->player.position.x = -25.0f;
+    if (p.x > 25.0f) game->player.position.x = 25.0f;
+    if (p.z < -25.0f) game->player.position.z = -25.0f;
+    if (p.z > 25.0f) game->player.position.z = 25.0f;
     if (p.y < 0.0f) game->player.position.y = 0.0f;
 }
 
@@ -304,10 +304,10 @@ static void GameApplyZombieCollisions(Game *game) {
             }
         }
         
-        if (p.x < -24.0f) game->zombies[i].position.x = -24.0f;
-        if (p.x > 36.0f) game->zombies[i].position.x = 36.0f;
-        if (p.z < -16.0f) game->zombies[i].position.z = -16.0f;
-        if (p.z > 14.0f) game->zombies[i].position.z = 14.0f;
+        if (p.x < -25.0f) game->zombies[i].position.x = -25.0f;
+        if (p.x > 25.0f) game->zombies[i].position.x = 25.0f;
+        if (p.z < -25.0f) game->zombies[i].position.z = -25.0f;
+        if (p.z > 25.0f) game->zombies[i].position.z = 25.0f;
         if (p.y < 0.0f) game->zombies[i].position.y = 0.0f;
     }
 }

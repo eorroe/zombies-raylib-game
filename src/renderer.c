@@ -96,11 +96,10 @@ void RendererDrawScene(Game *game) {
         DrawCylinderWires(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 255, 140, 140, 255 });
     }
 
-    for (int i = 0; i < 10; i++) {
-        float x = -18.0f + i * 4.0f;
-        Vector3 wallPos = { x, 0.75f, -10.0f };
-        DrawCube(wallPos, 4.5f, 1.5f, 0.6f, (Color){ 180, 175, 170, 255 });
-        DrawCubeWires(wallPos, 4.5f, 1.5f, 0.6f, (Color){ 255, 80, 80, 255 });
+    for (int i = 0; i < 1; i++) {
+        Vector3 wallPos = { 0, 0.75f, -10.0f };
+        DrawCube(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 180, 175, 170, 255 });
+        DrawCubeWires(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 255, 80, 80, 255 });
     }
 
     for (int i = 0; i < 12; i++) {

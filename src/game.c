@@ -7,12 +7,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-static void SpawnZombie(Game *game, Vector3 pos, ZombieType type) {
+static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     if (game->zombieCount >= MAX_ZOMBIES) return;
     int idx = game->zombieCount++;
-    int texIdx = 0;
     if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieHeadTextureCount > 0) {
-        texIdx = rand() % game->zombieHeadTextureCount;
+        texIdx = texIdx % game->zombieHeadTextureCount;
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
     ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieShirt, game->textures.zombiePants);
@@ -22,9 +21,29 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type) {
     }
 }
 
+static void SpawnImageZombie(Game *game, int texIdx) {
+    float angle = (float)rand() / RAND_MAX * 2.0f * PI;
+    float radius = 6.0f + rand() % 8;
+    Vector3 pos = {
+        cosf(angle) * radius,
+        0,
+        sinf(angle) * radius
+    };
+    SpawnZombie(game, pos, ZOMBIE_TYPE_IMAGE_HEAD, texIdx);
+}
+
 static void SpawnWave(Game *game) {
     game->round++;
     game->zombiesRemaining = 5 + game->round * 3;
+    game->nonImageDeathsSinceLastImage = 0;
+    bool usedImages[16] = { false };
+    int imageCount = 0;
+    if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
+        imageCount = game->zombieHeadTextureCount > 0 ? 1 : 0;
+    } else if (game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0) {
+        imageCount = 1;
+        usedImages[rand() % game->zombieHeadTextureCount] = true;
+    }
     for (int i = 0; i < game->zombiesRemaining; i++) {
         float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
         float radius = 6.0f + rand() % 8;
@@ -34,12 +53,17 @@ static void SpawnWave(Game *game) {
             sinf(angle) * radius
         };
         ZombieType type = ZOMBIE_TYPE_DEFAULT;
+        int texIdx = 0;
         if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
             type = ZOMBIE_TYPE_IMAGE_HEAD;
-        } else if (game->zombieMode == ZOMBIE_MODE_MIXED && rand() % 10 == 0 && game->zombieHeadTextureCount > 0) {
+            texIdx = i % game->zombieHeadTextureCount;
+        } else if (game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0 && i == 0 && imageCount > 0) {
             type = ZOMBIE_TYPE_IMAGE_HEAD;
+            for (int j = 0; j < game->zombieHeadTextureCount; j++) {
+                if (usedImages[j]) { texIdx = j; break; }
+            }
         }
-        SpawnZombie(game, pos, type);
+        SpawnZombie(game, pos, type, texIdx);
     }
 }
 
@@ -50,6 +74,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->score = 0;
     game->totalDeadZombies = 0;
     game->round = 0;
+    game->nonImageDeathsSinceLastImage = 0;
     game->gameTime = 0.0f;
     game->scopeActive = false;
     game->firstShotFired = false;
@@ -341,6 +366,29 @@ void GameUpdate(Game *game, float dt, InputState *input) {
             if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
                 game->score += 100;
                 game->totalDeadZombies += 1;
+                if (game->zombies[hit.zombieIndex].type == ZOMBIE_TYPE_DEFAULT) {
+                    game->nonImageDeathsSinceLastImage++;
+                    if (game->mode == GAME_MODE_ENDLESS && game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0 && game->nonImageDeathsSinceLastImage >= 3) {
+                        game->nonImageDeathsSinceLastImage = 0;
+                        int usedImages[16] = { false };
+                        for (int k = 0; k < game->zombieCount; k++) {
+                            if (game->zombies[k].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombies[k].active) {
+                                if (game->zombies[k].textureIndex >= 0 && game->zombies[k].textureIndex < 16) {
+                                    usedImages[game->zombies[k].textureIndex] = true;
+                                }
+                            }
+                        }
+                        int available[16];
+                        int availCount = 0;
+                        for (int j = 0; j < game->zombieHeadTextureCount && j < 16; j++) {
+                            if (!usedImages[j]) available[availCount++] = j;
+                        }
+                        if (availCount > 0) {
+                            int texIdx = available[rand() % availCount];
+                            SpawnImageZombie(game, texIdx);
+                        }
+                    }
+                }
                 DebugLogf(&game->debug, DEBUG_INFO, "Score: %d", game->score);
                 AudioPlayZombieGrowl(&game->audio);
                 Vector3 deathPos = game->zombies[hit.zombieIndex].position;

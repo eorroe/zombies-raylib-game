@@ -402,6 +402,7 @@ void GameRender(Game *game) {
     WeaponRender(&game->weapon, cam);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
+    RendererDrawZombieHeads(game);
     RendererDrawHUD(game);
     
     if (game->debug.enabled) DebugRender(&game->debug, 1280, 720);

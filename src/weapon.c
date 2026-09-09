@@ -113,12 +113,10 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt
     if (weapon->reloading) {
         weapon->reloadTimer -= dt;
         if (weapon->reloadTimer <= 0) {
-    weapon->cooldown = 0.0f;
-    weapon->ammo = MAX_AMMO;
+            weapon->ammo = MAX_AMMO;
             weapon->reloading = false;
         }
     }
-    if (weapon->cooldown > 0) weapon->cooldown -= dt;
     if (weapon->recoil > 0) weapon->recoil -= dt * 2.0f;
     if (weapon->muzzleFlashTimer > 0) weapon->muzzleFlashTimer -= dt;
     
@@ -183,7 +181,6 @@ void WeaponRender(Weapon *weapon, Camera3D camera, float yaw) {
 
 void WeaponShoot(Weapon *weapon) {
     if (!WeaponCanShoot(weapon)) return;
-    weapon->cooldown = WEAPON_FIRE_RATE;
     weapon->ammo--;
     weapon->recoil = 1.0f;
     weapon->muzzleFlashTimer = 0.05f;
@@ -196,7 +193,7 @@ void WeaponReload(Weapon *weapon) {
 }
 
 bool WeaponCanShoot(Weapon *weapon) {
-    return weapon->cooldown <= 0 && weapon->ammo > 0 && !weapon->reloading;
+    return weapon->ammo > 0 && !weapon->reloading;
 }
 
 void WeaponApplyRecoil(Weapon *weapon) {

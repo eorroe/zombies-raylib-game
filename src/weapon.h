@@ -7,7 +7,7 @@
 
 #define WEAPON_DAMAGE 25.0f
 #define WEAPON_RANGE 100.0f
-#define WEAPON_FIRE_RATE 0.15f
+#define WEAPON_FIRE_RATE 0.0f
 #define SCOPE_FOV 15.0f
 #define SCOPE_ZOOM 4.0f
 #define MAX_AMMO 30

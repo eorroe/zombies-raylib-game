@@ -196,7 +196,7 @@ void WeaponReload(Weapon *weapon) {
 }
 
 bool WeaponCanShoot(Weapon *weapon) {
-    return weapon->cooldown <= 0 && weapon->ammo > 0 && !weapon->reloading;
+    return weapon->cooldown <= 0;
 }
 
 void WeaponApplyRecoil(Weapon *weapon) {

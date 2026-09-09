@@ -354,7 +354,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         CameraSetAiming(&game->camera, true);
     }
     
-    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
+    if (input->mouseLeftDown && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         CameraSetAiming(&game->camera, false);

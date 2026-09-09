@@ -353,7 +353,6 @@ void GameRender(Game *game) {
     RendererDrawScene(game);
     RendererDrawBloodDecals(game);
     RendererDrawZombies(game, game->shaders.pbr);
-    RendererDrawPlayer(&game->player, game->shaders.pbr);
     WeaponRender(&game->weapon, cam);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);

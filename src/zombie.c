@@ -108,6 +108,16 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     }
     DrawModelEx(zombie->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 80, 80, 255 });
 
+    if (zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
+        Vector3 barPos = (Vector3){ zombie->position.x, headCenterY + HEAD_RADIUS + 0.25f, zombie->position.z };
+        Vector2 barScreen = GetWorldToScreen(barPos, camera);
+        float barWidth = 40.0f;
+        float barHeight = 4.0f;
+        float healthPct = (zombie->maxHealth > 0.0f) ? (zombie->health / zombie->maxHealth) : 0.0f;
+        DrawRectangle(barScreen.x - barWidth / 2, barScreen.y - barHeight / 2, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
+        DrawRectangle(barScreen.x - barWidth / 2, barScreen.y - barHeight / 2, barWidth * healthPct, barHeight, RED);
+    }
+
     Vector3 shoulderL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
     Vector3 shoulderR = (Vector3){ zombie->position.x + TORSO_WIDTH * 0.6f, torsoCenterY + TORSO_HEIGHT * 0.35f, zombie->position.z };
     Vector3 hipL = (Vector3){ zombie->position.x - TORSO_WIDTH * 0.35f, hipY, zombie->position.z };

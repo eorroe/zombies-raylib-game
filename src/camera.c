@@ -20,8 +20,8 @@ void CameraInit(GameCamera *cam, Player *player) {
 void CameraUpdate(GameCamera *cam, Player *player, float dt) {
     Vector3 forward = PlayerGetForward(player);
     
-    Vector3 tpPos = Vector3Add(player->position, Vector3Scale(forward, -cam->distance));
-    tpPos.y += cam->height;
+    Vector3 behindOffset = (Vector3){ -sinf(player->yaw) * cam->distance, cam->height, -cosf(player->yaw) * cam->distance };
+    Vector3 tpPos = Vector3Add(player->position, behindOffset);
     Vector3 tpTarget = Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 });
     
     Vector3 fpPos = Vector3Add(player->position, (Vector3){ 0, 1.6f, 0 });

@@ -90,7 +90,7 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
         player->animTime += dt * 8.0f;
     }
     
-    player->yaw -= input->mouseDelta.x * 0.003f;
+    player->yaw += input->mouseDelta.x * 0.003f;
     player->pitch -= input->mouseDelta.y * 0.003f;
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }

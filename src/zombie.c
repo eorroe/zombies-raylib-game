@@ -69,6 +69,15 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     Color skinColor = (Color){ 100, 120, 85, 255 };
     Color shirtColor = (Color){ 60, 65, 55, 255 };
     Color pantsColor = (Color){ 40, 40, 50, 255 };
+    
+    int colorVar = (int)(zombie->position.x * 10.0f + zombie->position.z * 10.0f) % 3;
+    if (colorVar == 1) {
+        shirtColor = (Color){ 70, 55, 50, 255 };
+        pantsColor = (Color){ 45, 40, 55, 255 };
+    } else if (colorVar == 2) {
+        shirtColor = (Color){ 55, 70, 60, 255 };
+        pantsColor = (Color){ 35, 45, 45, 255 };
+    }
 
     float hipY = feetY + LEG_UPPER_LEN + LEG_LOWER_LEN;
     float torsoCenterY = hipY + TORSO_HEIGHT * 0.5f;

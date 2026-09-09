@@ -30,6 +30,7 @@ typedef struct {
     bool scopeActive;
     Model model;
     float muzzleFlashTimer;
+    float swayTimer;
 } Weapon;
 
 void WeaponInit(Weapon *weapon);

@@ -4,14 +4,14 @@
 #include "raymath.h"
 
 void CameraInit(GameCamera *cam, Player *player) {
-    cam->camera.position = Vector3Add(player->position, (Vector3){ 0, 3.0f, 6.0f });
+    cam->camera.position = Vector3Add(player->position, (Vector3){ 0, 2.0f, 4.0f });
     cam->camera.target = Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 });
     cam->camera.up = (Vector3){ 0, 1, 0 };
     cam->camera.fovy = 60.0f;
     cam->camera.projection = CAMERA_PERSPECTIVE;
     cam->target = player->position;
-    cam->distance = 6.0f;
-    cam->height = 3.0f;
+    cam->distance = 4.0f;
+    cam->height = 2.0f;
     cam->smoothSpeed = 5.0f;
 }
 

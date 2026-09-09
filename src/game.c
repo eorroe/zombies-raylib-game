@@ -23,7 +23,7 @@ static void SpawnWave(Game *game) {
     game->zombiesRemaining = 5 + game->round * 3;
     for (int i = 0; i < game->zombiesRemaining; i++) {
         float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 15.0f + rand() % 10;  // was 20.0f + rand() % 10;
+        float radius = 10.0f + rand() % 8;
         Vector3 pos = {
             cosf(angle) * radius,
             0,
@@ -51,6 +51,8 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->particleCount = 0;
     game->bloodDecalCount = 0;
     game->zombieHeadTextureCount = 0;
+    game->muzzleFlashTimer = 0.0f;
+    game->muzzleFlashPos = (Vector3){ 0 };
     
     PlayerInit(&game->player, (Vector3){ 0, 0, 0 });
     WeaponInit(&game->weapon);
@@ -141,6 +143,9 @@ void GameUpdate(Game *game, float dt) {
                 }
             }
         }
+        
+        game->muzzleFlashPos = game->weapon.position;
+        game->muzzleFlashTimer = 0.05f;
     }
     
     if (IsKeyPressed(KEY_R)) WeaponReload(&game->weapon);
@@ -149,6 +154,8 @@ void GameUpdate(Game *game, float dt) {
     else CameraApplyScope(&game->camera, false);
     
     ParticleSystemUpdate(game->particles, game->particleCount, dt);
+    
+    if (game->muzzleFlashTimer > 0) game->muzzleFlashTimer -= dt;
     
     bool allDead = true;
     for (int i = 0; i < game->zombieCount; i++) {
@@ -166,6 +173,7 @@ void GameRender(Game *game) {
     RendererDrawBloodDecals(game);
     RendererDrawZombies(game, game->shaders.pbr);
     RendererDrawPlayer(&game->player, game->shaders.pbr);
+    WeaponRender(&game->weapon, cam);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
     

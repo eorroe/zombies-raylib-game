@@ -9,7 +9,7 @@ void PlayerInit(Player *player, Vector3 startPos) {
     player->maxHealth = PLAYER_HEALTH;
     player->yaw = 0.0f;
     player->pitch = 0.0f;
-    player->model = LoadModelFromMesh(GenMeshCylinder(0.5f, 1.8f, 8));
+    player->model = LoadModelFromMesh(GenMeshCylinder(0.35f, 1.6f, 8));
     player->isMoving = false;
     player->footstepTimer = 0.0f;
 }
@@ -43,7 +43,8 @@ void PlayerUpdate(Player *player, Camera3D camera, float dt) {
 }
 
 void PlayerRender(Player *player, Shader shader) {
-    DrawModelEx(player->model, player->position, (Vector3){ 0, 1, 0 }, player->yaw * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    (void)shader;
+    (void)player;
 }
 
 void PlayerShutdown(Player *player) {

@@ -77,6 +77,10 @@ static const char *postFragShader =
     "    col += grain;\n"
     "    float bloom = smoothstep(0.8, 1.0, max(col.r, max(col.g, col.b))) * 0.3;\n"
     "    col += bloom;\n"
+    "    float fog = smoothstep(0.4, 0.9, length(uv - 0.5) * 1.2);\n"
+    "    col = mix(col, vec3(0.7, 0.85, 1.0), fog * 0.4);\n"
+    "    col.r *= 1.05;\n"
+    "    col.b *= 0.95;\n"
     "    col = pow(col, vec3(1.0 / 2.2));\n"
     "    finalColor = vec4(col, 1.0);\n"
     "}\n";

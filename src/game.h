@@ -40,6 +40,8 @@ typedef struct Game {
     int particleCount;
     Vector3 bloodDecals[128];
     int bloodDecalCount;
+    Vector3 muzzleFlashPos;
+    float muzzleFlashTimer;
     AudioManager audio;
     ProceduralTextures textures;
     ImageUpload imageUpload;

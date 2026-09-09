@@ -7,6 +7,7 @@
 
 #define WEAPON_DAMAGE 25.0f
 #define WEAPON_RANGE 100.0f
+#define WEAPON_FIRE_RATE 0.15f
 #define SCOPE_FOV 15.0f
 #define SCOPE_ZOOM 4.0f
 #define MAX_AMMO 30
@@ -22,6 +23,7 @@ typedef struct {
 typedef struct {
     Vector3 position;
     Vector3 direction;
+    float cooldown;
     int ammo;
     bool reloading;
     float reloadTimer;

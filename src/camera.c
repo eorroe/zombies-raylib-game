@@ -25,7 +25,7 @@ void CameraUpdate(GameCamera *cam, Player *player, float dt) {
     Vector3 tpTarget = Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 });
     
     Vector3 fpPos = Vector3Add(player->position, (Vector3){ 0, 1.6f, 0 });
-    Vector3 fpTarget = Vector3Add(player->position, forward);
+    Vector3 fpTarget = Vector3Add(fpPos, forward);
     
     if (cam->isAiming && cam->firstPersonBlend < 1.0f) {
         cam->firstPersonBlend += dt * 6.0f;

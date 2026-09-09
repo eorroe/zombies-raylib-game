@@ -46,8 +46,8 @@ void PlayerInit(Player *player, Vector3 startPos) {
 
     player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
     player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
-    player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
-    player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->leftLegModel = CreateLimbPivoted(0.1f, PLAYER_LEG_LENGTH, 8);
+    player->rightLegModel = CreateLimbPivoted(0.1f, PLAYER_LEG_LENGTH, 8);
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
     for (int i = 0; i < 800; i++) {
@@ -160,10 +160,8 @@ void PlayerRender(Player *player, Shader shader) {
 
     float leftLegAngle = -legSwing * RAD2DEG;
     float rightLegAngle = legSwing * RAD2DEG;
-    Vector3 leftLegPos = Vector3Add(leftHip, (Vector3){ 0, PLAYER_LEG_LENGTH * 0.5f, 0 });
-    Vector3 rightLegPos = Vector3Add(rightHip, (Vector3){ 0, PLAYER_LEG_LENGTH * 0.5f, 0 });
-    DrawModelEx(player->leftLegModel, leftLegPos, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightLegPos, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {

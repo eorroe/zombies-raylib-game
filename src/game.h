@@ -20,6 +20,7 @@ typedef struct Game {
     GameMode mode;
     ZombieMode zombieMode;
     int score;
+    int totalDeadZombies;
     int round;
     int zombiesRemaining;
     float gameTime;

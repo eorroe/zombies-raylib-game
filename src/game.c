@@ -48,6 +48,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     DebugLog(&game->debug, "Game started", DEBUG_SUCCESS);
     game->state = GAME_STATE_PLAYING;
     game->score = 0;
+    game->totalDeadZombies = 0;
     game->round = 0;
     game->gameTime = 0.0f;
     game->scopeActive = false;

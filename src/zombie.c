@@ -105,7 +105,8 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
 
     float flash = 0.0f;
     if (zombie->damageFlashTimer > 0.0f) {
-        flash = (sinf(zombie->damageFlashTimer * 20.0f) > 0.0f) ? 1.0f : 0.0f;
+        float cycle = fmodf(zombie->damageFlashTimer, 1.0f);
+        if (cycle < 0.5f) flash = 1.0f;
     }
     
     Color skinColor = (Color){ 255, 100, 100, 255 };
@@ -218,7 +219,7 @@ bool ZombieIsAlive(Zombie *zombie) {
 void ZombieTakeDamage(Zombie *zombie, float damage) {
     (void)damage;
     zombie->health -= zombie->maxHealth * 0.25f;
-    zombie->damageFlashTimer = 0.5f;
+    zombie->damageFlashTimer = 2.0f;
     if (zombie->health <= 0 && !zombie->dying) {
         zombie->dying = true;
         zombie->deathTimer = 3.0f;

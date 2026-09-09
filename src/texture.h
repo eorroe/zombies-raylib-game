@@ -11,6 +11,8 @@ typedef struct {
     Texture2D concrete;
     Texture2D defaultZombieHead;
     Texture2D metal;
+    Texture2D darkMetal;
+    Texture2D grip;
     bool generated;
 } ProceduralTextures;
 

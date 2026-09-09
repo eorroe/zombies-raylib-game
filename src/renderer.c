@@ -72,7 +72,7 @@ void RendererDrawScene(Game *game) {
     if (game->floorModel.meshCount > 0) {
         DrawModel(game->floorModel, (Vector3){ 0, 0, 0 }, 1.0f, WHITE);
     } else {
-        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 50, 50, 55, 255 });
+        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 90, 90, 95, 255 });
     }
 
     Vector3 lightDir = Vector3Normalize((Vector3){ 0.5f, 1.0f, 0.3f });
@@ -115,8 +115,8 @@ void RendererDrawScene(Game *game) {
         if (game->crateModel.meshCount > 0) {
             DrawModel(game->crateModel, cratePos, 1.0f, WHITE);
         } else {
-            DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 80, 70, 60, 255 });
-            DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 50, 45, 40, 255 });
+            DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 140, 120, 100, 255 });
+            DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 80, 70, 60, 255 });
         }
     }
 
@@ -131,8 +131,8 @@ void RendererDrawScene(Game *game) {
         if (game->barrelModel.meshCount > 0) {
             DrawModel(game->barrelModel, barrelPos, 1.0f, WHITE);
         } else {
-            DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 100, 90, 70, 255 });
-            DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 60, 55, 45, 255 });
+            DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 160, 140, 110, 255 });
+            DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 100, 90, 75, 255 });
         }
     }
 
@@ -142,8 +142,8 @@ void RendererDrawScene(Game *game) {
         if (game->wallModel.meshCount > 0) {
             DrawModel(game->wallModel, wallPos, 1.0f, WHITE);
         } else {
-            DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 90, 85, 80, 255 });
-            DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 55, 50, 45, 255 });
+            DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 150, 145, 140, 255 });
+            DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 90, 85, 80, 255 });
         }
     }
 
@@ -155,17 +155,17 @@ void RendererDrawScene(Game *game) {
         if (game->buildingModel.meshCount > 0) {
             DrawModelEx(game->buildingModel, bldPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, h / 3.0f, 1 }, WHITE);
         } else {
-            Color bldColor = (Color){ 75, 75, 80, 255 };
-            if (i % 3 == 1) bldColor = (Color){ 85, 80, 75, 255 };
-            else if (i % 3 == 2) bldColor = (Color){ 70, 75, 85, 255 };
+            Color bldColor = (Color){ 130, 130, 140, 255 };
+            if (i % 3 == 1) bldColor = (Color){ 150, 140, 130, 255 };
+            else if (i % 3 == 2) bldColor = (Color){ 120, 130, 150, 255 };
             DrawCube(bldPos, 2.5f, h, 2.5f, bldColor);
-            DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 45, 45, 50, 255 });
+            DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 80, 80, 90, 255 });
         }
 
         for (int w = 0; w < 3; w++) {
             float wx = x - 0.6f + w * 0.6f;
             float wy = h * 0.5f + 0.3f;
-            DrawCube((Vector3){ wx, wy, z + 1.26f }, 0.3f, 0.3f, 0.05f, (Color){ 40, 40, 50, 255 });
+            DrawCube((Vector3){ wx, wy, z + 1.26f }, 0.3f, 0.3f, 0.05f, (Color){ 60, 60, 70, 255 });
         }
     }
 
@@ -188,9 +188,9 @@ void RendererDrawBloodDecals(Game *game) {
         Vector3 pos = game->bloodDecals[i];
         pos.y = 0.02f;
         if (game->bloodDecalModel.meshCount > 0) {
-            DrawModel(game->bloodDecalModel, pos, 1.0f, WHITE);
+            DrawModelEx(game->bloodDecalModel, pos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 2.0f, 2.0f, 2.0f }, WHITE);
         } else {
-            DrawPlane(pos, (Vector2){ 1.5f, 1.5f }, (Color){ 140, 0, 0, 160 });
+            DrawPlane(pos, (Vector2){ 3.0f, 3.0f }, (Color){ 200, 0, 0, 200 });
         }
     }
 }
@@ -234,14 +234,14 @@ void RendererDrawPlayer(Player *player, Shader shader) {
 void RendererDrawParticles(Particle *particles, int count) {
     ParticleSystemRender(particles, count);
     
-    for (int i = 0; i < 50; i++) {
-        float t = GetTime() * 0.1f + i * 1.37f;
-        float x = sinf(t * 1.3f) * 15.0f;
-        float y = 0.2f + fmodf(t * 0.5f, 3.0f);
-        float z = cosf(t * 0.9f) * 15.0f;
+    for (int i = 0; i < 80; i++) {
+        float t = GetTime() * 0.15f + i * 2.17f;
+        float x = sinf(t * 1.3f) * 18.0f;
+        float y = 0.3f + fmodf(t * 0.4f, 4.0f);
+        float z = cosf(t * 0.9f) * 18.0f;
         Vector3 dustPos = { x, y, z };
-        float alpha = 0.3f + sinf(t + i) * 0.15f;
-        DrawSphere(dustPos, 0.08f, (Color){ 220, 220, 210, (unsigned char)(alpha * 255) });
+        float alpha = 0.4f + sinf(t + i) * 0.2f;
+        DrawSphere(dustPos, 0.12f, (Color){ 255, 255, 240, (unsigned char)(alpha * 255) });
     }
 }
 

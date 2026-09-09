@@ -23,7 +23,7 @@ static void SpawnWave(Game *game) {
     game->zombiesRemaining = 5 + game->round * 3;
     for (int i = 0; i < game->zombiesRemaining; i++) {
         float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 10.0f + rand() % 8;
+        float radius = 8.0f + rand() % 8;
         Vector3 pos = {
             cosf(angle) * radius,
             0,
@@ -161,13 +161,15 @@ void GameUpdate(Game *game, float dt) {
     DebugLogf(&game->debug, DEBUG_INFO, "Player health: %.1f", game->player.health);
     DebugLogf(&game->debug, DEBUG_INFO, "Zombies alive: %d", game->zombieCount);
     
+    bool invincible = game->gameTime < 3.0f;
+    
     for (int i = 0; i < game->zombieCount; i++) {
         ZombieUpdate(&game->zombies[i], game->player.position, dt);
-        if (ZombieIsAlive(&game->zombies[i]) && game->zombies[i].attackCooldown <= 0) {
+        if (!invincible && ZombieIsAlive(&game->zombies[i]) && game->zombies[i].attackCooldown <= 0) {
             float dist = Vector3Length(Vector3Subtract(game->zombies[i].position, game->player.position));
             if (dist < 2.0f) {
-                PlayerTakeDamage(&game->player, 10.0f);
-                game->zombies[i].attackCooldown = 1.0f;
+                PlayerTakeDamage(&game->player, 5.0f);
+                game->zombies[i].attackCooldown = 2.0f;
                 AudioPlayPlayerHit(&game->audio);
             }
         }
@@ -197,7 +199,7 @@ void GameUpdate(Game *game, float dt) {
                             (rand()%100-50)/25.0f
                         };
                         ParticleSpawn(&game->particles[game->particleCount++], deathPos,
-                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 160 + rand()%60, 0, 0, 255 });
+                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 200 + rand()%55, 0, 0, 255 });
                     }
                 }
                 if (game->bloodDecalCount < 128) {
@@ -209,7 +211,7 @@ void GameUpdate(Game *game, float dt) {
                         splashPos.y = 0.05f;
                         ParticleSpawn(&game->particles[game->particleCount++], splashPos,
                             (Vector3){ (rand()%100-50)/80.0f, 0.05f, (rand()%100-50)/80.0f },
-                            3.0f, PARTICLE_BLOOD, 0.2f + rand()%100/500.0f, (Color){ 140, 0, 0, 200 });
+                            3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 180, 0, 0, 220 });
                     }
                 }
             }
@@ -294,6 +296,7 @@ int main(void) {
     double startTime = GetTime();
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
+    int screenshotFrame = 150;
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);
@@ -337,7 +340,7 @@ int main(void) {
         
         EndDrawing();
         
-        if (screenshotPath && frameCount == 60) {
+        if (screenshotPath && frameCount == screenshotFrame) {
             TakeScreenshot(screenshotPath);
         }
         frameCount++;

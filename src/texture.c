@@ -10,88 +10,110 @@ static Image GenerateNoiseImage(int width, int height, float intensity) {
 
 static Image GenerateBloodTexture(int width, int height) {
     Image img = GenImageColor(width, height, BLANK);
-    for (int i = 0; i < 300; i++) {
+    for (int i = 0; i < 400; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int r = 20 + rand() % 40;
-        ImageDrawCircle(&img, x, y, r, (Color){ 120 + rand()%50, 0, 0, 160 + rand()%75 });
+        int r = 30 + rand() % 50;
+        ImageDrawCircle(&img, x, y, r, (Color){ 180 + rand()%50, 0, 0, 200 + rand()%55 });
     }
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 80; i++) {
         int x1 = rand() % width;
         int y1 = rand() % height;
-        int x2 = x1 + (rand()%40-20);
-        int y2 = y1 + (rand()%40-20);
-        ImageDrawLine(&img, x1, y1, x2, y2, (Color){ 100, 0, 0, 180 + rand()%60 });
+        int x2 = x1 + (rand()%60-30);
+        int y2 = y1 + (rand()%60-30);
+        ImageDrawLine(&img, x1, y1, x2, y2, (Color){ 160, 0, 0, 220 + rand()%35 });
     }
     return img;
 }
 
 static Image GenerateZombieSkin(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 70, 90, 55, 255 });
-    for (int i = 0; i < 800; i++) {
+    Image img = GenImageColor(width, height, (Color){ 140, 170, 110, 255 });
+    for (int i = 0; i < 1200; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int shade = 35 + rand() % 70;
-        ImageDrawPixel(&img, x, y, (Color){ shade, shade + 20, shade - 10, 255 });
+        int shade = 100 + rand() % 100;
+        ImageDrawPixel(&img, x, y, (Color){ shade, shade + 40, shade - 10, 255 });
     }
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 40; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int r = 2 + rand() % 5;
-        ImageDrawCircle(&img, x, y, r, (Color){ 50, 60, 40, 200 });
+        int r = 3 + rand() % 8;
+        ImageDrawCircle(&img, x, y, r, (Color){ 90, 120, 70, 220 });
     }
     return img;
 }
 
 static Image GenerateUniformTexture(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 40, 45, 55, 255 });
-    for (int i = 0; i < 400; i++) {
+    Image img = GenImageColor(width, height, (Color){ 90, 95, 110, 255 });
+    for (int i = 0; i < 600; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int shade = 30 + rand() % 40;
-        ImageDrawPixel(&img, x, y, (Color){ shade, shade + 5, shade + 15, 255 });
+        int shade = 70 + rand() % 60;
+        ImageDrawPixel(&img, x, y, (Color){ shade, shade + 8, shade + 20, 255 });
     }
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 50; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int r = 3 + rand() % 6;
-        ImageDrawCircle(&img, x, y, r, (Color){ 35, 40, 50, 180 });
+        int r = 4 + rand() % 8;
+        ImageDrawCircle(&img, x, y, r, (Color){ 70, 75, 90, 200 });
     }
     return img;
 }
 
 static Image GenerateConcreteTexture(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 70, 70, 75, 255 });
-    for (int i = 0; i < 1000; i++) {
+    Image img = GenImageColor(width, height, (Color){ 120, 120, 125, 255 });
+    for (int i = 0; i < 1500; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int shade = 55 + rand() % 30;
+        int shade = 100 + rand() % 40;
         ImageDrawPixel(&img, x, y, (Color){ shade, shade, shade + 5, 255 });
     }
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 8; i++) {
         int x1 = rand() % width;
         int y1 = rand() % height;
-        int x2 = x1 + (rand()%60-30);
-        int y2 = y1 + (rand()%60-30);
-        ImageDrawLine(&img, x1, y1, x2, y2, (Color){ 50, 50, 55, 100 });
+        int x2 = x1 + (rand()%80-40);
+        int y2 = y1 + (rand()%80-40);
+        ImageDrawLine(&img, x1, y1, x2, y2, (Color){ 90, 90, 95, 120 });
     }
     return img;
 }
 
 static Image GenerateMetalTexture(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 90, 90, 95, 255 });
+    Image img = GenImageColor(width, height, (Color){ 150, 150, 155, 255 });
+    for (int i = 0; i < 1000; i++) {
+        int x = rand() % width;
+        int y = rand() % height;
+        int shade = 120 + rand() % 50;
+        ImageDrawPixel(&img, x, y, (Color){ shade, shade, shade + 3, 255 });
+    }
+    for (int i = 0; i < 15; i++) {
+        int x = rand() % width;
+        int y = rand() % height;
+        int w = 3 + rand() % 6;
+        int h = 3 + rand() % 6;
+        ImageDrawRectangle(&img, x, y, w, h, (Color){ 100, 100, 105, 150 });
+    }
+    return img;
+}
+
+static Image GenerateDarkMetalTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 80, 80, 85, 255 });
+    for (int i = 0; i < 800; i++) {
+        int x = rand() % width;
+        int y = rand() % height;
+        int shade = 60 + rand() % 40;
+        ImageDrawPixel(&img, x, y, (Color){ shade, shade, shade + 2, 255 });
+    }
+    return img;
+}
+
+static Image GenerateGripTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 50, 40, 35, 255 });
     for (int i = 0; i < 600; i++) {
         int x = rand() % width;
         int y = rand() % height;
-        int shade = 70 + rand() % 40;
-        ImageDrawPixel(&img, x, y, (Color){ shade, shade, shade + 3, 255 });
-    }
-    for (int i = 0; i < 10; i++) {
-        int x = rand() % width;
-        int y = rand() % height;
-        int w = 2 + rand() % 4;
-        int h = 2 + rand() % 4;
-        ImageDrawRectangle(&img, x, y, w, h, (Color){ 60, 60, 65, 120 });
+        int shade = 35 + rand() % 30;
+        ImageDrawPixel(&img, x, y, (Color){ shade, shade - 5, shade - 10, 255 });
     }
     return img;
 }
@@ -104,6 +126,8 @@ void TextureGenerate(ProceduralTextures *textures) {
     textures->concrete = LoadTextureFromImage(GenerateConcreteTexture(256, 256));
     textures->defaultZombieHead = LoadTextureFromImage(GenerateZombieSkin(128, 128));
     textures->metal = LoadTextureFromImage(GenerateMetalTexture(256, 256));
+    textures->darkMetal = LoadTextureFromImage(GenerateDarkMetalTexture(256, 256));
+    textures->grip = LoadTextureFromImage(GenerateGripTexture(256, 256));
     textures->generated = true;
 }
 
@@ -158,6 +182,8 @@ void TextureShutdown(ProceduralTextures *textures) {
         UnloadTexture(textures->concrete);
         UnloadTexture(textures->defaultZombieHead);
         UnloadTexture(textures->metal);
+        UnloadTexture(textures->darkMetal);
+        UnloadTexture(textures->grip);
         textures->generated = false;
     }
 }

@@ -69,6 +69,7 @@ CMakeFiles/ZombieShooter.dir/src/camera.c.o: ../src/camera.c \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
   ../src/player.h \
+  ../src/input.h \
   ../src/weapon.h \
   ../src/zombie.h \
   ../src/texture.h \
@@ -152,10 +153,10 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   ../src/zombie.h \
   ../src/texture.h \
   ../src/player.h \
+  ../src/input.h \
   ../src/weapon.h \
   ../src/camera.h \
   ../src/ui.h \
-  ../src/input.h \
   ../src/image_upload.h \
   ../src/shader.h \
   ../src/particle.h \
@@ -368,6 +369,7 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   ../raylib_src/src/raylib.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
+  ../src/input.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -391,7 +393,39 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
-  ../src/texture.h
+  ../src/texture.h \
+  /usr/include/stdlib.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
+  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
+  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
+  /usr/include/x86_64-linux-gnu/sys/types.h \
+  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/time_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/timer_t.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+  /usr/include/endian.h \
+  /usr/include/x86_64-linux-gnu/bits/endian.h \
+  /usr/include/x86_64-linux-gnu/bits/endianness.h \
+  /usr/include/x86_64-linux-gnu/bits/byteswap.h \
+  /usr/include/x86_64-linux-gnu/bits/uintn-identity.h \
+  /usr/include/x86_64-linux-gnu/sys/select.h \
+  /usr/include/x86_64-linux-gnu/bits/select.h \
+  /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
+  /usr/include/x86_64-linux-gnu/bits/select2.h \
+  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
+  /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
+  /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
+  /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
+  /usr/include/alloca.h \
+  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
+  /usr/include/x86_64-linux-gnu/bits/stdlib.h
 
 CMakeFiles/ZombieShooter.dir/src/renderer.c.o: ../src/renderer.c \
   /usr/include/stdc-predef.h \
@@ -403,10 +437,10 @@ CMakeFiles/ZombieShooter.dir/src/renderer.c.o: ../src/renderer.c \
   ../src/zombie.h \
   ../src/texture.h \
   ../src/player.h \
+  ../src/input.h \
   ../src/weapon.h \
   ../src/camera.h \
   ../src/ui.h \
-  ../src/input.h \
   ../src/image_upload.h \
   ../src/shader.h \
   ../src/particle.h \
@@ -572,6 +606,7 @@ CMakeFiles/ZombieShooter.dir/src/weapon.c.o: ../src/weapon.c \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
   ../src/zombie.h \
   ../src/texture.h \
+  ../src/input.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -710,8 +745,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
 
 ../src/shader.h:
 
-../src/input.h:
-
 ../src/ui.h:
 
 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:
@@ -749,6 +782,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
 /usr/include/stdio.h:
 
 ../src/weapon.h:
+
+../src/input.h:
 
 ../src/player.h:
 

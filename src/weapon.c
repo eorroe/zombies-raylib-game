@@ -110,6 +110,7 @@ void WeaponInit(Weapon *weapon) {
 }
 
 void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt) {
+    (void)input;
     if (weapon->reloading) {
         weapon->reloadTimer -= dt;
         if (weapon->reloadTimer <= 0) {
@@ -121,21 +122,9 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt
     if (weapon->recoil > 0) weapon->recoil -= dt * 2.0f;
     if (weapon->muzzleFlashTimer > 0) weapon->muzzleFlashTimer -= dt;
     
-    if (input->mouseLeftDown) {
-        weapon->aimOffset.x += input->mouseDelta.x * 0.005f;
-        weapon->aimOffset.y -= input->mouseDelta.y * 0.005f;
-        weapon->aimOffset.x = Clamp(weapon->aimOffset.x, -0.3f, 0.3f);
-        weapon->aimOffset.y = Clamp(weapon->aimOffset.y, -0.2f, 0.2f);
-    } else {
-        weapon->aimOffset.x *= 0.85f;
-        weapon->aimOffset.y *= 0.85f;
-        if (fabsf(weapon->aimOffset.x) < 0.001f) weapon->aimOffset.x = 0.0f;
-        if (fabsf(weapon->aimOffset.y) < 0.001f) weapon->aimOffset.y = 0.0f;
-    }
-    
     weapon->position = playerPos;
-    weapon->position.x += 0.3f + weapon->aimOffset.x;
-    weapon->position.y += 0.8f + weapon->aimOffset.y;
+    weapon->position.x += 0.3f;
+    weapon->position.y += 0.8f;
     weapon->position.z += 0.2f;
     weapon->direction = (Vector3){ 0, 0, 1 };
     
@@ -155,8 +144,8 @@ void WeaponRender(Weapon *weapon, Camera3D camera) {
 
     float swayX = sinf(weapon->swayTimer) * 0.003f;
     float swayY = cosf(weapon->swayTimer * 0.7f) * 0.002f;
-    pos = Vector3Add(pos, Vector3Scale(right, swayX + weapon->aimOffset.x * 1.0f));
-    pos = Vector3Add(pos, Vector3Scale(up, swayY + weapon->aimOffset.y * 1.0f));
+    pos = Vector3Add(pos, Vector3Scale(right, swayX));
+    pos = Vector3Add(pos, Vector3Scale(up, swayY));
 
     Vector3 bodyPos = pos;
     DrawModelEx(g_weaponModels.body, bodyPos, up, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 100, 100, 255 });

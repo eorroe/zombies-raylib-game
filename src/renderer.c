@@ -209,10 +209,12 @@ void RendererDrawHUD(Game *game) {
         DrawText("RELOADING...", 600, 20, 30, YELLOW);
     }
     
-    int cx = game->sceneTarget.texture.width / 2;
-    int cy = game->sceneTarget.texture.height / 2;
-    DrawLine(cx - 10, cy, cx + 10, cy, RED);
-    DrawLine(cx, cy - 10, cx, cy + 10, RED);
+    if (CameraGetFirstPersonBlend(&game->camera) > 0.5f) {
+        int cx = game->sceneTarget.texture.width / 2;
+        int cy = game->sceneTarget.texture.height / 2;
+        DrawLine(cx - 10, cy, cx + 10, cy, RED);
+        DrawLine(cx, cy - 10, cx, cy + 10, RED);
+    }
 }
 
 void RendererDrawScope(Game *game) {

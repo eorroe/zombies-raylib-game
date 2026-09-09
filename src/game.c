@@ -279,9 +279,14 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
+    if (input->mouseLeftPressed) {
+        CameraSetAiming(&game->camera, true);
+    }
+    
     if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
+        CameraSetAiming(&game->camera, false);
         
         RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
         if (hit.hit) {
@@ -353,6 +358,9 @@ void GameRender(Game *game) {
     RendererDrawScene(game);
     RendererDrawBloodDecals(game);
     RendererDrawZombies(game, game->shaders.pbr);
+    if (CameraGetFirstPersonBlend(&game->camera) < 0.5f) {
+        RendererDrawPlayer(&game->player, game->shaders.pbr);
+    }
     WeaponRender(&game->weapon, cam);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);

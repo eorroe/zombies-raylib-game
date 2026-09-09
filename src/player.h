@@ -8,6 +8,7 @@
 #define PLAYER_HEALTH 100.0f
 #define PLAYER_HEIGHT 1.8f
 #define PLAYER_RADIUS 0.5f
+#define PLAYER_LEG_LENGTH 0.9f
 
 typedef struct {
     Vector3 position;

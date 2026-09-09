@@ -8,7 +8,7 @@
 static Model CreateLimbPivoted(float radius, float length, int slices) {
     Mesh m = GenMeshCylinder(radius, length, slices);
     for (int i = 0; i < m.vertexCount; i++) {
-        m.vertices[i * 3 + 1] += length * 0.5f;
+        m.vertices[i * 3 + 1] -= length * 0.5f;
     }
     Model model = LoadModelFromMesh(m);
     return model;
@@ -160,8 +160,10 @@ void PlayerRender(Player *player, Shader shader) {
 
     float leftLegAngle = -legSwing * RAD2DEG;
     float rightLegAngle = legSwing * RAD2DEG;
-    DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    Vector3 leftLegPos = Vector3Add(leftHip, (Vector3){ 0, PLAYER_LEG_LENGTH * 0.5f, 0 });
+    Vector3 rightLegPos = Vector3Add(rightHip, (Vector3){ 0, PLAYER_LEG_LENGTH * 0.5f, 0 });
+    DrawModelEx(player->leftLegModel, leftLegPos, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightLegModel, rightLegPos, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {

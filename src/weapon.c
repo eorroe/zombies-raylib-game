@@ -207,11 +207,11 @@ RayHitInfo WeaponRaycast(Weapon *weapon, Camera3D camera, Zombie *zombies, int z
     RayHitInfo result = { 0 };
     Vector3 dir = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
     Ray ray = { camera.position, dir };
-    float minDist = WEAPON_RANGE;
+    float minDist = 10000.0f;
     for (int i = 0; i < zombieCount; i++) {
         if (!ZombieIsAlive(&zombies[i])) continue;
         Vector3 zombieCenter = Vector3Add(zombies[i].position, (Vector3){ 0, 1.0f, 0 });
-        RayCollision col = GetRayCollisionSphere(ray, zombieCenter, 1.0f);
+        RayCollision col = GetRayCollisionSphere(ray, zombieCenter, 1.5f);
         if (col.hit && col.distance < minDist) {
             minDist = col.distance;
             result.hit = true;

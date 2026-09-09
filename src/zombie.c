@@ -142,7 +142,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     }
     
     SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
-    DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 0, 1, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
+    DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
     if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
         Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };

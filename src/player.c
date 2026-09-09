@@ -103,17 +103,21 @@ void PlayerRender(Player *player, Shader shader) {
     float legSwing = walk * 0.5f;
     float armSwing = walk * 0.3f;
 
+    float yawDeg = player->yaw * RAD2DEG;
+    float cosYaw = cosf(player->yaw);
+    float sinYaw = sinf(player->yaw);
+
     Vector3 bodyPos = player->position;
     bodyPos.y += 1.0f;
-    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
     Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
-    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f, 0.4f, 0 });
-    Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f, 0.4f, 0 });
-    Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f, -0.6f, 0 });
-    Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f, -0.6f, 0 });
+    Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
+    Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
+    Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f * cosYaw, -0.6f, -0.2f * sinYaw });
+    Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f * cosYaw, -0.6f, 0.2f * sinYaw });
 
     DrawModelEx(player->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
     DrawModelEx(player->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, -armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);

@@ -48,6 +48,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->gameTime = 0.0f;
     game->scopeActive = false;
     game->firstShotFired = false;
+    game->firstShotGraceTimer = 0.3f;
     game->zombieCount = 0;
     game->particleCount = 0;
     game->bloodDecalCount = 0;
@@ -289,6 +290,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     if (game->state != GAME_STATE_PLAYING) return;
     
     game->gameTime += dt;
+    if (game->firstShotGraceTimer > 0.0f) game->firstShotGraceTimer -= dt;
     PlayerUpdate(&game->player, input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
     WeaponUpdate(&game->weapon, game->player.position, input, dt);
@@ -322,7 +324,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         CameraSetAiming(&game->camera, true);
     }
     
-    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
+    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         CameraSetAiming(&game->camera, false);

@@ -25,6 +25,7 @@ typedef struct Game {
     float gameTime;
     bool scopeActive;
     bool firstShotFired;
+    float firstShotGraceTimer;
     
     Texture2D zombieHeadTextures[16];
     int zombieHeadTextureCount;

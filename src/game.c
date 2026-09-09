@@ -168,6 +168,48 @@ static void GameApplyCollisions(Game *game) {
     }
 }
 
+static void GameApplyZombieCollisions(Game *game) {
+    float radius = 0.4f;
+    for (int i = 0; i < game->zombieCount; i++) {
+        if (!ZombieIsAlive(&game->zombies[i])) continue;
+        Vector3 p = game->zombies[i].position;
+        for (int w = 0; w < 10; w++) {
+            float x = -18.0f + w * 4.0f;
+            Vector3 wallCenter = { x, 0.75f, -10.0f };
+            Vector3 wallSize = { 4.0f, 1.5f, 0.6f };
+            if (PointInAABB(p, wallCenter, wallSize)) {
+                float dx = p.x - wallCenter.x;
+                float dz = p.z - wallCenter.z;
+                float halfX = wallSize.x * 0.5f + radius;
+                float halfZ = wallSize.z * 0.5f + radius;
+                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                    game->zombies[i].position.x = wallCenter.x + (dx > 0 ? halfX : -halfX);
+                } else {
+                    game->zombies[i].position.z = wallCenter.z + (dz > 0 ? halfZ : -halfZ);
+                }
+            }
+        }
+        for (int b = 0; b < 12; b++) {
+            float x = -12.0f + b * 4.0f;
+            float z = 10.0f;
+            float h = 1.5f + (b % 3) * 1.0f;
+            Vector3 bldPos = { x, h * 0.5f, z };
+            Vector3 bldSize = { 3.5f, h, 3.5f };
+            if (PointInAABB(p, bldPos, bldSize)) {
+                float dx = p.x - bldPos.x;
+                float dz = p.z - bldPos.z;
+                float halfX = bldSize.x * 0.5f + radius;
+                float halfZ = bldSize.z * 0.5f + radius;
+                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                    game->zombies[i].position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
+                } else {
+                    game->zombies[i].position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
+                }
+            }
+        }
+    }
+}
+
 void GameUpdate(Game *game, float dt, InputState *input) {
     DebugUpdate(&game->debug, dt);
     if (IsKeyPressed(KEY_F1)) DebugToggle(&game->debug);
@@ -199,11 +241,13 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         }
     }
     
+    GameApplyZombieCollisions(game);
+    
     if (game->player.health <= 0) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
+    if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon)) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         
@@ -252,65 +296,6 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->muzzleFlashTimer = 0.05f;
     }
     
-    static float autoShootTimer = 0.0f;
-    if (game->gameTime > 0.5f && game->gameTime < 12.0f) {
-        autoShootTimer += dt;
-        if (autoShootTimer > 0.15f) {
-            autoShootTimer = 0.0f;
-            
-            int nearestIdx = -1;
-            float nearestDist = 9999.0f;
-            for (int i = 0; i < game->zombieCount; i++) {
-                if (!ZombieIsAlive(&game->zombies[i])) continue;
-                float d = Vector3Length(Vector3Subtract(game->zombies[i].position, game->player.position));
-                if (d < nearestDist) {
-                    nearestDist = d;
-                    nearestIdx = i;
-                }
-            }
-            
-            if (nearestIdx >= 0) {
-                Vector3 dir = Vector3Normalize(Vector3Subtract(game->zombies[nearestIdx].position, game->player.position));
-                game->player.yaw = atan2f(dir.x, dir.z);
-                game->player.pitch = -asinf(dir.y);
-                game->player.pitch = Clamp(game->player.pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
-            }
-            
-            WeaponShoot(&game->weapon);
-            AudioPlayGunshot(&game->audio);
-            RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
-            if (hit.hit) {
-                ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
-                if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
-                    game->score += 100;
-                    Vector3 deathPos = game->zombies[hit.zombieIndex].position;
-                    for (int p = 0; p < 80; p++) {
-                        if (game->particleCount < 256) {
-                            Vector3 bloodVel = {
-                                (rand()%100-50)/15.0f,
-                                (rand()%100)/8.0f,
-                                (rand()%100-50)/15.0f
-                            };
-                            ParticleSpawn(&game->particles[game->particleCount++], deathPos,
-                                bloodVel, 4.0f, PARTICLE_BLOOD, 0.2f + rand()%100/400.0f, (Color){ 255, 30, 30, 255 });
-                        }
-                    }
-                    if (game->bloodDecalCount < 128) {
-                        game->bloodDecals[game->bloodDecalCount++] = deathPos;
-                    }
-                }
-                for (int p = 0; p < 15; p++) {
-                    if (game->particleCount < 256) {
-                        ParticleSpawn(&game->particles[game->particleCount++], hit.point,
-                            (Vector3){ (rand()%100-50)/30.0f, (rand()%100-50)/30.0f, (rand()%100-50)/30.0f },
-                            2.0f, PARTICLE_BLOOD, 0.1f, RED);
-                    }
-                }
-            }
-            game->muzzleFlashPos = game->weapon.position;
-            game->muzzleFlashTimer = 0.08f;
-        }
-    }
     
     if (IsKeyPressed(KEY_R)) WeaponReload(&game->weapon);
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) game->scopeActive = !game->scopeActive;
@@ -388,10 +373,17 @@ int main(void) {
         InputUpdate(&input, game.menu.active);
         UIUpdate(&game.menu, &input, &game);
         
-        if (game.state == GAME_STATE_MENU || game.menu.active) {
-            EnableCursor();
-        } else if (game.state == GAME_STATE_PLAYING) {
-            DisableCursor();
+        static bool cursorEnabled = true;
+        if (game.state == GAME_STATE_PLAYING && !game.menu.active) {
+            if (cursorEnabled) {
+                DisableCursor();
+                cursorEnabled = false;
+            }
+        } else {
+            if (!cursorEnabled) {
+                EnableCursor();
+                cursorEnabled = true;
+            }
         }
         
         if (autoStart && frameCount == autoStartFrame && game.state == GAME_STATE_MENU) {

@@ -4,7 +4,7 @@
 #include "raymath.h"
 
 void CameraInit(GameCamera *cam, Player *player) {
-    cam->camera.position = Vector3Add(player->position, (Vector3){ 0, 2.0f, 4.0f });
+    cam->camera.position = Vector3Add(player->position, (Vector3){ 0, 2.0f, -4.0f });
     cam->camera.target = Vector3Add(player->position, (Vector3){ 0, 1.0f, 0 });
     cam->camera.up = (Vector3){ 0, 1, 0 };
     cam->camera.fovy = 60.0f;

@@ -208,6 +208,11 @@ void RendererDrawHUD(Game *game) {
     if (game->weapon.reloading) {
         DrawText("RELOADING...", 600, 20, 30, YELLOW);
     }
+    
+    int cx = game->sceneTarget.texture.width / 2;
+    int cy = game->sceneTarget.texture.height / 2;
+    DrawLine(cx - 10, cy, cx + 10, cy, RED);
+    DrawLine(cx, cy - 10, cx, cy + 10, RED);
 }
 
 void RendererDrawScope(Game *game) {
@@ -216,8 +221,8 @@ void RendererDrawScope(Game *game) {
 
 void RendererEnd(Game *game) {
     (void)game;
-    EndTextureMode();
     EndMode3D();
+    EndTextureMode();
 
     BeginShaderMode(game->shaders.postProcess);
     DrawTexture(game->sceneTarget.texture, 0, 0, WHITE);

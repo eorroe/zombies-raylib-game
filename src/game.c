@@ -75,7 +75,6 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     }
     
     SpawnWave(game);
-    DisableCursor();
 }
 
 static bool PointInAABB(Vector3 p, Vector3 center, Vector3 size) {
@@ -100,45 +99,70 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    if (PointInAABB(p, (Vector3){ 0, 0.75f, -10.0f }, (Vector3){ 20.0f, 1.5f, 0.4f })) {
-        game->player.position.z = -10.0f - 0.4f - radius;
-    }
-    
-    Vector3 buildingPositions[6];
-    float buildingSizes[6][3];
-    for (int i = 0; i < 6; i++) {
-        float x = -8.0f + i * 3.5f;
-        float z = 8.0f;
-        float h = 1.5f + (i % 3) * 1.0f;
-        buildingPositions[i] = (Vector3){ x, h * 0.5f, z };
-        buildingSizes[i][0] = 2.5f;
-        buildingSizes[i][1] = h;
-        buildingSizes[i][2] = 2.5f;
-        if (PointInAABB(p, buildingPositions[i], (Vector3){ buildingSizes[i][0], buildingSizes[i][1], buildingSizes[i][2] })) {
-            float dx = p.x - buildingPositions[i].x;
-            float dz = p.z - buildingPositions[i].z;
-            float halfX = buildingSizes[i][0] * 0.5f + radius;
-            float halfZ = buildingSizes[i][2] * 0.5f + radius;
+    for (int i = 0; i < 10; i++) {
+        float x = -18.0f + i * 4.0f;
+        Vector3 wallCenter = { x, 0.75f, -10.0f };
+        Vector3 wallSize = { 4.0f, 1.5f, 0.6f };
+        if (PointInAABB(p, wallCenter, wallSize)) {
+            float dx = p.x - wallCenter.x;
+            float dz = p.z - wallCenter.z;
+            float halfX = wallSize.x * 0.5f + radius;
+            float halfZ = wallSize.z * 0.5f + radius;
             if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
-                game->player.position.x = buildingPositions[i].x + (dx > 0 ? halfX : -halfX);
+                game->player.position.x = wallCenter.x + (dx > 0 ? halfX : -halfX);
             } else {
-                game->player.position.z = buildingPositions[i].z + (dz > 0 ? halfZ : -halfZ);
+                game->player.position.z = wallCenter.z + (dz > 0 ? halfZ : -halfZ);
             }
         }
     }
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 12; i++) {
+        float x = -12.0f + i * 4.0f;
+        float z = 10.0f;
+        float h = 1.5f + (i % 3) * 1.0f;
+        Vector3 bldPos = { x, h * 0.5f, z };
+        Vector3 bldSize = { 3.5f, h, 3.5f };
+        if (PointInAABB(p, bldPos, bldSize)) {
+            float dx = p.x - bldPos.x;
+            float dz = p.z - bldPos.z;
+            float halfX = bldSize.x * 0.5f + radius;
+            float halfZ = bldSize.z * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->player.position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->player.position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
+            }
+        }
+    }
+    
+    for (int i = 0; i < 16; i++) {
         float angle = i * PI * 0.25f;
-        float radius2 = 12.0f;
-        Vector3 cratePos = { cosf(angle) * radius2, 0.3f, sinf(angle) * radius2 };
-        if (PointInAABB(p, cratePos, (Vector3){ 0.6f, 0.6f, 0.6f })) {
+        float rad = 5.0f + (i % 3) * 3.0f;
+        Vector3 cratePos = { cosf(angle) * rad, 0.3f, sinf(angle) * rad };
+        if (PointInAABB(p, cratePos, (Vector3){ 1.0f, 1.0f, 1.0f })) {
             float dx = p.x - cratePos.x;
             float dz = p.z - cratePos.z;
             float dist2 = sqrtf(dx*dx + dz*dz);
             if (dist2 > 0.001f) {
-                float pushDist = 0.6f * 0.5f + radius;
+                float pushDist = 1.0f * 0.5f + radius;
                 game->player.position.x = cratePos.x + (dx / dist2) * pushDist;
                 game->player.position.z = cratePos.z + (dz / dist2) * pushDist;
+            }
+        }
+    }
+    
+    for (int i = 0; i < 10; i++) {
+        float angle = i * PI * 0.5f + 0.3f;
+        float rad = 3.0f + (i % 2) * 3.0f;
+        Vector3 barrelPos = { cosf(angle) * rad, 0.4f, sinf(angle) * rad };
+        if (PointInAABB(p, barrelPos, (Vector3){ 0.6f, 1.2f, 0.6f })) {
+            float dx = p.x - barrelPos.x;
+            float dz = p.z - barrelPos.z;
+            float dist2 = sqrtf(dx*dx + dz*dz);
+            if (dist2 > 0.001f) {
+                float pushDist = 0.6f * 0.5f + radius;
+                game->player.position.x = barrelPos.x + (dx / dist2) * pushDist;
+                game->player.position.z = barrelPos.z + (dz / dist2) * pushDist;
             }
         }
     }

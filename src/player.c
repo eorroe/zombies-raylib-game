@@ -27,6 +27,7 @@ void PlayerInit(Player *player, Vector3 startPos) {
     player->isMoving = false;
     player->footstepTimer = 0.0f;
     player->animTime = 0.0f;
+    player->moveDir = (Vector3){ 0 };
 
     Mesh bodyMesh = GenMeshCylinder(0.4f, 1.2f, 8);
     player->bodyModel = LoadModelFromMesh(bodyMesh);
@@ -88,6 +89,9 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
         player->velocity = Vector3Scale(moveDir, PLAYER_SPEED);
         player->position = Vector3Add(player->position, Vector3Scale(player->velocity, dt));
         player->animTime += dt * 8.0f;
+        player->moveDir = moveDir;
+    } else {
+        player->moveDir = (Vector3){ 0 };
     }
     
     player->yaw -= input->mouseDelta.x * 0.003f;
@@ -100,7 +104,6 @@ void PlayerRender(Player *player, Shader shader) {
     if (!player->bodyModel.meshCount) return;
 
     float walk = player->isMoving ? sinf(player->animTime) : 0.0f;
-    float legSwing = walk * 0.5f;
     float armSwing = walk * 0.3f;
 
     float yawDeg = player->yaw * RAD2DEG;
@@ -121,8 +124,35 @@ void PlayerRender(Player *player, Shader shader) {
 
     DrawModelEx(player->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, yawDeg + armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
     DrawModelEx(player->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, yawDeg - armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->leftLegModel, leftHip, (Vector3){ 0, 1, 0 }, yawDeg - legSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightHip, (Vector3){ 0, 1, 0 }, yawDeg + legSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+
+    Vector3 forward = PlayerGetForward(player);
+    Vector3 right = PlayerGetRight(player);
+    float fwd = Vector3DotProduct(player->moveDir, forward);
+    float rightDot = Vector3DotProduct(player->moveDir, right);
+
+    float legSwing = walk * 0.5f;
+    Vector3 leftAxis = (Vector3){ 0, 0, 1 };
+    Vector3 rightAxis = (Vector3){ 0, 0, 1 };
+
+    if (player->isMoving) {
+        float moveMag = sqrtf(fwd * fwd + rightDot * rightDot);
+        if (moveMag > 0.001f) {
+            fwd /= moveMag;
+            rightDot /= moveMag;
+        }
+
+        if (fabsf(fwd) > fabsf(rightDot)) {
+            leftAxis = rightAxis = (Vector3){ 1, 0, 0 };
+            if (fwd < 0.0f) legSwing = -legSwing;
+        } else {
+            leftAxis = rightAxis = (Vector3){ 0, 0, 1 };
+        }
+    }
+
+    float leftLegAngle = yawDeg - legSwing * RAD2DEG;
+    float rightLegAngle = yawDeg + legSwing * RAD2DEG;
+    DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {

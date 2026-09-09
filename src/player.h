@@ -27,6 +27,7 @@ typedef struct {
     bool isMoving;
     float footstepTimer;
     float animTime;
+    Vector3 moveDir;
 } Player;
 
 void PlayerInit(Player *player, Vector3 startPos);

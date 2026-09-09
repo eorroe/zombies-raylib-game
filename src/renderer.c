@@ -37,36 +37,42 @@ void RendererInit(Game *game, int screenWidth, int screenHeight) {
     if (game->textures.generated && game->textures.wood.id != 0) {
         SetModelTexture(&game->crateModel, game->textures.wood, game->textures.crateNormal);
     }
+    game->crateModel.materials[0].shader = game->shaders.pbr;
     
     Mesh barrelMesh = GenMeshCylinder(0.2f, 0.8f, 16);
     game->barrelModel = LoadModelFromMesh(barrelMesh);
     if (game->textures.generated && game->textures.metal.id != 0) {
         SetModelTexture(&game->barrelModel, game->textures.metal, game->textures.metalNormal);
     }
+    game->barrelModel.materials[0].shader = game->shaders.pbr;
     
     Mesh wallMesh = GenMeshCube(4.5f, 1.5f, 0.4f);
     game->wallModel = LoadModelFromMesh(wallMesh);
     if (game->textures.generated && game->textures.concrete.id != 0) {
         SetModelTexture(&game->wallModel, game->textures.concrete, game->textures.concreteNormal);
     }
+    game->wallModel.materials[0].shader = game->shaders.pbr;
     
     Mesh buildingMesh = GenMeshCube(2.5f, 3.0f, 2.5f);
     game->buildingModel = LoadModelFromMesh(buildingMesh);
     if (game->textures.generated && game->textures.brick.id != 0) {
         SetModelTexture(&game->buildingModel, game->textures.brick, (Texture2D){0});
     }
+    game->buildingModel.materials[0].shader = game->shaders.pbr;
     
     Mesh floorMesh = GenMeshPlane(50, 50, 50, 50);
     game->floorModel = LoadModelFromMesh(floorMesh);
     if (game->textures.generated && game->textures.asphalt.id != 0) {
         SetModelTexture(&game->floorModel, game->textures.asphalt, (Texture2D){0});
     }
+    game->floorModel.materials[0].shader = game->shaders.pbr;
     
     Mesh bloodMesh = GenMeshPlane(1.5f, 1.5f, 4, 4);
     game->bloodDecalModel = LoadModelFromMesh(bloodMesh);
     if (game->textures.generated && game->textures.bloodDecal.id != 0) {
         SetModelTexture(&game->bloodDecalModel, game->textures.bloodDecal, (Texture2D){0});
     }
+    game->bloodDecalModel.materials[0].shader = game->shaders.pbr;
     
     fireLightPositions[0] = (Vector3){ -4.0f, 1.5f, 12.0f };
     fireLightPositions[1] = (Vector3){ 0.0f, 0.5f, 2.0f };
@@ -110,14 +116,14 @@ void RendererDrawScene(Game *game) {
     }
     int lightCount = 4;
     
+    ShaderBeginPBR(&game->shaders);
+    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.035f);
+    
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCol[i], &lightColors[i], SHADER_UNIFORM_VEC3);
     }
     SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCount, &lightCount, SHADER_UNIFORM_INT);
-    
-    ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.035f);
     
     SetPBRMaterial(game, game->textures.asphalt, (Texture2D){0}, 0.0f, 0.9f);
     if (game->textures.generated && game->textures.asphalt.id != 0) {

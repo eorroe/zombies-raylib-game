@@ -225,7 +225,7 @@ void RendererEnd(Game *game) {
     EndTextureMode();
 
     BeginShaderMode(game->shaders.postProcess);
-    DrawTexture(game->sceneTarget.texture, 0, 0, WHITE);
+    DrawTexturePro(game->sceneTarget.texture, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, -(float)game->sceneTarget.texture.height }, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, (float)game->sceneTarget.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
     EndShaderMode();
 }
 

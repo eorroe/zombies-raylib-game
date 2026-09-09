@@ -388,7 +388,7 @@ int main(void) {
         InputUpdate(&input, game.menu.active);
         UIUpdate(&game.menu, &input, &game);
         
-        if (game.state == GAME_STATE_MENU) {
+        if (game.state == GAME_STATE_MENU || game.menu.active) {
             EnableCursor();
         } else if (game.state == GAME_STATE_PLAYING) {
             DisableCursor();
@@ -399,14 +399,14 @@ int main(void) {
             GameInit(&game, screenWidth, screenHeight);
         }
         
-        if (game.state == GAME_STATE_PLAYING) {
+        if (game.state == GAME_STATE_PLAYING && !game.menu.active) {
             GameUpdate(&game, GetFrameTime(), &input);
         }
         
         BeginDrawing();
         ClearBackground(BLACK);
         
-        if (game.state == GAME_STATE_MENU) {
+        if (game.state == GAME_STATE_MENU || game.menu.active) {
             UIRender(&game.menu);
             if (game.debug.enabled) DebugRender(&game.debug, screenWidth, screenHeight);
         } else if (game.state == GAME_STATE_PLAYING) {

@@ -396,6 +396,11 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                         }
                         if (game->nonImageDeathsSinceLastImage >= 3) {
                             game->nonImageDeathsSinceLastImage = 0;
+                            for (int k = 0; k < game->zombieCount; k++) {
+                                if (game->zombies[k].type == ZOMBIE_TYPE_DEFAULT && ZombieIsAlive(&game->zombies[k])) {
+                                    game->zombies[k].speed = ZOMBIE_SPEED_BASE;
+                                }
+                            }
                             int usedImages[16] = { false };
                             for (int k = 0; k < game->zombieCount; k++) {
                                 if (game->zombies[k].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombies[k].active) {

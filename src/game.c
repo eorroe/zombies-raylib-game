@@ -23,7 +23,7 @@ static void SpawnWave(Game *game) {
     game->zombiesRemaining = 5 + game->round * 3;
     for (int i = 0; i < game->zombiesRemaining; i++) {
         float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 8.0f + rand() % 8;
+        float radius = 4.0f + rand() % 6;
         Vector3 pos = {
             cosf(angle) * radius,
             0,
@@ -226,6 +226,66 @@ void GameUpdate(Game *game, float dt) {
         
         game->muzzleFlashPos = game->weapon.position;
         game->muzzleFlashTimer = 0.05f;
+    }
+    
+    static float autoShootTimer = 0.0f;
+    if (game->gameTime > 0.5f && game->gameTime < 8.0f) {
+        autoShootTimer += dt;
+        if (autoShootTimer > 0.2f) {
+            autoShootTimer = 0.0f;
+            
+            int nearestIdx = -1;
+            float nearestDist = 9999.0f;
+            for (int i = 0; i < game->zombieCount; i++) {
+                if (!ZombieIsAlive(&game->zombies[i])) continue;
+                float d = Vector3Length(Vector3Subtract(game->zombies[i].position, game->player.position));
+                if (d < nearestDist) {
+                    nearestDist = d;
+                    nearestIdx = i;
+                }
+            }
+            
+            if (nearestIdx >= 0) {
+                Vector3 dir = Vector3Normalize(Vector3Subtract(game->zombies[nearestIdx].position, game->player.position));
+                game->player.yaw = atan2f(dir.x, dir.z);
+                game->player.pitch = -asinf(dir.y);
+                game->player.pitch = Clamp(game->player.pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
+            }
+            
+            WeaponShoot(&game->weapon);
+            AudioPlayGunshot(&game->audio);
+            RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
+            if (hit.hit) {
+                ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
+                if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
+                    game->score += 100;
+                    Vector3 deathPos = game->zombies[hit.zombieIndex].position;
+                    for (int p = 0; p < 80; p++) {
+                        if (game->particleCount < 256) {
+                            Vector3 bloodVel = {
+                                (rand()%100-50)/15.0f,
+                                (rand()%100)/8.0f,
+                                (rand()%100-50)/15.0f
+                            };
+                            ParticleSpawn(&game->particles[game->particleCount++], deathPos,
+                                bloodVel, 4.0f, PARTICLE_BLOOD, 0.2f + rand()%100/400.0f, (Color){ 255, 30, 30, 255 });
+                        }
+                    }
+                    if (game->bloodDecalCount < 128) {
+                        game->bloodDecals[game->bloodDecalCount++] = deathPos;
+                    }
+                }
+                for (int p = 0; p < 15; p++) {
+                    if (game->particleCount < 256) {
+                        ParticleSpawn(&game->particles[game->particleCount++], hit.point,
+                            (Vector3){ (rand()%100-50)/30.0f, (rand()%100-50)/30.0f, (rand()%100-50)/30.0f },
+                            2.0f, PARTICLE_BLOOD, 0.1f, RED);
+                    }
+                }
+            }
+            game->muzzleFlashPos = game->weapon.position;
+            game->muzzleFlashTimer = 0.08f;
+        }
     }
     
     if (IsKeyPressed(KEY_R)) WeaponReload(&game->weapon);

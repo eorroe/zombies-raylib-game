@@ -37,22 +37,22 @@ void PlayerInit(Player *player, Vector3 startPos) {
     player->leftLegModel = CreateLimb(0.1f, 0.9f, 8);
     player->rightLegModel = CreateLimb(0.1f, 0.9f, 8);
 
-    Image uniformImg = GenImageColor(256, 256, (Color){ 50, 55, 65, 255 });
-    for (int i = 0; i < 400; i++) {
+    Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
+    for (int i = 0; i < 800; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 40 + rand() % 40;
-        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 5, shade + 15, 255 });
+        int shade = 110 + rand() % 70;
+        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 10, shade + 25, 255 });
     }
     Texture2D uniformTex = LoadTextureFromImage(uniformImg);
     UnloadImage(uniformImg);
 
-    Image skinImg = GenImageColor(256, 256, (Color){ 70, 90, 55, 255 });
-    for (int i = 0; i < 800; i++) {
+    Image skinImg = GenImageColor(256, 256, (Color){ 180, 220, 140, 255 });
+    for (int i = 0; i < 1500; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 35 + rand() % 70;
-        ImageDrawPixel(&skinImg, x, y, (Color){ shade, shade + 20, shade - 10, 255 });
+        int shade = 140 + rand() % 100;
+        ImageDrawPixel(&skinImg, x, y, (Color){ shade, shade + 50, shade - 5, 255 });
     }
     Texture2D skinTex = LoadTextureFromImage(skinImg);
     UnloadImage(skinImg);

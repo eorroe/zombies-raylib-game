@@ -58,10 +58,10 @@ void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
     BeginTextureMode(game->sceneTarget);
-    ClearBackground(BLACK);
+    ClearBackground((Color){ 30, 30, 40, 255 });
 
-    DrawRectangleGradientV(0, 0, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 100, 180, 255, 255 }, (Color){ 180, 220, 255, 255 });
-    DrawRectangleGradientV(0, game->sceneTarget.texture.height / 2, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 180, 220, 255, 255 }, (Color){ 135, 206, 235, 255 });
+    DrawRectangleGradientV(0, 0, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 20, 20, 60, 255 }, (Color){ 60, 40, 80, 255 });
+    DrawRectangleGradientV(0, game->sceneTarget.texture.height / 2, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 60, 40, 80, 255 }, (Color){ 20, 15, 30, 255 });
 
     BeginMode3D(camera);
 }
@@ -69,40 +69,8 @@ void RendererBegin(Game *game, Camera3D camera) {
 void RendererDrawScene(Game *game) {
     (void)game;
 
-    if (game->floorModel.meshCount > 0) {
-        DrawModel(game->floorModel, (Vector3){ 0, 0, 0 }, 1.0f, WHITE);
-    } else {
-        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 90, 90, 95, 255 });
-    }
-
-    Vector3 lightDir = Vector3Normalize((Vector3){ 0.5f, 1.0f, 0.3f });
-    Vector3 lightPos = Vector3Scale(lightDir, -20.0f);
-    lightPos.y = 15.0f;
-
-    BeginShaderMode(game->shaders.pbr);
-    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCount, &(int){ 1 }, SHADER_UNIFORM_INT);
-    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[0], &lightPos, SHADER_UNIFORM_VEC3);
-    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCol[0], &(Vector3){ 1.0f, 0.95f, 0.8f }, SHADER_UNIFORM_VEC3);
-    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocMetallic, &(float){ 0.0f }, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocRoughness, &(float){ 0.7f }, SHADER_UNIFORM_FLOAT);
-    EndShaderMode();
-    
-    for (int i = 0; i < 4; i++) {
-        float angle = i * PI * 0.5f + PI * 0.25f;
-        float radius = 18.0f;
-        Vector3 lampPos = {
-            cosf(angle) * radius,
-            2.0f,
-            sinf(angle) * radius
-        };
-        DrawSphere((Vector3){ lampPos.x, 0.05f, lampPos.z }, 1.5f, (Color){ 255, 240, 200, 40 });
-    }
-
+    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 200, 200, 210, 255 });
     DrawGrid(50, 1.0f);
-
-    if (game->muzzleFlashTimer > 0) {
-        DrawSphere(game->muzzleFlashPos, 0.3f, (Color){ 255, 240, 200, 255 });
-    }
 
     for (int i = 0; i < 8; i++) {
         float angle = i * PI * 0.25f;
@@ -112,12 +80,8 @@ void RendererDrawScene(Game *game) {
             0.3f,
             sinf(angle) * radius
         };
-        if (game->crateModel.meshCount > 0) {
-            DrawModel(game->crateModel, cratePos, 1.0f, WHITE);
-        } else {
-            DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 140, 120, 100, 255 });
-            DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 80, 70, 60, 255 });
-        }
+        DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 220, 200, 170, 255 });
+        DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 140, 125, 105, 255 });
     }
 
     for (int i = 0; i < 4; i++) {
@@ -128,23 +92,15 @@ void RendererDrawScene(Game *game) {
             0.4f,
             sinf(angle) * radius
         };
-        if (game->barrelModel.meshCount > 0) {
-            DrawModel(game->barrelModel, barrelPos, 1.0f, WHITE);
-        } else {
-            DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 160, 140, 110, 255 });
-            DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 100, 90, 75, 255 });
-        }
+        DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 230, 210, 180, 255 });
+        DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 150, 140, 125, 255 });
     }
 
     for (int i = 0; i < 5; i++) {
         float x = -10.0f + i * 5.0f;
         Vector3 wallPos = { x, 0.75f, -10.0f };
-        if (game->wallModel.meshCount > 0) {
-            DrawModel(game->wallModel, wallPos, 1.0f, WHITE);
-        } else {
-            DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 150, 145, 140, 255 });
-            DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 90, 85, 80, 255 });
-        }
+        DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 220, 215, 210, 255 });
+        DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 140, 135, 130, 255 });
     }
 
     for (int i = 0; i < 6; i++) {
@@ -152,20 +108,16 @@ void RendererDrawScene(Game *game) {
         float z = 8.0f;
         float h = 1.5f + (i % 3) * 1.0f;
         Vector3 bldPos = { x, h * 0.5f, z };
-        if (game->buildingModel.meshCount > 0) {
-            DrawModelEx(game->buildingModel, bldPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, h / 3.0f, 1 }, WHITE);
-        } else {
-            Color bldColor = (Color){ 130, 130, 140, 255 };
-            if (i % 3 == 1) bldColor = (Color){ 150, 140, 130, 255 };
-            else if (i % 3 == 2) bldColor = (Color){ 120, 130, 150, 255 };
-            DrawCube(bldPos, 2.5f, h, 2.5f, bldColor);
-            DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 80, 80, 90, 255 });
-        }
+        Color bldColor = (Color){ 210, 210, 220, 255 };
+        if (i % 3 == 1) bldColor = (Color){ 230, 220, 210, 255 };
+        else if (i % 3 == 2) bldColor = (Color){ 200, 210, 230, 255 };
+        DrawCube(bldPos, 2.5f, h, 2.5f, bldColor);
+        DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 130, 130, 140, 255 });
 
         for (int w = 0; w < 3; w++) {
             float wx = x - 0.6f + w * 0.6f;
             float wy = h * 0.5f + 0.3f;
-            DrawCube((Vector3){ wx, wy, z + 1.26f }, 0.3f, 0.3f, 0.05f, (Color){ 60, 60, 70, 255 });
+            DrawCube((Vector3){ wx, wy, z + 1.26f }, 0.3f, 0.3f, 0.05f, (Color){ 100, 100, 110, 255 });
         }
     }
 
@@ -177,7 +129,7 @@ void RendererDrawScene(Game *game) {
             2.0f,
             sinf(angle) * radius
         };
-        DrawCylinder(lampPos, 0.1f, 0.1f, 2.0f, 8, (Color){ 60, 60, 65, 255 });
+        DrawCylinder(lampPos, 0.1f, 0.1f, 2.0f, 8, (Color){ 100, 100, 105, 255 });
         DrawSphere((Vector3){ lampPos.x, lampPos.y + 1.0f, lampPos.z }, 0.3f, (Color){ 255, 240, 200, 255 });
     }
 }
@@ -187,11 +139,7 @@ void RendererDrawBloodDecals(Game *game) {
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
         pos.y = 0.02f;
-        if (game->bloodDecalModel.meshCount > 0) {
-            DrawModelEx(game->bloodDecalModel, pos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 2.0f, 2.0f, 2.0f }, WHITE);
-        } else {
-            DrawPlane(pos, (Vector2){ 3.0f, 3.0f }, (Color){ 200, 0, 0, 200 });
-        }
+        DrawPlane(pos, (Vector2){ 6.0f, 6.0f }, (Color){ 255, 0, 0, 240 });
     }
 }
 
@@ -234,14 +182,20 @@ void RendererDrawPlayer(Player *player, Shader shader) {
 void RendererDrawParticles(Particle *particles, int count) {
     ParticleSystemRender(particles, count);
     
-    for (int i = 0; i < 80; i++) {
-        float t = GetTime() * 0.15f + i * 2.17f;
-        float x = sinf(t * 1.3f) * 18.0f;
-        float y = 0.3f + fmodf(t * 0.4f, 4.0f);
-        float z = cosf(t * 0.9f) * 18.0f;
+    for (int i = 0; i < count; i++) {
+        if (particles[i].type == PARTICLE_BLOOD) {
+            DrawSphere(particles[i].position, particles[i].size * 2.0f, particles[i].color);
+        }
+    }
+    
+    for (int i = 0; i < 200; i++) {
+        float t = GetTime() * 0.25f + i * 2.17f;
+        float x = sinf(t * 1.3f) * 22.0f;
+        float y = 0.5f + fmodf(t * 0.6f, 6.0f);
+        float z = cosf(t * 0.9f) * 22.0f;
         Vector3 dustPos = { x, y, z };
-        float alpha = 0.4f + sinf(t + i) * 0.2f;
-        DrawSphere(dustPos, 0.12f, (Color){ 255, 255, 240, (unsigned char)(alpha * 255) });
+        float alpha = 0.6f + sinf(t + i) * 0.4f;
+        DrawSphere(dustPos, 0.2f, (Color){ 255, 255, 240, (unsigned char)(alpha * 255) });
     }
 }
 

@@ -3,7 +3,9 @@
 #include "particle.h"
 #include "audio.h"
 #include "texture.h"
+#include "input.h"
 #include <stdlib.h>
+#include <math.h>
 
 static void SetModelTexture(Model *model, Texture2D tex) {
     if (model->meshCount > 0 && model->materialCount > 0) {
@@ -28,7 +30,7 @@ typedef struct {
 static WeaponModels g_weaponModels;
 
 void WeaponInit(Weapon *weapon) {
-    weapon->position = (Vector3){ 0.5f, -0.4f, -0.7f };
+    weapon->position = (Vector3){ 0.3f, 0.8f, 0.2f };
     weapon->direction = (Vector3){ 0, 0, 1 };
     weapon->cooldown = 0.0f;
     weapon->ammo = MAX_AMMO;
@@ -37,6 +39,7 @@ void WeaponInit(Weapon *weapon) {
     weapon->recoil = 0.0f;
     weapon->scopeActive = false;
     weapon->muzzleFlashTimer = 0.0f;
+    weapon->aimOffset = (Vector2){ 0 };
 
     Mesh bodyMesh = GenMeshCube(0.12f, 0.15f, 0.35f);
     g_weaponModels.body = LoadModelFromMesh(bodyMesh);
@@ -106,7 +109,7 @@ void WeaponInit(Weapon *weapon) {
     }
 }
 
-void WeaponUpdate(Weapon *weapon, Camera3D camera, float dt) {
+void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt) {
     if (weapon->reloading) {
         weapon->reloadTimer -= dt;
         if (weapon->reloadTimer <= 0) {
@@ -118,42 +121,52 @@ void WeaponUpdate(Weapon *weapon, Camera3D camera, float dt) {
     if (weapon->recoil > 0) weapon->recoil -= dt * 2.0f;
     if (weapon->muzzleFlashTimer > 0) weapon->muzzleFlashTimer -= dt;
     
-    Vector3 forward = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
-    Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, camera.up));
-    Vector3 up = camera.up;
+    if (input->mouseLeftDown) {
+        weapon->aimOffset.x += input->mouseDelta.x * 0.005f;
+        weapon->aimOffset.y -= input->mouseDelta.y * 0.005f;
+        weapon->aimOffset.x = Clamp(weapon->aimOffset.x, -0.3f, 0.3f);
+        weapon->aimOffset.y = Clamp(weapon->aimOffset.y, -0.2f, 0.2f);
+    } else {
+        weapon->aimOffset.x *= 0.85f;
+        weapon->aimOffset.y *= 0.85f;
+        if (fabsf(weapon->aimOffset.x) < 0.001f) weapon->aimOffset.x = 0.0f;
+        if (fabsf(weapon->aimOffset.y) < 0.001f) weapon->aimOffset.y = 0.0f;
+    }
     
-    weapon->position = Vector3Add(camera.position, Vector3Scale(forward, 0.5f));
-    weapon->position = Vector3Add(weapon->position, Vector3Scale(right, 0.3f));
-    weapon->position = Vector3Add(weapon->position, Vector3Scale(up, -0.3f));
-    weapon->direction = forward;
+    weapon->position = playerPos;
+    weapon->position.x += 0.3f + weapon->aimOffset.x;
+    weapon->position.y += 0.8f + weapon->aimOffset.y;
+    weapon->position.z += 0.2f;
+    weapon->direction = (Vector3){ 0, 0, 1 };
     
     weapon->swayTimer += dt * 8.0f;
 }
 
 void WeaponRender(Weapon *weapon, Camera3D camera) {
+    (void)camera;
     if (weapon->reloading) return;
 
     float recoilOffset = weapon->recoil * 0.02f;
     Vector3 pos = weapon->position;
-    pos = Vector3Add(pos, Vector3Scale(weapon->direction, -recoilOffset));
+    pos.z -= recoilOffset;
 
-    Vector3 right = Vector3Normalize(Vector3CrossProduct(weapon->direction, (Vector3){ 0, 1, 0 }));
-    Vector3 up = Vector3CrossProduct(right, weapon->direction);
+    Vector3 right = (Vector3){ 1, 0, 0 };
+    Vector3 up = (Vector3){ 0, 1, 0 };
 
     float swayX = sinf(weapon->swayTimer) * 0.003f;
     float swayY = cosf(weapon->swayTimer * 0.7f) * 0.002f;
-    pos = Vector3Add(pos, Vector3Scale(right, swayX));
-    pos = Vector3Add(pos, Vector3Scale(up, swayY));
+    pos = Vector3Add(pos, Vector3Scale(right, swayX + weapon->aimOffset.x * 0.1f));
+    pos = Vector3Add(pos, Vector3Scale(up, swayY + weapon->aimOffset.y * 0.1f));
 
     Vector3 bodyPos = pos;
     DrawModelEx(g_weaponModels.body, bodyPos, up, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 100, 100, 255 });
 
-    Vector3 barrelPos = Vector3Add(pos, Vector3Scale(weapon->direction, 0.15f));
+    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.15f });
     DrawModelEx(g_weaponModels.barrel, barrelPos, up, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 50, 50, 255 });
 
     for (int i = 0; i < 4; i++) {
         float t = (float)i / 3.0f;
-        Vector3 ringPos = Vector3Add(barrelPos, Vector3Scale(weapon->direction, t * 0.15f));
+        Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.15f });
         DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 200, 200, 255 });
     }
 
@@ -169,8 +182,8 @@ void WeaponRender(Weapon *weapon, Camera3D camera) {
     Vector3 sightPos = Vector3Add(pos, (Vector3){ 0, 0.07f, 0.03f });
     DrawModelEx(g_weaponModels.sight, sightPos, up, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 255, 255, 255 });
 
-    Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.03f, 0.015f });
-    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 200, 200, 255 });
+    Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.02f, 0.01f });
+    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 80, 80, 90, 255 });
 
     if (weapon->muzzleFlashTimer > 0) {
         DrawSphere(barrelPos, 0.12f, YELLOW);
@@ -201,7 +214,8 @@ void WeaponApplyRecoil(Weapon *weapon) {
 
 RayHitInfo WeaponRaycast(Weapon *weapon, Camera3D camera, Zombie *zombies, int zombieCount) {
     RayHitInfo result = { 0 };
-    Ray ray = { camera.position, Vector3Normalize(camera.target) };
+    Vector3 dir = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
+    Ray ray = { weapon->position, dir };
     float minDist = WEAPON_RANGE;
     for (int i = 0; i < zombieCount; i++) {
         if (!ZombieIsAlive(&zombies[i])) continue;

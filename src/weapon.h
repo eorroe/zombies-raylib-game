@@ -31,10 +31,11 @@ typedef struct {
     Model model;
     float muzzleFlashTimer;
     float swayTimer;
+    Vector2 aimOffset;
 } Weapon;
 
 void WeaponInit(Weapon *weapon);
-void WeaponUpdate(Weapon *weapon, Camera3D camera, float dt);
+void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt);
 void WeaponRender(Weapon *weapon, Camera3D camera);
 void WeaponShoot(Weapon *weapon);
 void WeaponReload(Weapon *weapon);

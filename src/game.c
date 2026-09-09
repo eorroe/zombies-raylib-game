@@ -176,9 +176,9 @@ void GameUpdate(Game *game, float dt) {
     if (game->state != GAME_STATE_PLAYING) return;
     
     game->gameTime += dt;
-    PlayerUpdate(&game->player, CameraGetCamera(&game->camera), dt);
+    PlayerUpdate(&game->player, &input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
-    WeaponUpdate(&game->weapon, game->camera.camera, dt);
+    WeaponUpdate(&game->weapon, game->player.position, &input, dt);
     
     GameApplyCollisions(game);
     
@@ -203,7 +203,7 @@ void GameUpdate(Game *game, float dt) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (input.mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         

@@ -4,6 +4,7 @@ void InputUpdate(InputState *input, bool menuActive) {
     input->mouseDelta = GetMouseDelta();
     input->mouseLeftDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
     input->mouseLeftPressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+    input->mouseLeftReleased = IsMouseButtonReleased(MOUSE_BUTTON_LEFT);
     input->mouseRightDown = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
     input->mouseRightPressed = IsMouseButtonPressed(MOUSE_BUTTON_RIGHT);
     input->scopePressed = IsMouseButtonPressed(MOUSE_BUTTON_RIGHT);
@@ -12,8 +13,10 @@ void InputUpdate(InputState *input, bool menuActive) {
     input->menuPressed = IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_P);
     input->escapePressed = IsKeyPressed(KEY_ESCAPE);
     input->scrollDelta = GetMouseWheelMove();
-    input->upPressed = IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W);
-    input->downPressed = IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S);
+    input->upPressed = IsKeyDown(KEY_UP) || IsKeyDown(KEY_W);
+    input->downPressed = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S);
+    input->leftPressed = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A);
+    input->rightPressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D);
     input->enterPressed = IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE);
 }
 

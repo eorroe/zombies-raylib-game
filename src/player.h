@@ -29,7 +29,7 @@ typedef struct {
 } Player;
 
 void PlayerInit(Player *player, Vector3 startPos);
-void PlayerUpdate(Player *player, Camera3D camera, float dt);
+void PlayerUpdate(Player *player, InputState *input, float dt);
 void PlayerRender(Player *player, Shader shader);
 void PlayerShutdown(Player *player);
 void PlayerTakeDamage(Player *player, float damage);

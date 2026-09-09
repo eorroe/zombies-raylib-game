@@ -7,6 +7,7 @@ typedef struct {
     Vector2 mouseDelta;
     bool mouseLeftDown;
     bool mouseLeftPressed;
+    bool mouseLeftReleased;
     bool mouseRightDown;
     bool mouseRightPressed;
     bool scopePressed;
@@ -16,6 +17,8 @@ typedef struct {
     bool escapePressed;
     bool upPressed;
     bool downPressed;
+    bool leftPressed;
+    bool rightPressed;
     bool enterPressed;
     float scrollDelta;
 } InputState;

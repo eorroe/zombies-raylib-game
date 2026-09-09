@@ -1,6 +1,7 @@
 #include "player.h"
 #include "raymath.h"
 #include "texture.h"
+#include "input.h"
 #include <math.h>
 
 static Model CreateLimb(float radius, float length, int slices) {
@@ -68,21 +69,18 @@ void PlayerInit(Player *player, Vector3 startPos) {
     player->skinTex = skinTex;
 }
 
-void PlayerUpdate(Player *player, Camera3D camera, float dt) {
+void PlayerUpdate(Player *player, InputState *input, float dt) {
     player->velocity = (Vector3){ 0 };
     player->isMoving = false;
     
-    Vector3 cameraForward = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
-    cameraForward.y = 0;
-    if (Vector3Length(cameraForward) > 0.001f) cameraForward = Vector3Normalize(cameraForward);
-    else cameraForward = (Vector3){ 0, 0, 1 };
-    Vector3 cameraRight = Vector3Normalize(Vector3CrossProduct(cameraForward, (Vector3){ 0, 1, 0 }));
+    Vector3 cameraForward = (Vector3){ sinf(player->yaw), 0, cosf(player->yaw) };
+    Vector3 cameraRight = (Vector3){ cosf(player->yaw), 0, -sinf(player->yaw) };
     
     Vector3 moveDir = { 0 };
-    if (IsKeyDown(KEY_W)) { moveDir = Vector3Add(moveDir, cameraForward); player->isMoving = true; }
-    if (IsKeyDown(KEY_S)) { moveDir = Vector3Subtract(moveDir, cameraForward); player->isMoving = true; }
-    if (IsKeyDown(KEY_A)) { moveDir = Vector3Subtract(moveDir, cameraRight); player->isMoving = true; }
-    if (IsKeyDown(KEY_D)) { moveDir = Vector3Add(moveDir, cameraRight); player->isMoving = true; }
+    if (input->upPressed) { moveDir = Vector3Add(moveDir, cameraForward); player->isMoving = true; }
+    if (input->downPressed) { moveDir = Vector3Subtract(moveDir, cameraForward); player->isMoving = true; }
+    if (input->leftPressed) { moveDir = Vector3Subtract(moveDir, cameraRight); player->isMoving = true; }
+    if (input->rightPressed) { moveDir = Vector3Add(moveDir, cameraRight); player->isMoving = true; }
     
     if (player->isMoving) {
         moveDir = Vector3Normalize(moveDir);
@@ -91,9 +89,8 @@ void PlayerUpdate(Player *player, Camera3D camera, float dt) {
         player->animTime += dt * 8.0f;
     }
     
-    Vector2 mouseDelta = GetMouseDelta();
-    player->yaw -= mouseDelta.x * 0.003f;
-    player->pitch -= mouseDelta.y * 0.003f;
+    player->yaw -= input->mouseDelta.x * 0.003f;
+    player->pitch -= input->mouseDelta.y * 0.003f;
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }
 

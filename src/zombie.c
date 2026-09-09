@@ -135,7 +135,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     float bodyY = torsoPos.y;
     
     if (zombie->dying) {
-        float deathProgress = 1.0f - (zombie->deathTimer / 1.0f);
+        float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);
         if (deathProgress > 1.0f) deathProgress = 1.0f;
         bodyRot = deathProgress * 90.0f;
         bodyY = torsoPos.y - deathProgress * torsoPos.y;
@@ -148,7 +148,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };
         float headY = headPos.y;
         if (zombie->dying) {
-            float deathProgress = 1.0f - (zombie->deathTimer / 1.0f);
+            float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);
             if (deathProgress > 1.0f) deathProgress = 1.0f;
             headY = headPos.y - deathProgress * headPos.y;
         }
@@ -173,7 +173,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     float legSwing = walk * 0.6f;
     
     if (zombie->dying) {
-        float deathProgress = 1.0f - (zombie->deathTimer / 1.0f);
+        float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);
         if (deathProgress > 1.0f) deathProgress = 1.0f;
         armSwing = deathProgress * 2.0f;
         legSwing = deathProgress * 2.0f;
@@ -221,6 +221,6 @@ void ZombieTakeDamage(Zombie *zombie, float damage) {
     zombie->damageFlashTimer = 0.5f;
     if (zombie->health <= 0 && !zombie->dying) {
         zombie->dying = true;
-        zombie->deathTimer = 1.0f;
+        zombie->deathTimer = 3.0f;
     }
 }

@@ -29,7 +29,7 @@ void RendererInit(Game *game, int screenWidth, int screenHeight) {
         SetModelTexture(&game->barrelModel, game->textures.metal);
     }
     
-    Mesh wallMesh = GenMeshCube(4.0f, 1.5f, 0.4f);
+    Mesh wallMesh = GenMeshCube(4.5f, 1.5f, 0.4f);
     game->wallModel = LoadModelFromMesh(wallMesh);
     if (game->textures.generated && game->textures.concrete.id != 0) {
         SetModelTexture(&game->wallModel, game->textures.concrete);
@@ -99,8 +99,8 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 10; i++) {
         float x = -18.0f + i * 4.0f;
         Vector3 wallPos = { x, 0.75f, -10.0f };
-        DrawCube(wallPos, 4.0f, 1.5f, 0.6f, (Color){ 180, 175, 170, 255 });
-        DrawCubeWires(wallPos, 4.0f, 1.5f, 0.6f, (Color){ 255, 80, 80, 255 });
+        DrawCube(wallPos, 4.5f, 1.5f, 0.6f, (Color){ 180, 175, 170, 255 });
+        DrawCubeWires(wallPos, 4.5f, 1.5f, 0.6f, (Color){ 255, 80, 80, 255 });
     }
 
     for (int i = 0; i < 12; i++) {

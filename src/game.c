@@ -102,7 +102,7 @@ static void GameApplyCollisions(Game *game) {
     for (int i = 0; i < 10; i++) {
         float x = -18.0f + i * 4.0f;
         Vector3 wallCenter = { x, 0.75f, -10.0f };
-        Vector3 wallSize = { 4.0f, 1.5f, 0.6f };
+        Vector3 wallSize = { 4.5f, 1.5f, 0.6f };
         if (PointInAABB(p, wallCenter, wallSize)) {
             float dx = p.x - wallCenter.x;
             float dz = p.z - wallCenter.z;
@@ -198,7 +198,7 @@ static void GameApplyZombieCollisions(Game *game) {
         for (int w = 0; w < 10; w++) {
             float x = -18.0f + w * 4.0f;
             Vector3 wallCenter = { x, 0.75f, -10.0f };
-            Vector3 wallSize = { 4.0f, 1.5f, 0.6f };
+            Vector3 wallSize = { 4.5f, 1.5f, 0.6f };
             if (PointInAABB(p, wallCenter, wallSize)) {
                 float dx = p.x - wallCenter.x;
                 float dz = p.z - wallCenter.z;

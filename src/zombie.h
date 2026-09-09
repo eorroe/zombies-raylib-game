@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include "texture.h"
 
-#define MAX_ZOMBIES 64
+#define MAX_ZOMBIES 128
 #define ZOMBIE_SPEED_BASE 2.0f
 #define LIMB_RADIUS 0.12f
 #define TORSO_WIDTH 0.55f
@@ -34,6 +34,7 @@ typedef struct {
     float walkCycle;
     Model bodyModel;
     Model headModel;
+    Model jawModel;
     Model leftUpperArm;
     Model leftLowerArm;
     Model rightUpperArm;
@@ -43,15 +44,24 @@ typedef struct {
     Model rightUpperLeg;
     Model rightLowerLeg;
     Texture2D skinTex;
+    Texture2D skinNormal;
     Texture2D shirtTex;
     Texture2D pantsTex;
     float speed;
     float damageFlashTimer;
     bool dying;
     float deathTimer;
+    float torsoWidth;
+    float torsoHeight;
+    float headRadius;
+    float armUpperLen;
+    float armLowerLen;
+    float legUpperLen;
+    float legLowerLen;
+    float limbRadius;
 } Zombie;
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants);
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants);
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired);
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader);
 void ZombieShutdown(Zombie *zombie);

@@ -6,5 +6,5 @@ C_DEFINES =
 
 C_INCLUDES = -I/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/raylib_src/src -I/workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src
 
-C_FLAGS = -O3 -DNDEBUG -std=gnu11
+C_FLAGS = -std=gnu11
 

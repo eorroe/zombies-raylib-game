@@ -14,7 +14,7 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
         texIdx = texIdx % game->zombieHeadTextureCount;
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
-    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieShirt, game->textures.zombiePants);
+    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieSkinNormal, game->textures.zombieShirt, game->textures.zombiePants);
     game->zombies[idx].speed = ZOMBIE_SPEED_BASE;
     if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
         game->zombies[idx].speed = ZOMBIE_SPEED_BASE * 2.0f;
@@ -23,7 +23,7 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
 
 static void SpawnImageZombie(Game *game, int texIdx) {
     float angle = (float)rand() / RAND_MAX * 2.0f * PI;
-    float radius = 6.0f + rand() % 8;
+    float radius = 5.0f + rand() % 12;
     Vector3 pos = {
         cosf(angle) * radius,
         0,
@@ -34,7 +34,8 @@ static void SpawnImageZombie(Game *game, int texIdx) {
 
 static void SpawnWave(Game *game) {
     game->round++;
-    game->zombiesRemaining = 5 + game->round * 3;
+    game->zombiesRemaining = 10 + game->round * 5;
+    if (game->zombiesRemaining > MAX_ZOMBIES) game->zombiesRemaining = MAX_ZOMBIES;
     game->nonImageDeathsSinceLastImage = 0;
     bool usedImages[16] = { false };
     int imageCount = 0;
@@ -45,8 +46,8 @@ static void SpawnWave(Game *game) {
         usedImages[rand() % game->zombieHeadTextureCount] = true;
     }
     for (int i = 0; i < game->zombiesRemaining; i++) {
-        float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 6.0f + rand() % 8;
+        float angle = (float)i / game->zombiesRemaining * 2.0f * PI + (rand() % 100) / 5000.0f;
+        float radius = 5.0f + rand() % 12;
         Vector3 pos = {
             cosf(angle) * radius,
             0,
@@ -324,6 +325,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     PlayerUpdate(&game->player, input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
     WeaponUpdate(&game->weapon, game->player.position, input, dt);
+    RendererUpdate(game, dt);
     
     GameApplyCollisions(game);
     

@@ -9,6 +9,7 @@
 void RendererInit(Game *game, int screenWidth, int screenHeight);
 void RendererBegin(Game *game, Camera3D camera);
 void RendererDrawScene(Game *game);
+void RendererUpdate(Game *game, float dt);
 void RendererDrawBloodDecals(Game *game);
 void RendererDrawZombies(Game *game, Shader shader);
 void RendererDrawZombieHeads(Game *game);

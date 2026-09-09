@@ -5,14 +5,25 @@
 
 typedef struct {
     Texture2D zombieSkin;
+    Texture2D zombieSkinNormal;
     Texture2D zombieShirt;
     Texture2D zombiePants;
     Texture2D bloodDecal;
     Texture2D concrete;
+    Texture2D concreteNormal;
     Texture2D defaultZombieHead;
     Texture2D metal;
+    Texture2D metalNormal;
     Texture2D darkMetal;
     Texture2D grip;
+    Texture2D asphalt;
+    Texture2D brick;
+    Texture2D wood;
+    Texture2D fireGlow;
+    Texture2D barrel;
+    Texture2D barrelNormal;
+    Texture2D crate;
+    Texture2D crateNormal;
     bool generated;
 } ProceduralTextures;
 

@@ -11,8 +11,10 @@ typedef struct {
     int pbrLocNormal;
     int pbrLocMetallic;
     int pbrLocRoughness;
-    int pbrLocLightPos[4];
-    int pbrLocLightCol[4];
+    int pbrLocFogColor;
+    int pbrLocFogDensity;
+    int pbrLocLightPos[8];
+    int pbrLocLightCol[8];
     int pbrLocLightCount;
     int postLocTime;
     int postLocResolution;
@@ -26,6 +28,7 @@ void ShaderBeginPBR(ShaderManager *shaders);
 void ShaderBeginPostProcess(ShaderManager *shaders);
 void ShaderBeginScope(ShaderManager *shaders);
 void ShaderEnd(ShaderManager *shaders);
+void ShaderSetFog(ShaderManager *shaders, Vector3 fogColor, float fogDensity);
 void ShaderShutdown(ShaderManager *shaders);
 
 #endif

@@ -155,8 +155,8 @@ void WeaponRender(Weapon *weapon, Camera3D camera) {
 
     float swayX = sinf(weapon->swayTimer) * 0.003f;
     float swayY = cosf(weapon->swayTimer * 0.7f) * 0.002f;
-    pos = Vector3Add(pos, Vector3Scale(right, swayX + weapon->aimOffset.x * 0.1f));
-    pos = Vector3Add(pos, Vector3Scale(up, swayY + weapon->aimOffset.y * 0.1f));
+    pos = Vector3Add(pos, Vector3Scale(right, swayX + weapon->aimOffset.x * 1.0f));
+    pos = Vector3Add(pos, Vector3Scale(up, swayY + weapon->aimOffset.y * 1.0f));
 
     Vector3 bodyPos = pos;
     DrawModelEx(g_weaponModels.body, bodyPos, up, 0.0f, (Vector3){ 1, 1, 1 }, (Color){ 255, 100, 100, 255 });

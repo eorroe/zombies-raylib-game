@@ -207,6 +207,38 @@ static void GameApplyZombieCollisions(Game *game) {
                 }
             }
         }
+        
+        for (int c = 0; c < 16; c++) {
+            float angle = c * PI * 0.25f;
+            float rad = 5.0f + (c % 3) * 3.0f;
+            Vector3 cratePos = { cosf(angle) * rad, 0.3f, sinf(angle) * rad };
+            if (PointInAABB(p, cratePos, (Vector3){ 1.0f, 1.0f, 1.0f })) {
+                float dx = p.x - cratePos.x;
+                float dz = p.z - cratePos.z;
+                float dist2 = sqrtf(dx*dx + dz*dz);
+                if (dist2 > 0.001f) {
+                    float pushDist = 1.0f * 0.5f + radius;
+                    game->zombies[i].position.x = cratePos.x + (dx / dist2) * pushDist;
+                    game->zombies[i].position.z = cratePos.z + (dz / dist2) * pushDist;
+                }
+            }
+        }
+        
+        for (int br = 0; br < 10; br++) {
+            float angle = br * PI * 0.5f + 0.3f;
+            float rad = 3.0f + (br % 2) * 3.0f;
+            Vector3 barrelPos = { cosf(angle) * rad, 0.4f, sinf(angle) * rad };
+            if (PointInAABB(p, barrelPos, (Vector3){ 0.6f, 1.2f, 0.6f })) {
+                float dx = p.x - barrelPos.x;
+                float dz = p.z - barrelPos.z;
+                float dist2 = sqrtf(dx*dx + dz*dz);
+                if (dist2 > 0.001f) {
+                    float pushDist = 0.6f * 0.5f + radius;
+                    game->zombies[i].position.x = barrelPos.x + (dx / dist2) * pushDist;
+                    game->zombies[i].position.z = barrelPos.z + (dz / dist2) * pushDist;
+                }
+            }
+        }
     }
 }
 
@@ -247,7 +279,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon)) {
+    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         
@@ -325,6 +357,7 @@ void GameRender(Game *game) {
     WeaponRender(&game->weapon, cam);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
+    RendererDrawHUD(game);
     
     if (game->debug.enabled) DebugRender(&game->debug, 1280, 720);
 }

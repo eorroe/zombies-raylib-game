@@ -75,7 +75,7 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
     player->isMoving = false;
     
     Vector3 cameraForward = (Vector3){ sinf(player->yaw), 0, cosf(player->yaw) };
-    Vector3 cameraRight = (Vector3){ cosf(player->yaw), 0, -sinf(player->yaw) };
+    Vector3 cameraRight = (Vector3){ -cosf(player->yaw), 0, sinf(player->yaw) };
     
     Vector3 moveDir = { 0 };
     if (input->upPressed) { moveDir = Vector3Add(moveDir, cameraForward); player->isMoving = true; }
@@ -147,8 +147,8 @@ Vector3 PlayerGetForward(Player *player) {
 
 Vector3 PlayerGetRight(Player *player) {
     return (Vector3){
-        cosf(player->yaw),
+        -cosf(player->yaw),
         0,
-        -sinf(player->yaw)
+        sinf(player->yaw)
     };
 }

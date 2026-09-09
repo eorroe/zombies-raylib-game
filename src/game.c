@@ -166,6 +166,28 @@ static void GameApplyCollisions(Game *game) {
             }
         }
     }
+    
+    for (int i = 0; i < 8; i++) {
+        float angle = i * PI * 0.5f + PI * 0.25f;
+        float rad = 18.0f;
+        Vector3 lampPos = { cosf(angle) * rad, 0.05f, sinf(angle) * rad };
+        if (PointInAABB(p, lampPos, (Vector3){ 0.6f, 0.6f, 0.6f })) {
+            float dx = p.x - lampPos.x;
+            float dz = p.z - lampPos.z;
+            float dist2 = sqrtf(dx*dx + dz*dz);
+            if (dist2 > 0.001f) {
+                float pushDist = 0.6f * 0.5f + radius;
+                game->player.position.x = lampPos.x + (dx / dist2) * pushDist;
+                game->player.position.z = lampPos.z + (dz / dist2) * pushDist;
+            }
+        }
+    }
+    
+    if (p.x < -24.0f) game->player.position.x = -24.0f;
+    if (p.x > 36.0f) game->player.position.x = 36.0f;
+    if (p.z < -16.0f) game->player.position.z = -16.0f;
+    if (p.z > 14.0f) game->player.position.z = 14.0f;
+    if (p.y < 0.0f) game->player.position.y = 0.0f;
 }
 
 static void GameApplyZombieCollisions(Game *game) {
@@ -239,6 +261,28 @@ static void GameApplyZombieCollisions(Game *game) {
                 }
             }
         }
+        
+        for (int l = 0; l < 8; l++) {
+            float angle = l * PI * 0.5f + PI * 0.25f;
+            float rad = 18.0f;
+            Vector3 lampPos = { cosf(angle) * rad, 0.05f, sinf(angle) * rad };
+            if (PointInAABB(p, lampPos, (Vector3){ 0.6f, 0.6f, 0.6f })) {
+                float dx = p.x - lampPos.x;
+                float dz = p.z - lampPos.z;
+                float dist2 = sqrtf(dx*dx + dz*dz);
+                if (dist2 > 0.001f) {
+                    float pushDist = 0.6f * 0.5f + radius;
+                    game->zombies[i].position.x = lampPos.x + (dx / dist2) * pushDist;
+                    game->zombies[i].position.z = lampPos.z + (dz / dist2) * pushDist;
+                }
+            }
+        }
+        
+        if (p.x < -24.0f) game->zombies[i].position.x = -24.0f;
+        if (p.x > 36.0f) game->zombies[i].position.x = 36.0f;
+        if (p.z < -16.0f) game->zombies[i].position.z = -16.0f;
+        if (p.z > 14.0f) game->zombies[i].position.z = 14.0f;
+        if (p.y < 0.0f) game->zombies[i].position.y = 0.0f;
     }
 }
 

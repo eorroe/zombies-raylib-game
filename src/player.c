@@ -142,15 +142,15 @@ void PlayerRender(Player *player, Shader shader) {
         }
 
         if (fabsf(fwd) > fabsf(rightDot)) {
-            leftAxis = rightAxis = (Vector3){ 1, 0, 0 };
+            leftAxis = rightAxis = (Vector3){ cosYaw, 0.0f, -sinYaw };
             if (fwd < 0.0f) legSwing = -legSwing;
         } else {
-            leftAxis = rightAxis = (Vector3){ 0, 0, 1 };
+            leftAxis = rightAxis = (Vector3){ sinYaw, 0.0f, cosYaw };
         }
     }
 
-    float leftLegAngle = yawDeg - legSwing * RAD2DEG;
-    float rightLegAngle = yawDeg + legSwing * RAD2DEG;
+    float leftLegAngle = -legSwing * RAD2DEG;
+    float rightLegAngle = legSwing * RAD2DEG;
     DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
     DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
 }

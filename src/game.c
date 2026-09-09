@@ -16,6 +16,10 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type) {
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
     ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieShirt, game->textures.zombiePants);
+    game->zombies[idx].speed = ZOMBIE_SPEED_BASE;
+    if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
+        game->zombies[idx].speed = ZOMBIE_SPEED_BASE * 2.0f;
+    }
 }
 
 static void SpawnWave(Game *game) {

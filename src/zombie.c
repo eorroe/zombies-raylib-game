@@ -66,7 +66,7 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
         float dist = Vector3Length(dir);
         if (dist > 0.1f) {
             dir = Vector3Normalize(dir);
-            zombie->velocity = Vector3Scale(dir, ZOMBIE_SPEED_BASE);
+            zombie->velocity = Vector3Scale(dir, zombie->speed);
             zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
         }
     }

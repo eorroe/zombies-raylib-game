@@ -171,6 +171,14 @@ void RendererDrawZombieHeads(Game *game) {
         Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
         Rectangle dst = { screenPos.x - size / 2, screenPos.y - size / 2, size, size };
         DrawTexturePro(tex, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);
+        
+        float barHeight = 6.0f;
+        float barWidth = size;
+        float barX = screenPos.x - size / 2;
+        float barY = screenPos.y - size / 2 - barHeight - 4.0f;
+        float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
+        DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
+        DrawRectangle(barX, barY, barWidth * healthPct, barHeight, RED);
     }
 }
 

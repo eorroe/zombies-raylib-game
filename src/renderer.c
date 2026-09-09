@@ -229,6 +229,7 @@ void RendererDrawParticles(Particle *particles, int count) {
 void RendererDrawHUD(Game *game) {
     DrawRectangle(0, 0, game->sceneTarget.texture.width, 60, ColorAlpha(BLACK, 0.5f));
     DrawText(TextFormat("Score: %d", game->score), 20, 20, 30, WHITE);
+    DrawText(TextFormat("Kills: %d", game->totalDeadZombies), 140, 20, 30, WHITE);
     DrawText(TextFormat("Health: %.0f", game->player.health), 200, 20, 30, WHITE);
     DrawText(TextFormat("Ammo: %d", game->weapon.ammo), 400, 20, 30, WHITE);
     if (game->weapon.reloading) {

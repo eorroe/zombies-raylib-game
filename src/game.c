@@ -340,6 +340,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
             ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
             if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
                 game->score += 100;
+                game->totalDeadZombies += 1;
                 DebugLogf(&game->debug, DEBUG_INFO, "Score: %d", game->score);
                 AudioPlayZombieGrowl(&game->audio);
                 Vector3 deathPos = game->zombies[hit.zombieIndex].position;

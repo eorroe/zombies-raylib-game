@@ -47,6 +47,13 @@ typedef struct Game {
     ImageUpload imageUpload;
     DebugState debug;
     
+    Model crateModel;
+    Model barrelModel;
+    Model wallModel;
+    Model buildingModel;
+    Model floorModel;
+    Model bloodDecalModel;
+    
     MenuState menu;
 } Game;
 

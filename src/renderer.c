@@ -5,11 +5,53 @@
 #include "zombie.h"
 #include "raymath.h"
 
+static void SetModelTexture(Model *model, Texture2D tex) {
+    if (model->meshCount > 0 && model->materialCount > 0) {
+        model->materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tex;
+    }
+}
+
 void RendererInit(Game *game, int screenWidth, int screenHeight) {
     game->sceneTarget = LoadRenderTexture(screenWidth, screenHeight);
     game->postProcessTarget = LoadRenderTexture(screenWidth, screenHeight);
     ShaderInit(&game->shaders, screenWidth, screenHeight);
     ShaderUpdate(&game->shaders, 0.0f, screenWidth, screenHeight);
+    
+    Mesh crateMesh = GenMeshCube(0.6f, 0.6f, 0.6f);
+    game->crateModel = LoadModelFromMesh(crateMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->crateModel, game->textures.concrete);
+    }
+    
+    Mesh barrelMesh = GenMeshCylinder(0.2f, 0.8f, 16);
+    game->barrelModel = LoadModelFromMesh(barrelMesh);
+    if (game->textures.generated && game->textures.metal.id != 0) {
+        SetModelTexture(&game->barrelModel, game->textures.metal);
+    }
+    
+    Mesh wallMesh = GenMeshCube(4.0f, 1.5f, 0.4f);
+    game->wallModel = LoadModelFromMesh(wallMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->wallModel, game->textures.concrete);
+    }
+    
+    Mesh buildingMesh = GenMeshCube(2.5f, 3.0f, 2.5f);
+    game->buildingModel = LoadModelFromMesh(buildingMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->buildingModel, game->textures.concrete);
+    }
+    
+    Mesh floorMesh = GenMeshPlane(50, 50, 50, 50);
+    game->floorModel = LoadModelFromMesh(floorMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->floorModel, game->textures.concrete);
+    }
+    
+    Mesh bloodMesh = GenMeshPlane(1.5f, 1.5f, 4, 4);
+    game->bloodDecalModel = LoadModelFromMesh(bloodMesh);
+    if (game->textures.generated && game->textures.bloodDecal.id != 0) {
+        SetModelTexture(&game->bloodDecalModel, game->textures.bloodDecal);
+    }
 }
 
 void RendererBegin(Game *game, Camera3D camera) {
@@ -27,11 +69,11 @@ void RendererBegin(Game *game, Camera3D camera) {
 void RendererDrawScene(Game *game) {
     (void)game;
 
-    Color floorColor = (Color){ 50, 50, 55, 255 };
-    if (game->textures.generated && game->textures.concrete.id != 0) {
-        floorColor = (Color){ 70, 70, 75, 255 };
+    if (game->floorModel.meshCount > 0) {
+        DrawModel(game->floorModel, (Vector3){ 0, 0, 0 }, 1.0f, WHITE);
+    } else {
+        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 50, 50, 55, 255 });
     }
-    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, floorColor);
 
     Vector3 lightDir = Vector3Normalize((Vector3){ 0.5f, 1.0f, 0.3f });
     Vector3 lightPos = Vector3Scale(lightDir, -20.0f);
@@ -70,8 +112,12 @@ void RendererDrawScene(Game *game) {
             0.3f,
             sinf(angle) * radius
         };
-        DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 80, 70, 60, 255 });
-        DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 50, 45, 40, 255 });
+        if (game->crateModel.meshCount > 0) {
+            DrawModel(game->crateModel, cratePos, 1.0f, WHITE);
+        } else {
+            DrawCube(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 80, 70, 60, 255 });
+            DrawCubeWires(cratePos, 0.6f, 0.6f, 0.6f, (Color){ 50, 45, 40, 255 });
+        }
     }
 
     for (int i = 0; i < 4; i++) {
@@ -82,15 +128,23 @@ void RendererDrawScene(Game *game) {
             0.4f,
             sinf(angle) * radius
         };
-        DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 100, 90, 70, 255 });
-        DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 60, 55, 45, 255 });
+        if (game->barrelModel.meshCount > 0) {
+            DrawModel(game->barrelModel, barrelPos, 1.0f, WHITE);
+        } else {
+            DrawCylinder(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 100, 90, 70, 255 });
+            DrawCylinderWires(barrelPos, 0.2f, 0.2f, 0.8f, 12, (Color){ 60, 55, 45, 255 });
+        }
     }
 
     for (int i = 0; i < 5; i++) {
         float x = -10.0f + i * 5.0f;
         Vector3 wallPos = { x, 0.75f, -10.0f };
-        DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 90, 85, 80, 255 });
-        DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 55, 50, 45, 255 });
+        if (game->wallModel.meshCount > 0) {
+            DrawModel(game->wallModel, wallPos, 1.0f, WHITE);
+        } else {
+            DrawCube(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 90, 85, 80, 255 });
+            DrawCubeWires(wallPos, 4.0f, 1.5f, 0.4f, (Color){ 55, 50, 45, 255 });
+        }
     }
 
     for (int i = 0; i < 6; i++) {
@@ -98,11 +152,15 @@ void RendererDrawScene(Game *game) {
         float z = 8.0f;
         float h = 1.5f + (i % 3) * 1.0f;
         Vector3 bldPos = { x, h * 0.5f, z };
-        Color bldColor = (Color){ 75, 75, 80, 255 };
-        if (i % 3 == 1) bldColor = (Color){ 85, 80, 75, 255 };
-        else if (i % 3 == 2) bldColor = (Color){ 70, 75, 85, 255 };
-        DrawCube(bldPos, 2.5f, h, 2.5f, bldColor);
-        DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 45, 45, 50, 255 });
+        if (game->buildingModel.meshCount > 0) {
+            DrawModelEx(game->buildingModel, bldPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, h / 3.0f, 1 }, WHITE);
+        } else {
+            Color bldColor = (Color){ 75, 75, 80, 255 };
+            if (i % 3 == 1) bldColor = (Color){ 85, 80, 75, 255 };
+            else if (i % 3 == 2) bldColor = (Color){ 70, 75, 85, 255 };
+            DrawCube(bldPos, 2.5f, h, 2.5f, bldColor);
+            DrawCubeWires(bldPos, 2.5f, h, 2.5f, (Color){ 45, 45, 50, 255 });
+        }
 
         for (int w = 0; w < 3; w++) {
             float wx = x - 0.6f + w * 0.6f;
@@ -129,7 +187,11 @@ void RendererDrawBloodDecals(Game *game) {
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
         pos.y = 0.02f;
-        DrawPlane(pos, (Vector2){ 1.5f, 1.5f }, (Color){ 140, 0, 0, 160 });
+        if (game->bloodDecalModel.meshCount > 0) {
+            DrawModel(game->bloodDecalModel, pos, 1.0f, WHITE);
+        } else {
+            DrawPlane(pos, (Vector2){ 1.5f, 1.5f }, (Color){ 140, 0, 0, 160 });
+        }
     }
 }
 
@@ -230,4 +292,10 @@ void RendererEnd(Game *game) {
 void RendererShutdown(Game *game) {
     UnloadRenderTexture(game->sceneTarget);
     UnloadRenderTexture(game->postProcessTarget);
+    if (game->crateModel.meshCount > 0) UnloadModel(game->crateModel);
+    if (game->barrelModel.meshCount > 0) UnloadModel(game->barrelModel);
+    if (game->wallModel.meshCount > 0) UnloadModel(game->wallModel);
+    if (game->buildingModel.meshCount > 0) UnloadModel(game->buildingModel);
+    if (game->floorModel.meshCount > 0) UnloadModel(game->floorModel);
+    if (game->bloodDecalModel.meshCount > 0) UnloadModel(game->bloodDecalModel);
 }

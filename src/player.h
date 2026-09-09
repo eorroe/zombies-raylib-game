@@ -15,9 +15,17 @@ typedef struct {
     float maxHealth;
     float yaw;
     float pitch;
-    Model model;
+    Model bodyModel;
+    Model headModel;
+    Model leftArmModel;
+    Model rightArmModel;
+    Model leftLegModel;
+    Model rightLegModel;
+    Texture2D uniformTex;
+    Texture2D skinTex;
     bool isMoving;
     float footstepTimer;
+    float animTime;
 } Player;
 
 void PlayerInit(Player *player, Vector3 startPos);

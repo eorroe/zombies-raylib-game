@@ -75,6 +75,73 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     }
     
     SpawnWave(game);
+    DisableCursor();
+}
+
+static bool PointInAABB(Vector3 p, Vector3 center, Vector3 size) {
+    Vector3 half = Vector3Scale(size, 0.5f);
+    Vector3 min = Vector3Subtract(center, half);
+    Vector3 max = Vector3Add(center, half);
+    return p.x >= min.x && p.x <= max.x &&
+           p.z >= min.z && p.z <= max.z;
+}
+
+static void GameApplyCollisions(Game *game) {
+    Vector3 p = game->player.position;
+    float radius = PLAYER_RADIUS;
+    
+    for (int i = 0; i < game->zombieCount; i++) {
+        if (!ZombieIsAlive(&game->zombies[i])) continue;
+        float dist = Vector3Length(Vector3Subtract(p, game->zombies[i].position));
+        float minDist = radius + 0.4f;
+        if (dist < minDist && dist > 0.001f) {
+            Vector3 push = Vector3Normalize(Vector3Subtract(p, game->zombies[i].position));
+            game->player.position = Vector3Add(game->player.position, Vector3Scale(push, minDist - dist));
+        }
+    }
+    
+    if (PointInAABB(p, (Vector3){ 0, 0.75f, -10.0f }, (Vector3){ 20.0f, 1.5f, 0.4f })) {
+        game->player.position.z = -10.0f - 0.4f - radius;
+    }
+    
+    Vector3 buildingPositions[6];
+    float buildingSizes[6][3];
+    for (int i = 0; i < 6; i++) {
+        float x = -8.0f + i * 3.5f;
+        float z = 8.0f;
+        float h = 1.5f + (i % 3) * 1.0f;
+        buildingPositions[i] = (Vector3){ x, h * 0.5f, z };
+        buildingSizes[i][0] = 2.5f;
+        buildingSizes[i][1] = h;
+        buildingSizes[i][2] = 2.5f;
+        if (PointInAABB(p, buildingPositions[i], (Vector3){ buildingSizes[i][0], buildingSizes[i][1], buildingSizes[i][2] })) {
+            float dx = p.x - buildingPositions[i].x;
+            float dz = p.z - buildingPositions[i].z;
+            float halfX = buildingSizes[i][0] * 0.5f + radius;
+            float halfZ = buildingSizes[i][2] * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->player.position.x = buildingPositions[i].x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->player.position.z = buildingPositions[i].z + (dz > 0 ? halfZ : -halfZ);
+            }
+        }
+    }
+    
+    for (int i = 0; i < 8; i++) {
+        float angle = i * PI * 0.25f;
+        float radius2 = 12.0f;
+        Vector3 cratePos = { cosf(angle) * radius2, 0.3f, sinf(angle) * radius2 };
+        if (PointInAABB(p, cratePos, (Vector3){ 0.6f, 0.6f, 0.6f })) {
+            float dx = p.x - cratePos.x;
+            float dz = p.z - cratePos.z;
+            float dist2 = sqrtf(dx*dx + dz*dz);
+            if (dist2 > 0.001f) {
+                float pushDist = 0.6f * 0.5f + radius;
+                game->player.position.x = cratePos.x + (dx / dist2) * pushDist;
+                game->player.position.z = cratePos.z + (dz / dist2) * pushDist;
+            }
+        }
+    }
 }
 
 void GameUpdate(Game *game, float dt) {
@@ -88,6 +155,8 @@ void GameUpdate(Game *game, float dt) {
     PlayerUpdate(&game->player, CameraGetCamera(&game->camera), dt);
     CameraUpdate(&game->camera, &game->player, dt);
     WeaponUpdate(&game->weapon, game->camera.camera, dt);
+    
+    GameApplyCollisions(game);
     
     DebugLogf(&game->debug, DEBUG_INFO, "Player health: %.1f", game->player.health);
     DebugLogf(&game->debug, DEBUG_INFO, "Zombies alive: %d", game->zombieCount);
@@ -120,19 +189,28 @@ void GameUpdate(Game *game, float dt) {
                 DebugLogf(&game->debug, DEBUG_INFO, "Score: %d", game->score);
                 AudioPlayZombieGrowl(&game->audio);
                 Vector3 deathPos = game->zombies[hit.zombieIndex].position;
-                for (int p = 0; p < 20; p++) {
+                for (int p = 0; p < 30; p++) {
                     if (game->particleCount < 256) {
                         Vector3 bloodVel = {
                             (rand()%100-50)/25.0f,
-                            (rand()%100)/25.0f,
+                            (rand()%100)/15.0f,
                             (rand()%100-50)/25.0f
                         };
                         ParticleSpawn(&game->particles[game->particleCount++], deathPos,
-                            bloodVel, 2.0f, PARTICLE_BLOOD, 0.08f + rand()%100/1000.0f, (Color){ 120 + rand()%60, 0, 0, 255 });
+                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 160 + rand()%60, 0, 0, 255 });
                     }
                 }
                 if (game->bloodDecalCount < 128) {
                     game->bloodDecals[game->bloodDecalCount++] = deathPos;
+                }
+                for (int p = 0; p < 3; p++) {
+                    if (game->particleCount < 256) {
+                        Vector3 splashPos = deathPos;
+                        splashPos.y = 0.05f;
+                        ParticleSpawn(&game->particles[game->particleCount++], splashPos,
+                            (Vector3){ (rand()%100-50)/80.0f, 0.05f, (rand()%100-50)/80.0f },
+                            3.0f, PARTICLE_BLOOD, 0.2f + rand()%100/500.0f, (Color){ 140, 0, 0, 200 });
+                    }
                 }
             }
             for (int p = 0; p < 5; p++) {
@@ -222,6 +300,12 @@ int main(void) {
         if (IsKeyPressed(KEY_F2)) DebugClear(&game.debug);
         InputUpdate(&input, game.menu.active);
         UIUpdate(&game.menu, &input, &game);
+        
+        if (game.state == GAME_STATE_MENU) {
+            EnableCursor();
+        } else if (game.state == GAME_STATE_PLAYING) {
+            DisableCursor();
+        }
         
         if (autoStart && frameCount == autoStartFrame && game.state == GAME_STATE_MENU) {
             game.state = GAME_STATE_PLAYING;

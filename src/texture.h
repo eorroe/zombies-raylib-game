@@ -10,6 +10,7 @@ typedef struct {
     Texture2D bloodDecal;
     Texture2D concrete;
     Texture2D defaultZombieHead;
+    Texture2D metal;
     bool generated;
 } ProceduralTextures;
 
@@ -17,6 +18,9 @@ void TextureGenerate(ProceduralTextures *textures);
 void TextureShutdown(ProceduralTextures *textures);
 Texture2D TextureCreateBloodSplatter(int width, int height);
 Texture2D TextureCreateZombieSkin(int width, int height);
+Texture2D TextureCreateUniformTexture(int width, int height);
+Texture2D TextureCreateConcreteTexture(int width, int height);
+Texture2D TextureCreateMetalTexture(int width, int height);
 Texture2D TextureCreateNoiseTexture(int width, int height, float intensity);
 
 #endif

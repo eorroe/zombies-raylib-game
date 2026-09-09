@@ -178,6 +178,11 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         if (deathProgress > 1.0f) deathProgress = 1.0f;
         armSwing = deathProgress * 2.0f;
         legSwing = deathProgress * 2.0f;
+        float groundY = 0.05f;
+        shoulderL.y = shoulderL.y + (groundY - shoulderL.y) * deathProgress;
+        shoulderR.y = shoulderR.y + (groundY - shoulderR.y) * deathProgress;
+        hipL.y = hipL.y + (groundY - hipL.y) * deathProgress;
+        hipR.y = hipR.y + (groundY - hipR.y) * deathProgress;
     }
 
     Vector3 playerPos = camera.position;

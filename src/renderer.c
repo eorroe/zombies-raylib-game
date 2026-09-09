@@ -228,17 +228,40 @@ void RendererDrawParticles(Particle *particles, int count) {
 
 void RendererDrawHUD(Game *game) {
     DrawRectangle(0, 0, game->sceneTarget.texture.width, 60, ColorAlpha(BLACK, 0.5f));
-    DrawText(TextFormat("Score: %d", game->score), 20, 20, 30, WHITE);
-    DrawText(TextFormat("Kills: %d", game->totalDeadZombies), 140, 20, 30, WHITE);
-    DrawText(TextFormat("Health: %.0f", game->player.health), 200, 20, 30, WHITE);
-    DrawText(TextFormat("Ammo: %d", game->weapon.ammo), 400, 20, 30, WHITE);
-    const char *modeText = (game->mode == GAME_MODE_ROUNDS) ? "Rounds" : "Endless";
-    DrawText(TextFormat("Mode: %s", modeText), 520, 20, 30, WHITE);
+    int x = 20;
+    int gap = 10;
+    int y = 20;
+    int fontSize = 30;
+    Color color = WHITE;
+
+    const char *scoreText = TextFormat("Score: %d", game->score);
+    DrawText(scoreText, x, y, fontSize, color);
+    x += MeasureText(scoreText, fontSize) + gap;
+
+    const char *killsText = TextFormat("Kills: %d", game->totalDeadZombies);
+    DrawText(killsText, x, y, fontSize, color);
+    x += MeasureText(killsText, fontSize) + gap;
+
+    const char *healthText = TextFormat("Health: %.0f", game->player.health);
+    DrawText(healthText, x, y, fontSize, color);
+    x += MeasureText(healthText, fontSize) + gap;
+
+    const char *ammoText = TextFormat("Ammo: %d", game->weapon.ammo);
+    DrawText(ammoText, x, y, fontSize, color);
+    x += MeasureText(ammoText, fontSize) + gap;
+
+    const char *modeText = TextFormat("Mode: %s", (game->mode == GAME_MODE_ROUNDS) ? "Rounds" : "Endless");
+    DrawText(modeText, x, y, fontSize, color);
+    x += MeasureText(modeText, fontSize) + gap;
+
     if (game->mode == GAME_MODE_ROUNDS) {
-        DrawText(TextFormat("Round: %d", game->round), 700, 20, 30, WHITE);
+        const char *roundText = TextFormat("Round: %d", game->round);
+        DrawText(roundText, x, y, fontSize, color);
+        x += MeasureText(roundText, fontSize) + gap;
     }
+
     if (game->weapon.reloading) {
-        DrawText("RELOADING...", 860, 20, 30, YELLOW);
+        DrawText("RELOADING...", x, y, fontSize, YELLOW);
     }
     
     if (CameraGetFirstPersonBlend(&game->camera) > 0.5f) {

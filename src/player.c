@@ -2,6 +2,7 @@
 #include "raymath.h"
 #include "texture.h"
 #include "input.h"
+#include <stdlib.h>
 #include <math.h>
 
 static Model CreateLimb(float radius, float length, int slices) {

@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "raylib.h"
+#include "input.h"
 
 #define PLAYER_SPEED 5.0f
 #define PLAYER_HEALTH 100.0f

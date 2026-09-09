@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "zombie.h"
+#include "input.h"
 
 #define WEAPON_DAMAGE 25.0f
 #define WEAPON_RANGE 100.0f
@@ -42,5 +43,6 @@ void WeaponReload(Weapon *weapon);
 bool WeaponCanShoot(Weapon *weapon);
 void WeaponApplyRecoil(Weapon *weapon);
 RayHitInfo WeaponRaycast(Weapon *weapon, Camera3D camera, Zombie *zombies, int zombieCount);
+void WeaponShutdown(Weapon *weapon);
 
 #endif

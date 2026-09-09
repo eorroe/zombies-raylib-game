@@ -58,7 +58,7 @@ typedef struct Game {
 } Game;
 
 void GameInit(Game *game, int screenWidth, int screenHeight);
-void GameUpdate(Game *game, float dt);
+void GameUpdate(Game *game, float dt, InputState *input);
 void GameRender(Game *game);
 void GameShutdown(Game *game);
 

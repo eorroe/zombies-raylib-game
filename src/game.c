@@ -168,7 +168,7 @@ static void GameApplyCollisions(Game *game) {
     }
 }
 
-void GameUpdate(Game *game, float dt) {
+void GameUpdate(Game *game, float dt, InputState *input) {
     DebugUpdate(&game->debug, dt);
     if (IsKeyPressed(KEY_F1)) DebugToggle(&game->debug);
     if (IsKeyPressed(KEY_F2)) DebugClear(&game->debug);
@@ -176,9 +176,9 @@ void GameUpdate(Game *game, float dt) {
     if (game->state != GAME_STATE_PLAYING) return;
     
     game->gameTime += dt;
-    PlayerUpdate(&game->player, &input, dt);
+    PlayerUpdate(&game->player, input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
-    WeaponUpdate(&game->weapon, game->player.position, &input, dt);
+    WeaponUpdate(&game->weapon, game->player.position, input, dt);
     
     GameApplyCollisions(game);
     
@@ -203,7 +203,7 @@ void GameUpdate(Game *game, float dt) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (input.mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
+    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon)) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         
@@ -400,7 +400,7 @@ int main(void) {
         }
         
         if (game.state == GAME_STATE_PLAYING) {
-            GameUpdate(&game, GetFrameTime());
+            GameUpdate(&game, GetFrameTime(), &input);
         }
         
         BeginDrawing();

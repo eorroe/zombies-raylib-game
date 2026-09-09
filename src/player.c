@@ -5,6 +5,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+static Model CreateLimbPivoted(float radius, float length, int slices) {
+    Mesh m = GenMeshCylinder(radius, length, slices);
+    for (int i = 0; i < m.vertexCount; i++) {
+        m.vertices[i * 3 + 1] += length * 0.5f;
+    }
+    Model model = LoadModelFromMesh(m);
+    return model;
+}
+
 static Model CreateLimb(float radius, float length, int slices) {
     Mesh m = GenMeshCylinder(radius, length, slices);
     Model model = LoadModelFromMesh(m);
@@ -37,8 +46,8 @@ void PlayerInit(Player *player, Vector3 startPos) {
 
     player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
     player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
-    player->leftLegModel = CreateLimb(0.1f, 0.9f, 8);
-    player->rightLegModel = CreateLimb(0.1f, 0.9f, 8);
+    player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
     for (int i = 0; i < 800; i++) {

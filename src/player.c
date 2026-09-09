@@ -5,15 +5,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-static Model CreateLimbPivoted(float radius, float length, int slices) {
-    Mesh m = GenMeshCylinder(radius, length, slices);
-    for (int i = 0; i < m.vertexCount; i++) {
-        m.vertices[i * 3 + 1] -= length * 0.5f;
-    }
-    Model model = LoadModelFromMesh(m);
-    return model;
-}
-
 static Model CreateLimb(float radius, float length, int slices) {
     Mesh m = GenMeshCylinder(radius, length, slices);
     Model model = LoadModelFromMesh(m);
@@ -46,8 +37,8 @@ void PlayerInit(Player *player, Vector3 startPos) {
 
     player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
     player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
-    player->leftLegModel = CreateLimbPivoted(0.1f, PLAYER_LEG_LENGTH, 8);
-    player->rightLegModel = CreateLimbPivoted(0.1f, PLAYER_LEG_LENGTH, 8);
+    player->leftLegModel = CreateLimb(0.1f, 0.9f, 8);
+    player->rightLegModel = CreateLimb(0.1f, 0.9f, 8);
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
     for (int i = 0; i < 800; i++) {
@@ -151,17 +142,19 @@ void PlayerRender(Player *player, Shader shader) {
         }
 
         if (fabsf(fwd) > fabsf(rightDot)) {
-            leftAxis = rightAxis = (Vector3){ cosYaw, 0.0f, -sinYaw };
             if (fwd < 0.0f) legSwing = -legSwing;
+            leftAxis = rightAxis = PlayerGetRight(player);
         } else {
-            leftAxis = rightAxis = (Vector3){ sinYaw, 0.0f, cosYaw };
+            leftAxis = rightAxis = PlayerGetForward(player);
         }
     }
 
     float leftLegAngle = -legSwing * RAD2DEG;
     float rightLegAngle = legSwing * RAD2DEG;
-    DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    Vector3 leftLegPos = Vector3Add(leftHip, (Vector3){ 0, -0.45f, 0 });
+    Vector3 rightLegPos = Vector3Add(rightHip, (Vector3){ 0, -0.45f, 0 });
+    DrawModelEx(player->leftLegModel, leftLegPos, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightLegModel, rightLegPos, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {

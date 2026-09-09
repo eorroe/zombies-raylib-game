@@ -1,7 +1,10 @@
 #include "particle.h"
+#include "texture.h"
 #include "raymath.h"
 #include <stdlib.h>
 #include <math.h>
+
+static ProceduralTextures *gTextures = NULL;
 
 void ParticleInit(Particle *p) {
     p->active = false;
@@ -40,8 +43,13 @@ void ParticleRender(Particle *p) {
     if (!p->active) return;
     float alpha = p->life / p->maxLife;
     Color c = p->color;
-    c.a = (unsigned char)(alpha * 255);
-    DrawSphere(p->position, p->size * alpha, c);
+    c.a = (unsigned char)(alpha * 200);
+    
+    if (p->type == PARTICLE_BLOOD) {
+        DrawSphere(p->position, p->size * (1.0f - alpha * 0.3f), c);
+    } else {
+        DrawSphere(p->position, p->size * alpha, c);
+    }
 }
 
 bool ParticleIsAlive(Particle *p) {

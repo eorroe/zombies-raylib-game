@@ -38,6 +38,8 @@ typedef struct Game {
     int zombieCount;
     Particle particles[256];
     int particleCount;
+    Vector3 bloodDecals[128];
+    int bloodDecalCount;
     AudioManager audio;
     ProceduralTextures textures;
     ImageUpload imageUpload;

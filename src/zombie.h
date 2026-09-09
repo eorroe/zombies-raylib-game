@@ -21,11 +21,24 @@ typedef struct {
     int textureIndex;
     float attackCooldown;
     bool active;
-    Model model;
     float animTime;
+    float walkCycle;
+    Model bodyModel;
+    Model headModel;
+    Model leftUpperArm;
+    Model leftLowerArm;
+    Model rightUpperArm;
+    Model rightLowerArm;
+    Model leftUpperLeg;
+    Model leftLowerLeg;
+    Model rightUpperLeg;
+    Model rightLowerLeg;
+    Texture2D skinTex;
+    Texture2D shirtTex;
+    Texture2D pantsTex;
 } Zombie;
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex);
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants);
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt);
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader);
 void ZombieShutdown(Zombie *zombie);

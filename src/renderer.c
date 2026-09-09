@@ -25,6 +25,16 @@ void RendererDrawScene(Game *game) {
     DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 60, 60, 60, 255 });
 }
 
+void RendererDrawBloodDecals(Game *game) {
+    if (game->bloodDecalCount <= 0) return;
+    Texture2D blood = game->textures.bloodDecal;
+    if (blood.id == 0) return;
+    for (int i = 0; i < game->bloodDecalCount; i++) {
+        Vector3 pos = game->bloodDecals[i];
+        DrawPlane(pos, (Vector2){ 1.5f, 1.5f }, (Color){ 120, 0, 0, 180 });
+    }
+}
+
 void RendererDrawZombies(Game *game, Shader shader) {
     (void)shader;
     Camera3D cam = CameraGetCamera(&game->camera);

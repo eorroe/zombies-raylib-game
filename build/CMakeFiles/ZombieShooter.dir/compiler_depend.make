@@ -305,6 +305,7 @@ CMakeFiles/ZombieShooter.dir/src/particle.c.o: ../src/particle.c \
   ../raylib_src/src/raylib.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
+  ../src/texture.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \

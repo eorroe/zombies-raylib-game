@@ -15,7 +15,7 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type) {
         texIdx = rand() % game->zombieHeadTextureCount;
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
-    ZombieInit(&game->zombies[idx], pos, type, texIdx);
+    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieShirt, game->textures.zombiePants);
 }
 
 static void SpawnWave(Game *game) {
@@ -49,6 +49,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->scopeActive = false;
     game->zombieCount = 0;
     game->particleCount = 0;
+    game->bloodDecalCount = 0;
     game->zombieHeadTextureCount = 0;
     
     PlayerInit(&game->player, (Vector3){ 0, 0, 0 });
@@ -116,6 +117,21 @@ void GameUpdate(Game *game, float dt) {
                 game->score += 100;
                 DebugLogf(&game->debug, DEBUG_INFO, "Score: %d", game->score);
                 AudioPlayZombieGrowl(&game->audio);
+                Vector3 deathPos = game->zombies[hit.zombieIndex].position;
+                for (int p = 0; p < 20; p++) {
+                    if (game->particleCount < 256) {
+                        Vector3 bloodVel = {
+                            (rand()%100-50)/25.0f,
+                            (rand()%100)/25.0f,
+                            (rand()%100-50)/25.0f
+                        };
+                        ParticleSpawn(&game->particles[game->particleCount++], deathPos,
+                            bloodVel, 2.0f, PARTICLE_BLOOD, 0.08f + rand()%100/1000.0f, (Color){ 120 + rand()%60, 0, 0, 255 });
+                    }
+                }
+                if (game->bloodDecalCount < 128) {
+                    game->bloodDecals[game->bloodDecalCount++] = deathPos;
+                }
             }
             for (int p = 0; p < 5; p++) {
                 if (game->particleCount < 256) {
@@ -147,6 +163,7 @@ void GameRender(Game *game) {
     Camera3D cam = CameraGetCamera(&game->camera);
     RendererBegin(game, cam);
     RendererDrawScene(game);
+    RendererDrawBloodDecals(game);
     RendererDrawZombies(game, game->shaders.pbr);
     RendererDrawPlayer(&game->player, game->shaders.pbr);
     RendererDrawParticles(game->particles, game->particleCount);

@@ -366,26 +366,37 @@ void GameUpdate(Game *game, float dt, InputState *input) {
             if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
                 game->score += 100;
                 game->totalDeadZombies += 1;
-                if (game->zombies[hit.zombieIndex].type == ZOMBIE_TYPE_DEFAULT) {
-                    game->nonImageDeathsSinceLastImage++;
-                    if (game->mode == GAME_MODE_ENDLESS && game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0 && game->nonImageDeathsSinceLastImage >= 3) {
-                        game->nonImageDeathsSinceLastImage = 0;
-                        int usedImages[16] = { false };
-                        for (int k = 0; k < game->zombieCount; k++) {
-                            if (game->zombies[k].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombies[k].active) {
-                                if (game->zombies[k].textureIndex >= 0 && game->zombies[k].textureIndex < 16) {
-                                    usedImages[game->zombies[k].textureIndex] = true;
+                if (game->mode == GAME_MODE_ENDLESS && game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0) {
+                    bool anyImageAlive = false;
+                    for (int k = 0; k < game->zombieCount; k++) {
+                        if (game->zombies[k].type == ZOMBIE_TYPE_IMAGE_HEAD && ZombieIsAlive(&game->zombies[k])) {
+                            anyImageAlive = true;
+                            break;
+                        }
+                    }
+                    if (!anyImageAlive) {
+                        if (game->zombies[hit.zombieIndex].type == ZOMBIE_TYPE_DEFAULT) {
+                            game->nonImageDeathsSinceLastImage++;
+                        }
+                        if (game->nonImageDeathsSinceLastImage >= 3) {
+                            game->nonImageDeathsSinceLastImage = 0;
+                            int usedImages[16] = { false };
+                            for (int k = 0; k < game->zombieCount; k++) {
+                                if (game->zombies[k].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombies[k].active) {
+                                    if (game->zombies[k].textureIndex >= 0 && game->zombies[k].textureIndex < 16) {
+                                        usedImages[game->zombies[k].textureIndex] = true;
+                                    }
                                 }
                             }
-                        }
-                        int available[16];
-                        int availCount = 0;
-                        for (int j = 0; j < game->zombieHeadTextureCount && j < 16; j++) {
-                            if (!usedImages[j]) available[availCount++] = j;
-                        }
-                        if (availCount > 0) {
-                            int texIdx = available[rand() % availCount];
-                            SpawnImageZombie(game, texIdx);
+                            int available[16];
+                            int availCount = 0;
+                            for (int j = 0; j < game->zombieHeadTextureCount && j < 16; j++) {
+                                if (!usedImages[j]) available[availCount++] = j;
+                            }
+                            if (availCount > 0) {
+                                int texIdx = available[rand() % availCount];
+                                SpawnImageZombie(game, texIdx);
+                            }
                         }
                     }
                 }

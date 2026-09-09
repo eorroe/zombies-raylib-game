@@ -366,6 +366,22 @@ void GameUpdate(Game *game, float dt, InputState *input) {
             if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
                 game->score += 100;
                 game->totalDeadZombies += 1;
+                if (game->zombies[hit.zombieIndex].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
+                    bool anyImageAlive = false;
+                    for (int k = 0; k < game->zombieCount; k++) {
+                        if (k != hit.zombieIndex && game->zombies[k].type == ZOMBIE_TYPE_IMAGE_HEAD && ZombieIsAlive(&game->zombies[k])) {
+                            anyImageAlive = true;
+                            break;
+                        }
+                    }
+                    if (!anyImageAlive) {
+                        for (int k = 0; k < game->zombieCount; k++) {
+                            if (game->zombies[k].type == ZOMBIE_TYPE_DEFAULT && ZombieIsAlive(&game->zombies[k])) {
+                                game->zombies[k].speed = ZOMBIE_SPEED_BASE * 2.0f;
+                            }
+                        }
+                    }
+                }
                 if (game->mode == GAME_MODE_ENDLESS && game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0) {
                     bool anyImageAlive = false;
                     for (int k = 0; k < game->zombieCount; k++) {

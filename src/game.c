@@ -394,12 +394,16 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                                 if (!usedImages[j]) available[availCount++] = j;
                             }
                             if (availCount > 0) {
-                                int spawnCount = 1 + rand() % 3;
-                                if (spawnCount > availCount) spawnCount = availCount;
-                                for (int s = 0; s < spawnCount; s++) {
-                                    int pick = rand() % availCount;
-                                    int texIdx = available[pick];
-                                    SpawnImageZombie(game, texIdx);
+                                int spawnCount = 1 + rand() % availCount;
+                                int usedPick[16] = { false };
+                                int picked = 0;
+                                while (picked < spawnCount && picked < availCount) {
+                                    int idx = rand() % availCount;
+                                    if (!usedPick[idx]) {
+                                        usedPick[idx] = true;
+                                        SpawnImageZombie(game, available[idx]);
+                                        picked++;
+                                    }
                                 }
                             }
                         }

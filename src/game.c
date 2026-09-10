@@ -444,7 +444,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                             (rand()%100-50)/25.0f
                         };
                         ParticleSpawn(&game->particles[game->particleCount++], deathPos,
-                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 200 + rand()%55, 0, 0, 255 });
+                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 120, 20, 20, 255 });
                     }
                 }
                 if (game->bloodDecalCount < 128) {
@@ -456,7 +456,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                         splashPos.y = 0.05f;
                         ParticleSpawn(&game->particles[game->particleCount++], splashPos,
                             (Vector3){ (rand()%100-50)/80.0f, 0.05f, (rand()%100-50)/80.0f },
-                            3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 180, 0, 0, 220 });
+                            3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 100, 15, 15, 220 });
                     }
                 }
             }
@@ -464,7 +464,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                 if (game->particleCount < 256) {
                     ParticleSpawn(&game->particles[game->particleCount++], hit.point,
                         (Vector3){ (rand()%100-50)/50.0f, (rand()%100-50)/50.0f, (rand()%100-50)/50.0f },
-                        1.0f, PARTICLE_BLOOD, 0.05f, RED);
+                        1.0f, PARTICLE_BLOOD, 0.05f, (Color){ 100, 15, 15, 255 });
                 }
             }
         }
@@ -585,8 +585,8 @@ int main(void) {
         } else if (game.state == GAME_STATE_PLAYING) {
             GameRender(&game);
         } else if (game.state == GAME_STATE_GAMEOVER) {
-            DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, RED);
-            DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, WHITE);
+            DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, (Color){ 100, 30, 30, 255 });
+            DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, (Color){ 35, 35, 40, 255 });
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
                 GameShutdown(&game);
                 UIInit(&game.menu, screenWidth, screenHeight);

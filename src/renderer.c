@@ -58,18 +58,14 @@ void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
     BeginTextureMode(game->sceneTarget);
-    ClearBackground((Color){ 60, 60, 80, 255 });
-
-    DrawRectangleGradientV(0, 0, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 80, 60, 100, 255 }, (Color){ 120, 80, 140, 255 });
-    DrawRectangleGradientV(0, game->sceneTarget.texture.height / 2, game->sceneTarget.texture.width, game->sceneTarget.texture.height / 2, (Color){ 120, 80, 140, 255 }, (Color){ 60, 40, 70, 255 });
-
+    ClearBackground((Color){ 245, 240, 232, 255 });
     BeginMode3D(camera);
 }
 
 void RendererDrawScene(Game *game) {
     (void)game;
 
-    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 120, 120, 140, 255 });
+    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 210, 205, 195, 255 });
     DrawGrid(50, 1.0f);
 
     for (int i = 0; i < 16; i++) {
@@ -81,7 +77,7 @@ void RendererDrawScene(Game *game) {
             sinf(angle) * radius
         };
         DrawCube(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 200, 180, 160, 255 });
-        DrawCubeWires(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 255, 100, 100, 255 });
+        DrawCubeWires(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 40, 40, 45, 255 });
     }
 
     for (int i = 0; i < 10; i++) {
@@ -92,14 +88,14 @@ void RendererDrawScene(Game *game) {
             0.4f,
             sinf(angle) * radius
         };
-        DrawCylinder(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 220, 200, 170, 255 });
-        DrawCylinderWires(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 255, 140, 140, 255 });
+        DrawCylinder(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 190, 175, 155, 255 });
+        DrawCylinderWires(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 40, 40, 45, 255 });
     }
 
     for (int i = 0; i < 1; i++) {
         Vector3 wallPos = { 0, 0.75f, -10.0f };
-        DrawCube(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 180, 175, 170, 255 });
-        DrawCubeWires(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 255, 80, 80, 255 });
+        DrawCube(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 190, 185, 180, 255 });
+        DrawCubeWires(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 40, 40, 45, 255 });
     }
 
     for (int i = 0; i < 12; i++) {
@@ -107,16 +103,17 @@ void RendererDrawScene(Game *game) {
         float z = 10.0f;
         float h = 1.5f + (i % 3) * 1.0f;
         Vector3 bldPos = { x, h * 0.5f, z };
-        Color bldColor = (Color){ 160, 160, 170, 255 };
-        if (i % 3 == 1) bldColor = (Color){ 180, 170, 160, 255 };
-        else if (i % 3 == 2) bldColor = (Color){ 160, 170, 190, 255 };
+        Color bldColor = (Color){ 175, 170, 165, 255 };
+        if (i % 3 == 1) bldColor = (Color){ 185, 175, 165, 255 };
+        else if (i % 3 == 2) bldColor = (Color){ 170, 175, 185, 255 };
         DrawCube(bldPos, 3.5f, h, 3.5f, bldColor);
-        DrawCubeWires(bldPos, 3.5f, h, 3.5f, (Color){ 255, 120, 120, 255 });
+        DrawCubeWires(bldPos, 3.5f, h, 3.5f, (Color){ 40, 40, 45, 255 });
 
         for (int w = 0; w < 5; w++) {
             float wx = x - 1.0f + w * 1.0f;
             float wy = h * 0.5f + 0.3f;
-            DrawCube((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 255, 50, 50, 255 });
+            DrawCube((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 140, 50, 50, 255 });
+            DrawCubeWires((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 40, 40, 45, 255 });
         }
     }
 
@@ -128,9 +125,11 @@ void RendererDrawScene(Game *game) {
             2.0f,
             sinf(angle) * radius
         };
-        DrawCylinder(lampPos, 0.2f, 0.2f, 3.0f, 8, (Color){ 120, 120, 130, 255 });
-        DrawSphere((Vector3){ lampPos.x, lampPos.y + 1.5f, lampPos.z }, 0.5f, (Color){ 255, 240, 200, 255 });
-        DrawSphere((Vector3){ lampPos.x, 0.05f, lampPos.z }, 3.0f, (Color){ 255, 200, 100, 60 });
+        DrawCylinder(lampPos, 0.2f, 0.2f, 3.0f, 8, (Color){ 110, 108, 105, 255 });
+        DrawCylinderWires(lampPos, 0.2f, 0.2f, 3.0f, 8, (Color){ 40, 40, 45, 255 });
+        DrawSphereWires((Vector3){ lampPos.x, lampPos.y + 1.5f, lampPos.z }, 0.5f, 8, 8, (Color){ 40, 40, 45, 255 });
+        DrawSphere((Vector3){ lampPos.x, 0.05f, lampPos.z }, 3.0f, (Color){ 240, 200, 100, 60 });
+        DrawSphereWires((Vector3){ lampPos.x, 0.05f, lampPos.z }, 3.0f, 8, 8, (Color){ 40, 40, 45, 60 });
     }
 }
 
@@ -139,7 +138,7 @@ void RendererDrawBloodDecals(Game *game) {
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
         pos.y = 0.03f;
-        DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){ 255, 0, 0, 220 });
+        DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){ 120, 20, 20, 200 });
     }
 }
 
@@ -187,16 +186,16 @@ void RendererDrawZombieHeads(Game *game) {
                 float barX = screenPos.x - size / 2;
                 float barY = screenPos.y - size / 2 - barHeight - 4.0f;
                 float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
-                DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
-                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, RED);
+                DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 60, 40, 40, 255 });
+                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, (Color){ 120, 50, 50, 255 });
             }
         } else {
             Vector2 screenPos = GetWorldToScreen(headPos, cam);
             float barWidth = 40.0f;
             float barHeight = 4.0f;
             float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
-            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
-            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth * healthPct, barHeight, RED);
+            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth, barHeight, (Color){ 60, 40, 40, 255 });
+            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth * healthPct, barHeight, (Color){ 120, 50, 50, 255 });
         }
     }
 }
@@ -212,6 +211,7 @@ void RendererDrawParticles(Particle *particles, int count) {
     for (int i = 0; i < count; i++) {
         if (particles[i].type == PARTICLE_BLOOD) {
             DrawSphere(particles[i].position, particles[i].size * 4.0f, particles[i].color);
+            DrawSphereWires(particles[i].position, particles[i].size * 4.0f, 8, 8, (Color){ 40, 40, 45, 180 });
         }
     }
     
@@ -222,17 +222,19 @@ void RendererDrawParticles(Particle *particles, int count) {
         float z = cosf(t * 0.9f) * 28.0f;
         Vector3 dustPos = { x, y, z };
         float alpha = 0.8f + sinf(t + i) * 0.2f;
-        DrawSphere(dustPos, 0.3f, (Color){ 255, 255, 240, (unsigned char)(alpha * 255) });
+        DrawSphere(dustPos, 0.3f, (Color){ 200, 190, 170, (unsigned char)(alpha * 255) });
+        DrawSphereWires(dustPos, 0.3f, 8, 8, (Color){ 40, 40, 45, (unsigned char)(alpha * 180) });
     }
 }
 
 void RendererDrawHUD(Game *game) {
-    DrawRectangle(0, 0, game->sceneTarget.texture.width, 60, ColorAlpha(BLACK, 0.5f));
+    DrawRectangle(0, 0, game->sceneTarget.texture.width, 60, (Color){ 245, 240, 232, 200 });
+    DrawRectangleLines(0, 0, game->sceneTarget.texture.width, 60, (Color){ 40, 40, 45, 255 });
     int x = 20;
     int gap = 10;
     int y = 20;
     int fontSize = 30;
-    Color color = WHITE;
+    Color color = (Color){ 35, 35, 40, 255 };
 
     const char *scoreText = TextFormat("Score: %d", game->score);
     DrawText(scoreText, x, y, fontSize, color);
@@ -261,14 +263,14 @@ void RendererDrawHUD(Game *game) {
     }
 
     if (game->weapon.reloading) {
-        DrawText("RELOADING...", x, y, fontSize, YELLOW);
+        DrawText("RELOADING...", x, y, fontSize, (Color){ 140, 50, 50, 255 });
     }
     
     if (CameraGetFirstPersonBlend(&game->camera) > 0.5f) {
         int cx = game->sceneTarget.texture.width / 2;
         int cy = game->sceneTarget.texture.height / 2;
-        DrawLine(cx - 10, cy, cx + 10, cy, RED);
-        DrawLine(cx, cy - 10, cx, cy + 10, RED);
+        DrawLine(cx - 10, cy, cx + 10, cy, (Color){ 40, 40, 45, 255 });
+        DrawLine(cx, cy - 10, cx, cy + 10, (Color){ 40, 40, 45, 255 });
     }
 }
 

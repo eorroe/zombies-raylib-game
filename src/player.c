@@ -49,22 +49,34 @@ void PlayerInit(Player *player, Vector3 startPos) {
     player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
     player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
 
-    Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
-    for (int i = 0; i < 800; i++) {
+    Image uniformImg = GenImageColor(256, 256, (Color){ 70, 90, 180, 255 });
+    for (int i = 0; i < 1000; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 110 + rand() % 70;
-        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 10, shade + 25, 255 });
+        int shade = 50 + rand() % 60;
+        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 10, shade + 30, 255 });
+    }
+    for (int i = 0; i < 80; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int r = 4 + rand() % 10;
+        ImageDrawCircle(&uniformImg, x, y, r, (Color){ 40, 60, 160, 200 });
     }
     Texture2D uniformTex = LoadTextureFromImage(uniformImg);
     UnloadImage(uniformImg);
 
-    Image skinImg = GenImageColor(256, 256, (Color){ 180, 220, 140, 255 });
+    Image skinImg = GenImageColor(256, 256, (Color){ 220, 200, 170, 255 });
     for (int i = 0; i < 1500; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 140 + rand() % 100;
-        ImageDrawPixel(&skinImg, x, y, (Color){ shade, shade + 50, shade - 5, 255 });
+        int shade = 180 + rand() % 60;
+        ImageDrawPixel(&skinImg, x, y, (Color){ shade + 20, shade - 5, shade - 20, 255 });
+    }
+    for (int i = 0; i < 60; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int r = 3 + rand() % 8;
+        ImageDrawCircle(&skinImg, x, y, r, (Color){ 160, 100, 80, 180 });
     }
     Texture2D skinTex = LoadTextureFromImage(skinImg);
     UnloadImage(skinImg);

@@ -66,32 +66,32 @@ void WeaponInit(Weapon *weapon) {
     Mesh triggerMesh = GenMeshCube(0.01f, 0.015f, 0.025f);
     g_weaponModels.trigger = LoadModelFromMesh(triggerMesh);
 
-    Image metalImg = GenImageColor(256, 256, (Color){ 160, 160, 165, 255 });
-    for (int i = 0; i < 600; i++) {
+    Image metalImg = GenImageColor(256, 256, (Color){ 130, 125, 120, 255 });
+    for (int i = 0; i < 700; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 140 + rand() % 40;
-        ImageDrawPixel(&metalImg, x, y, (Color){ shade, shade, shade + 3, 255 });
+        int shade = 100 + rand() % 50;
+        ImageDrawPixel(&metalImg, x, y, (Color){ shade, shade - 5, shade - 10, 255 });
     }
     g_weaponModels.metalTex = LoadTextureFromImage(metalImg);
     UnloadImage(metalImg);
 
-    Image darkMetalImg = GenImageColor(256, 256, (Color){ 90, 90, 95, 255 });
-    for (int i = 0; i < 400; i++) {
+    Image darkMetalImg = GenImageColor(256, 256, (Color){ 70, 68, 65, 255 });
+    for (int i = 0; i < 500; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 70 + rand() % 30;
-        ImageDrawPixel(&darkMetalImg, x, y, (Color){ shade, shade, shade + 2, 255 });
+        int shade = 50 + rand() % 30;
+        ImageDrawPixel(&darkMetalImg, x, y, (Color){ shade, shade - 3, shade - 5, 255 });
     }
     g_weaponModels.darkMetalTex = LoadTextureFromImage(darkMetalImg);
     UnloadImage(darkMetalImg);
 
-    Image gripImg = GenImageColor(256, 256, (Color){ 60, 48, 40, 255 });
-    for (int i = 0; i < 500; i++) {
+    Image gripImg = GenImageColor(256, 256, (Color){ 100, 78, 60, 255 });
+    for (int i = 0; i < 600; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 45 + rand() % 30;
-        ImageDrawPixel(&gripImg, x, y, (Color){ shade, shade - 5, shade - 10, 255 });
+        int shade = 70 + rand() % 40;
+        ImageDrawPixel(&gripImg, x, y, (Color){ shade, shade - 10, shade - 20, 255 });
     }
     g_weaponModels.gripTex = LoadTextureFromImage(gripImg);
     UnloadImage(gripImg);
@@ -148,31 +148,31 @@ void WeaponRender(Weapon *weapon, Camera3D camera, float yaw) {
     float yawDeg = yaw * RAD2DEG;
 
     Vector3 bodyPos = pos;
-    DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 100, 100, 255 });
+    DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 85, 170, 255 });
 
     Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.15f });
-    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 50, 50, 255 });
+    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 55, 65, 255 });
 
     for (int i = 0; i < 4; i++) {
         float t = (float)i / 3.0f;
         Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.15f });
-        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 200, 200, 255 });
+        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 120, 115, 110, 255 });
     }
 
     Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.07f, -0.015f });
-    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 150, 50, 255 });
+    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 100, 80, 60, 255 });
 
     Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.055f, 0.04f });
-    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 80, 80, 255 });
+    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 60, 70, 255 });
 
     Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.15f });
-    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 120, 80, 255 });
+    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 65, 70, 75, 255 });
 
     Vector3 sightPos = Vector3Add(pos, (Vector3){ 0, 0.07f, 0.03f });
-    DrawModelEx(g_weaponModels.sight, sightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 255, 255, 255, 255 });
+    DrawModelEx(g_weaponModels.sight, sightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 40, 45, 255 });
 
     Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.02f, 0.01f });
-    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 80, 80, 90, 255 });
+    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 40, 45, 255 });
 
     if (weapon->muzzleFlashTimer > 0) {
         DrawSphere(barrelPos, 0.12f, YELLOW);

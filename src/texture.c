@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-static Image GenerateNoiseImage(int width, int height, float intensity) {
-    Image img = GenImagePerlinNoise(width, height, 0, 0, intensity);
-    return img;
+float FastHashNoise(int x, int y) {
+    int n = x * 374761393 + y * 668265263;
+    n = (n ^ (n >> 13)) * 1274126177;
+    n = n ^ (n >> 16);
+    return (n & 0x7fffffff) / (float)0x7fffffff;
 }
 
 static Image GenerateBloodTexture(int width, int height) {
@@ -179,6 +181,37 @@ void TextureGenerate(ProceduralTextures *textures) {
     textures->generated = true;
 }
 
+void TextureShutdown(ProceduralTextures *textures) {
+    if (textures->generated) {
+    UnloadTexture(textures->zombieSkin);
+    UnloadTexture(textures->zombieSkinNormal);
+    UnloadTexture(textures->zombieShirt);
+    UnloadTexture(textures->zombiePants);
+    UnloadTexture(textures->zombieBone);
+    UnloadTexture(textures->bloodDecal);
+        UnloadTexture(textures->concrete);
+        UnloadTexture(textures->concreteNormal);
+        UnloadTexture(textures->defaultZombieHead);
+        UnloadTexture(textures->metal);
+        UnloadTexture(textures->metalNormal);
+        UnloadTexture(textures->darkMetal);
+        UnloadTexture(textures->grip);
+        UnloadTexture(textures->barrel);
+        UnloadTexture(textures->barrelNormal);
+        UnloadTexture(textures->crate);
+        UnloadTexture(textures->crateNormal);
+        UnloadTexture(textures->asphalt);
+        UnloadTexture(textures->brick);
+        UnloadTexture(textures->wood);
+        UnloadTexture(textures->fireGlow);
+        UnloadTexture(textures->camo);
+        UnloadTexture(textures->fence);
+        UnloadTexture(textures->container);
+        UnloadTexture(textures->containerNormal);
+        textures->generated = false;
+    }
+}
+
 Texture2D TextureCreateBloodSplatter(int width, int height) {
     Image img = GenerateBloodTexture(width, height);
     Texture2D tex = LoadTextureFromImage(img);
@@ -194,7 +227,7 @@ Texture2D TextureCreateZombieSkin(int width, int height) {
 }
 
 Texture2D TextureCreateNoiseTexture(int width, int height, float intensity) {
-    Image img = GenerateNoiseImage(width, height, intensity);
+    Image img = GenImagePerlinNoise(width, height, 0, 0, intensity);
     Texture2D tex = LoadTextureFromImage(img);
     UnloadImage(img);
     return tex;

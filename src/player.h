@@ -31,7 +31,7 @@ typedef struct {
     Vector3 moveDir;
 } Player;
 
-void PlayerInit(Player *player, Vector3 startPos);
+void PlayerInit(Player *player, Vector3 startPos, Shader pbr);
 void PlayerUpdate(Player *player, InputState *input, float dt);
 void PlayerRender(Player *player, Shader shader);
 void PlayerShutdown(Player *player);

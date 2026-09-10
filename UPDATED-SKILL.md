@@ -380,3 +380,65 @@ int main(void)
 ## Related Skills
 
 - `@related-skill` - Related Skill
+
+## Judge Protocol
+
+This protocol applies whenever visual fidelity is being evaluated against concept art or reference imagery. It enforces a self-assessment loop before external review, using tiered judging criteria with gated scoring and clear exit conditions.
+
+### Self-Assessment Loop
+
+Before submitting any work for review:
+1. Review the candidate output yourself
+2. Ensure it actually achieves the stated goals
+3. Do not submit half-baked work
+4. Step back and look at the output and concept side-by-side
+5. Log an honest assessment of whether it is judge-ready
+6. Only submit if you are confident you have significantly improved the score
+7. Be rigorous, objective, and transparent
+8. Look at every pixel and detail
+9. Check for missing/incorrect objects, wrong scale, perspective, positioning
+10. Check for rendering glitches, flat untextured surfaces, ugly lighting, poor contrast, speckles, ugly shadows
+11. Scan surface by surface, object by object, audit everything
+
+### Judge Prompt
+
+When submitting a screenshot to the judge, use this prompt with the latest screenshot, concept image, and previous verdict if available:
+
+```
+You are an art director reviewing a real-time render against its concept art. Compare the screenshot to the concept and score it 0-10 using this ladder. The ladder is gated: a frame cannot score above a tier's cap until every requirement of the tiers below it is fully met. Be strict about the gates.
+
+Tier 1, shape (0-3): camera, framing, composition, and the position and rough scale of every major object match the concept. This is about layout, not finish or precision: every major element is present, in the right region of the frame (within about 10% of frame width/height), at roughly the right size (within about 25%). An object the right place and vaguely correct outline passes, even if its edges and surface are wrong. Don't be nitpicky about precision, save that for Tier 4. The goal is just to have the right elements present in roughly the right spot at this tier. Cap 3 until this is true.
+Tier 2, light and color (3-5): key light direction and color, overall exposure (no clipping to black or white), shadow depth, palette, contrast, and atmosphere. Pay attention to reflections, glows, etc, and ensure they look great. Ensure the scene overall is not too bright or too dark relative to the concept. Judge at the level of the whole frame, not individual tiny details; those are Tier 4 polish. Cap 5 until the overall lighting, reflections, color, and contrast is generally right.
+Tier 3, materials and surfaces (5-7): every surface reads as the right material at a glance: Textures, roughness, translucency, wetness, reflections. Ensure assets don't look obviously procedural, blocky, simple, smooth/plastic; push for elements that dominate the frame to be properly sculpted and detailed (Blender assets with high quality image-gen textures). Cap 7 until this is true.
+Tier 4, fine detail (7-9): the small things: texture and fine detail. Nitpick relentlessly. Look at every little object up close. Layout should align near-perfectly with the concept. Materials should look extremely convincing. Cap 9 until they are right.
+Tier 5, indistinguishable (9-10): holds up side by side and zoomed in. Nitpick every pixel.
+
+If a previous verdict and screenshot are provided: you are one reviewer in a sequence, not the first. Maintain consistency. First go through the previous directives one by one and mark each LANDED, PARTIAL, or NOT DONE based on the new screenshot. Carry forward anything PARTIAL or NOT DONE. Do not reverse a prior directive unless the result is clearly worse than before, and if you do, say so explicitly and why.
+
+Output format:
+
+The score on the first line, then "Tier N" on the second line: the highest tier whose gate is fully passed. 1b. If given a previous verdict: the LANDED / PARTIAL / NOT DONE list for its directives.
+"Blocking:" the specific things that fail the gate of the next tier. These come first and the builder must clear them before anything else counts. Name the element and say what to change, with magnitudes: "Rocks: replace the stacked ovoid boulders with one continuous fractured slab; cracks 2-5cm wide, dark interiors, add more texture to the surfaces so they don't look flat/plastic" not just "the rocks look artificial".
+Then at most 4 further directives from higher tiers, same style, ordered by points recoverable.
+Don't give non-actionable feedback like "This element looks synthetic." Name the specific things causing that impression. Every directive must be something a developer can act on this round. Don't round up score: if a gate is not fully passed, the cap holds.
+```
+
+### Exit Criteria
+
+- **Score >= 8 and target FPS acceptable**: Done! Show the user the latest screenshot and ask if they want more iterations.
+- **Score >= 8 but target FPS unacceptable**: Optimize, aiming for lossless wins first, then optimizations with minimal visual impact. Re-judge after optimizations.
+- **Stall approaching**: Best score hasn't improved by a full point in 2 rounds, or judge named same gap 3 times. Stop incremental tweaks. Make a big structural change: swap asset strategy, rewrite lighting model, rebuild composition, change camera. Self-check before judge.
+- **Stalled**: At least one big structural change was tried and score still hasn't improved in 3 rounds, or judge asks for intractable improvements. Stop and tell the user why blocked, give options.
+- **None of the above**: Address most heavy-hitting gaps this round. Prioritize highest-impact changes. Only revert if score dropped by a full point or more.
+
+### Visual Quality Requirements
+
+Do not settle for plain, flat, procedural looks for key environmental details. Use image generation tools for textures, normal maps, skyboxes, etc. when available. The tiny details and texturing matter and require custom sculpting or high-quality assets.
+
+### Target Resolution
+
+Target the same resolution and aspect ratio as the concept art for fair comparison.
+
+### Subagent Judge
+
+Judging should ideally be done by a fresh subagent with a clean context. Give the judge the latest screenshot, concept image, and previous verdict/screenshot if available.

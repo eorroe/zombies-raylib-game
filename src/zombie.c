@@ -1,12 +1,12 @@
 #include "zombie.h"
+#include "zombie_mesh.h"
 #include "raymath.h"
 #include <stdlib.h>
 #include <math.h>
 
-static Model CreateLimbMesh(float radius, float length, int slices) {
-    Mesh m = GenMeshCylinder(radius, length, slices);
-    Model model = LoadModelFromMesh(m);
-    return model;
+static Model LoadHighPolyModel(Mesh mesh) {
+    ZombieMesh_Upload(&mesh);
+    return LoadModelFromMesh(mesh);
 }
 
 static Model CreateBoneMesh(float radius, float length, int slices) {
@@ -71,6 +71,7 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     zombie->animTime = (float)rand() / RAND_MAX * 6.28f;
     zombie->walkCycle = (float)rand() / RAND_MAX * 6.28f;
     zombie->skinTex = skin;
+    zombie->skinNormal = skinNormal;
     zombie->shirtTex = shirt;
     zombie->pantsTex = pants;
     zombie->boneTex = bone;
@@ -142,6 +143,13 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
             dir = Vector3Normalize(dir);
             zombie->velocity = Vector3Scale(dir, zombie->speed);
             zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
+        }
+        
+        if (fabsf(zombie->position.z - FENCE_Z) < 0.8f && zombie->position.z < FENCE_Z + 0.5f) {
+            zombie->position.z += dt * 1.5f;
+            zombie->position.y += dt * 0.8f;
+            if (zombie->position.y > 1.2f) zombie->position.y = 1.2f;
+            if (zombie->position.z > FENCE_Z + 0.5f) zombie->position.z = FENCE_Z + 0.5f;
         }
     }
     if (zombie->attackCooldown > 0) zombie->attackCooldown -= dt;
@@ -247,8 +255,8 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     Vector3 playerPos = camera.position;
     float distToPlayer = Vector3Length(Vector3Subtract(playerPos, zombie->position));
     bool reaching = distToPlayer < REACH_DIST;
-    float armAngleX = reaching ? -1.2f : -0.6f;
-    float armAngleY = reaching ? 0.3f : -0.8f;
+    float armAngleX = climbing ? -1.5f + climbReach : (reaching ? -1.2f : -0.6f);
+    float armAngleY = climbing ? 0.8f : (reaching ? 0.3f : -0.8f);
 
     DrawJoint(shoulderL, 0.04f, bodyColor);
     DrawJoint(shoulderR, 0.04f, bodyColor);

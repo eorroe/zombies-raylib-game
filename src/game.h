@@ -55,8 +55,13 @@ typedef struct Game {
     Model barrelModel;
     Model wallModel;
     Model buildingModel;
+    Model trainModel;
     Model floorModel;
     Model bloodDecalModel;
+    Model fenceModel;
+    Model containerModel;
+    Model platformModel;
+    Model rubbleModel;
     
     MenuState menu;
 } Game;

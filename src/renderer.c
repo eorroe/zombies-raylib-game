@@ -5,11 +5,26 @@
 #include "zombie.h"
 #include "raymath.h"
 
-static void SetModelTexture(Model *model, Texture2D tex) {
+static void SetModelTexture(Model *model, Texture2D diffuse, Texture2D normal) {
     if (model->meshCount > 0 && model->materialCount > 0) {
-        model->materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tex;
+        model->materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = diffuse;
+        if (normal.id != 0) {
+            model->materials[0].maps[MATERIAL_MAP_NORMAL].texture = normal;
+        }
     }
 }
+
+static void SetPBRMaterial(Game *game, Texture2D albedo, Texture2D normal, float metallic, float roughness) {
+    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocAlbedo, &albedo, SHADER_UNIFORM_SAMPLER2D);
+    if (normal.id != 0) {
+        SetShaderValue(game->shaders.pbr, game->shaders.pbrLocNormal, &normal, SHADER_UNIFORM_SAMPLER2D);
+    }
+    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocMetallic, &metallic, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocRoughness, &roughness, SHADER_UNIFORM_FLOAT);
+}
+
+static Vector3 fireLightPositions[4];
+static bool fireLightsInitialized = false;
 
 void RendererInit(Game *game, int screenWidth, int screenHeight) {
     game->sceneTarget = LoadRenderTexture(screenWidth, screenHeight);
@@ -19,38 +34,94 @@ void RendererInit(Game *game, int screenWidth, int screenHeight) {
     
     Mesh crateMesh = GenMeshCube(0.6f, 0.6f, 0.6f);
     game->crateModel = LoadModelFromMesh(crateMesh);
-    if (game->textures.generated && game->textures.concrete.id != 0) {
-        SetModelTexture(&game->crateModel, game->textures.concrete);
+    if (game->textures.generated && game->textures.wood.id != 0) {
+        SetModelTexture(&game->crateModel, game->textures.wood, game->textures.crateNormal);
     }
+    game->crateModel.materials[0].shader = game->shaders.pbr;
     
     Mesh barrelMesh = GenMeshCylinder(0.2f, 0.8f, 16);
     game->barrelModel = LoadModelFromMesh(barrelMesh);
     if (game->textures.generated && game->textures.metal.id != 0) {
-        SetModelTexture(&game->barrelModel, game->textures.metal);
+        SetModelTexture(&game->barrelModel, game->textures.metal, game->textures.metalNormal);
     }
+    game->barrelModel.materials[0].shader = game->shaders.pbr;
     
     Mesh wallMesh = GenMeshCube(4.5f, 1.5f, 0.4f);
     game->wallModel = LoadModelFromMesh(wallMesh);
     if (game->textures.generated && game->textures.concrete.id != 0) {
-        SetModelTexture(&game->wallModel, game->textures.concrete);
+        SetModelTexture(&game->wallModel, game->textures.concrete, game->textures.concreteNormal);
     }
+    game->wallModel.materials[0].shader = game->shaders.pbr;
     
     Mesh buildingMesh = GenMeshCube(2.5f, 3.0f, 2.5f);
     game->buildingModel = LoadModelFromMesh(buildingMesh);
-    if (game->textures.generated && game->textures.concrete.id != 0) {
-        SetModelTexture(&game->buildingModel, game->textures.concrete);
+    if (game->textures.generated && game->textures.brick.id != 0) {
+        SetModelTexture(&game->buildingModel, game->textures.brick, (Texture2D){0});
     }
+    game->buildingModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh trainMesh = GenMeshCube(12.0f, 3.5f, 3.0f);
+    game->trainModel = LoadModelFromMesh(trainMesh);
+    if (game->textures.generated && game->textures.metal.id != 0) {
+        SetModelTexture(&game->trainModel, game->textures.metal, game->textures.metalNormal);
+    }
+    game->trainModel.materials[0].shader = game->shaders.pbr;
     
     Mesh floorMesh = GenMeshPlane(50, 50, 50, 50);
     game->floorModel = LoadModelFromMesh(floorMesh);
-    if (game->textures.generated && game->textures.concrete.id != 0) {
-        SetModelTexture(&game->floorModel, game->textures.concrete);
+    if (game->textures.generated && game->textures.asphalt.id != 0) {
+        SetModelTexture(&game->floorModel, game->textures.asphalt, (Texture2D){0});
     }
+    game->floorModel.materials[0].shader = game->shaders.pbr;
     
     Mesh bloodMesh = GenMeshPlane(1.5f, 1.5f, 4, 4);
     game->bloodDecalModel = LoadModelFromMesh(bloodMesh);
     if (game->textures.generated && game->textures.bloodDecal.id != 0) {
-        SetModelTexture(&game->bloodDecalModel, game->textures.bloodDecal);
+        SetModelTexture(&game->bloodDecalModel, game->textures.bloodDecal, (Texture2D){0});
+    }
+    game->bloodDecalModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh fencePostMesh = GenMeshCylinder(0.08f, 1.2f, 8);
+    game->fenceModel = LoadModelFromMesh(fencePostMesh);
+    if (game->textures.generated && game->textures.fence.id != 0) {
+        SetModelTexture(&game->fenceModel, game->textures.fence, game->textures.metalNormal);
+    }
+    game->fenceModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh containerMesh = GenMeshCube(2.4f, 1.2f, 6.0f);
+    game->containerModel = LoadModelFromMesh(containerMesh);
+    if (game->textures.generated && game->textures.container.id != 0) {
+        SetModelTexture(&game->containerModel, game->textures.container, game->textures.containerNormal);
+    }
+    game->containerModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh platformMesh = GenMeshCube(4.0f, 0.6f, 1.5f);
+    game->platformModel = LoadModelFromMesh(platformMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->platformModel, game->textures.concrete, game->textures.concreteNormal);
+    }
+    game->platformModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh rubbleMesh = GenMeshCube(0.3f, 0.15f, 0.3f);
+    game->rubbleModel = LoadModelFromMesh(rubbleMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->rubbleModel, game->textures.concrete, (Texture2D){0});
+    }
+    game->rubbleModel.materials[0].shader = game->shaders.pbr;
+    
+    fireLightPositions[0] = (Vector3){ -4.0f, 1.5f, 12.0f };
+    fireLightPositions[1] = (Vector3){ 0.0f, 0.5f, 2.0f };
+    fireLightPositions[2] = (Vector3){ 8.0f, 2.0f, 8.0f };
+    fireLightPositions[3] = (Vector3){ -8.0f, 0.3f, -4.0f };
+    fireLightsInitialized = true;
+}
+
+void RendererUpdate(Game *game, float dt) {
+    (void)dt;
+    float t = GetTime();
+    for (int i = 0; i < 4; i++) {
+        float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
+        fireLightPositions[i].y += sinf(t * 3.0f + i) * 0.02f;
     }
 }
 
@@ -60,6 +131,7 @@ void RendererBegin(Game *game, Camera3D camera) {
     BeginTextureMode(game->sceneTarget);
     ClearBackground((Color){ 245, 240, 232, 255 });
     BeginMode3D(camera);
+    rlDisableBackfaceCulling();
 }
 
 void RendererDrawScene(Game *game) {
@@ -216,10 +288,29 @@ void RendererDrawBloodDecals(Game *game) {
 
 void RendererDrawZombies(Game *game, Shader shader) {
     (void)shader;
+    printf("ZOMBIES: count=%d\n", game->zombieCount);
     Camera3D cam = CameraGetCamera(&game->camera);
-    for (int i = 0; i < game->zombieCount; i++) {
-        ZombieRender(&game->zombies[i], cam, game->zombieHeadTextures, game->zombieHeadTextureCount, shader);
+    ShaderBeginPBR(&game->shaders);
+    ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 1.2f, 0.9f, 0.7f });
+    Vector3 lightPositions[4];
+    Vector3 lightColors[4];
+    float t = GetTime();
+    for (int i = 0; i < 4; i++) {
+        lightPositions[i] = fireLightPositions[i];
+        float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
+        lightColors[i] = (Vector3){ 1.2f * flicker, 0.7f * flicker, 0.4f * flicker };
     }
+    int lightCount = 4;
+    for (int i = 0; i < 4; i++) {
+        SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
+        SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCol[i], &lightColors[i], SHADER_UNIFORM_VEC3);
+    }
+    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCount, &lightCount, SHADER_UNIFORM_INT);
+    for (int i = 0; i < game->zombieCount; i++) {
+        ZombieRender(&game->zombies[i], cam, game->zombieHeadTextures, game->zombieHeadTextureCount, game->shaders.pbr);
+    }
+    ShaderEnd(&game->shaders);
 }
 
 void RendererDrawZombieHeads(Game *game) {
@@ -353,11 +444,6 @@ void RendererDrawScope(Game *game) {
 void RendererEnd(Game *game) {
     (void)game;
     EndMode3D();
-    EndTextureMode();
-
-    BeginShaderMode(game->shaders.postProcess);
-    DrawTexturePro(game->sceneTarget.texture, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, -(float)game->sceneTarget.texture.height }, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, (float)game->sceneTarget.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-    EndShaderMode();
 }
 
 void RendererShutdown(Game *game) {
@@ -367,6 +453,11 @@ void RendererShutdown(Game *game) {
     if (game->barrelModel.meshCount > 0) UnloadModel(game->barrelModel);
     if (game->wallModel.meshCount > 0) UnloadModel(game->wallModel);
     if (game->buildingModel.meshCount > 0) UnloadModel(game->buildingModel);
+    if (game->trainModel.meshCount > 0) UnloadModel(game->trainModel);
     if (game->floorModel.meshCount > 0) UnloadModel(game->floorModel);
     if (game->bloodDecalModel.meshCount > 0) UnloadModel(game->bloodDecalModel);
+    if (game->fenceModel.meshCount > 0) UnloadModel(game->fenceModel);
+    if (game->containerModel.meshCount > 0) UnloadModel(game->containerModel);
+    if (game->platformModel.meshCount > 0) UnloadModel(game->platformModel);
+    if (game->rubbleModel.meshCount > 0) UnloadModel(game->rubbleModel);
 }

@@ -26,7 +26,7 @@ static void SetModelTexture(Model *model, Texture2D tex) {
     }
 }
 
-void PlayerInit(Player *player, Vector3 startPos) {
+void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->position = startPos;
     player->velocity = (Vector3){ 0 };
     player->health = PLAYER_HEALTH;
@@ -40,14 +40,20 @@ void PlayerInit(Player *player, Vector3 startPos) {
 
     Mesh bodyMesh = GenMeshCylinder(0.4f, 1.2f, 8);
     player->bodyModel = LoadModelFromMesh(bodyMesh);
+    player->bodyModel.materials[0].shader = pbr;
 
     Mesh headMesh = GenMeshSphere(0.25f, 12, 12);
     player->headModel = LoadModelFromMesh(headMesh);
+    player->headModel.materials[0].shader = pbr;
 
     player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
+    player->leftArmModel.materials[0].shader = pbr;
     player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
+    player->rightArmModel.materials[0].shader = pbr;
     player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->leftLegModel.materials[0].shader = pbr;
     player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->rightLegModel.materials[0].shader = pbr;
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 70, 90, 180, 255 });
     for (int i = 0; i < 1000; i++) {
@@ -115,8 +121,11 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
         player->moveDir = (Vector3){ 0 };
     }
     
-    player->yaw -= input->mouseDelta.x * 0.003f;
-    player->pitch -= input->mouseDelta.y * 0.003f;
+    Vector2 mouseDelta = InputGetMouseDelta(input);
+    if (fabsf(mouseDelta.x) < 100.0f && fabsf(mouseDelta.y) < 100.0f) {
+        player->yaw -= mouseDelta.x * 0.003f;
+        player->pitch -= mouseDelta.y * 0.003f;
+    }
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }
 

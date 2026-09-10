@@ -280,7 +280,8 @@ ZombieShooter_OBJECTS = \
 "CMakeFiles/ZombieShooter.dir/src/texture.c.o" \
 "CMakeFiles/ZombieShooter.dir/src/ui.c.o" \
 "CMakeFiles/ZombieShooter.dir/src/weapon.c.o" \
-"CMakeFiles/ZombieShooter.dir/src/zombie.c.o"
+"CMakeFiles/ZombieShooter.dir/src/zombie.c.o" \
+"CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o"
 
 # External object files for target ZombieShooter
 ZombieShooter_EXTERNAL_OBJECTS =
@@ -299,6 +300,7 @@ ZombieShooter: CMakeFiles/ZombieShooter.dir/src/texture.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/ui.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/weapon.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/src/zombie.c.o
+ZombieShooter: CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o
 ZombieShooter: CMakeFiles/ZombieShooter.dir/build.make
 ZombieShooter: ../raylib_src/build/raylib/libraylib.a
 ZombieShooter: CMakeFiles/ZombieShooter.dir/link.txt

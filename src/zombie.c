@@ -15,7 +15,7 @@ static void SetModelTexture(Model *model, Texture2D tex) {
     }
 }
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants) {
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants, Texture2D bone) {
     zombie->position = position;
     zombie->velocity = (Vector3){ 0 };
     zombie->health = 50.0f + rand() % 50;
@@ -31,34 +31,35 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     zombie->skinTex = skin;
     zombie->shirtTex = shirt;
     zombie->pantsTex = pants;
+    zombie->boneTex = bone;
     zombie->speed = ZOMBIE_SPEED_BASE;
     zombie->damageFlashTimer = 0.0f;
 
-    Mesh torsoMesh = GenMeshCylinder(TORSO_WIDTH, TORSO_HEIGHT, 8);
+    Mesh torsoMesh = GenMeshCylinder(0.30f, TORSO_HEIGHT, 8);
     zombie->bodyModel = LoadModelFromMesh(torsoMesh);
-    SetModelTexture(&zombie->bodyModel, shirt);
+    SetModelTexture(&zombie->bodyModel, bone);
 
     Mesh headMesh = GenMeshSphere(HEAD_RADIUS, 12, 12);
     zombie->headModel = LoadModelFromMesh(headMesh);
-    SetModelTexture(&zombie->headModel, skin);
+    SetModelTexture(&zombie->headModel, bone);
 
-    zombie->leftUpperArm = CreateLimbMesh(LIMB_RADIUS, ARM_UPPER_LEN, 8);
-    SetModelTexture(&zombie->leftUpperArm, shirt);
-    zombie->leftLowerArm = CreateLimbMesh(LIMB_RADIUS * 0.8f, ARM_LOWER_LEN, 8);
-    SetModelTexture(&zombie->leftLowerArm, skin);
-    zombie->rightUpperArm = CreateLimbMesh(LIMB_RADIUS, ARM_UPPER_LEN, 8);
-    SetModelTexture(&zombie->rightUpperArm, shirt);
-    zombie->rightLowerArm = CreateLimbMesh(LIMB_RADIUS * 0.8f, ARM_LOWER_LEN, 8);
-    SetModelTexture(&zombie->rightLowerArm, skin);
+    zombie->leftUpperArm = CreateLimbMesh(0.055f, ARM_UPPER_LEN, 8);
+    SetModelTexture(&zombie->leftUpperArm, bone);
+    zombie->leftLowerArm = CreateLimbMesh(0.045f, ARM_LOWER_LEN, 8);
+    SetModelTexture(&zombie->leftLowerArm, bone);
+    zombie->rightUpperArm = CreateLimbMesh(0.055f, ARM_UPPER_LEN, 8);
+    SetModelTexture(&zombie->rightUpperArm, bone);
+    zombie->rightLowerArm = CreateLimbMesh(0.045f, ARM_LOWER_LEN, 8);
+    SetModelTexture(&zombie->rightLowerArm, bone);
 
-    zombie->leftUpperLeg = CreateLimbMesh(LIMB_RADIUS * 1.1f, LEG_UPPER_LEN, 8);
-    SetModelTexture(&zombie->leftUpperLeg, pants);
-    zombie->leftLowerLeg = CreateLimbMesh(LIMB_RADIUS * 0.9f, LEG_LOWER_LEN, 8);
-    SetModelTexture(&zombie->leftLowerLeg, pants);
-    zombie->rightUpperLeg = CreateLimbMesh(LIMB_RADIUS * 1.1f, LEG_UPPER_LEN, 8);
-    SetModelTexture(&zombie->rightUpperLeg, pants);
-    zombie->rightLowerLeg = CreateLimbMesh(LIMB_RADIUS * 0.9f, LEG_LOWER_LEN, 8);
-    SetModelTexture(&zombie->rightLowerLeg, pants);
+    zombie->leftUpperLeg = CreateLimbMesh(0.065f, LEG_UPPER_LEN, 8);
+    SetModelTexture(&zombie->leftUpperLeg, bone);
+    zombie->leftLowerLeg = CreateLimbMesh(0.055f, LEG_LOWER_LEN, 8);
+    SetModelTexture(&zombie->leftLowerLeg, bone);
+    zombie->rightUpperLeg = CreateLimbMesh(0.065f, LEG_UPPER_LEN, 8);
+    SetModelTexture(&zombie->rightUpperLeg, bone);
+    zombie->rightLowerLeg = CreateLimbMesh(0.055f, LEG_LOWER_LEN, 8);
+    SetModelTexture(&zombie->rightLowerLeg, bone);
 }
 
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired) {
@@ -109,23 +110,16 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         if (cycle < 0.5f) flash = 1.0f;
     }
     
-    Color skinColor = (Color){ 210, 190, 170, 255 };
-    Color shirtColor = (Color){ 70, 85, 170, 255 };
-    Color pantsColor = (Color){ 80, 90, 60, 255 };
+    Color boneColor = (Color){ 235, 225, 210, 255 };
     Color flashRed = (Color){ 120, 20, 20, 255 };
     
     Color bodyColor = (Color){
-        (unsigned char)(shirtColor.r + (flashRed.r - shirtColor.r) * flash),
-        (unsigned char)(shirtColor.g + (flashRed.g - shirtColor.g) * flash),
-        (unsigned char)(shirtColor.b + (flashRed.b - shirtColor.b) * flash),
+        (unsigned char)(boneColor.r + (flashRed.r - boneColor.r) * flash),
+        (unsigned char)(boneColor.g + (flashRed.g - boneColor.g) * flash),
+        (unsigned char)(boneColor.b + (flashRed.b - boneColor.b) * flash),
         255
     };
-    Color headColor = (Color){
-        (unsigned char)(skinColor.r + (flashRed.r - skinColor.r) * flash),
-        (unsigned char)(skinColor.g + (flashRed.g - skinColor.g) * flash),
-        (unsigned char)(skinColor.b + (flashRed.b - skinColor.b) * flash),
-        255
-    };
+    Color headColor = bodyColor;
     
     float hipY = feetY + LEG_UPPER_LEN + LEG_LOWER_LEN;
     float torsoCenterY = hipY + TORSO_HEIGHT * 0.5f;
@@ -142,7 +136,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         bodyY = torsoPos.y - deathProgress * torsoPos.y;
     }
     
-    SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
+    SetModelTexture(&zombie->bodyModel, zombie->boneTex);
     DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
     if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
@@ -157,10 +151,10 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
             if (headTextures[zombie->textureIndex].id != 0) {
                 SetModelTexture(&zombie->headModel, headTextures[zombie->textureIndex]);
             } else {
-                SetModelTexture(&zombie->headModel, zombie->skinTex);
+                SetModelTexture(&zombie->headModel, zombie->boneTex);
             }
         } else {
-            SetModelTexture(&zombie->headModel, zombie->skinTex);
+            SetModelTexture(&zombie->headModel, zombie->boneTex);
         }
         DrawModelEx(zombie->headModel, (Vector3){ headPos.x, headY, headPos.z }, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, headColor);
     }

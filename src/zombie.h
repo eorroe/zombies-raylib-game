@@ -45,13 +45,14 @@ typedef struct {
     Texture2D skinTex;
     Texture2D shirtTex;
     Texture2D pantsTex;
+    Texture2D boneTex;
     float speed;
     float damageFlashTimer;
     bool dying;
     float deathTimer;
 } Zombie;
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants);
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants, Texture2D bone);
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired);
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader);
 void ZombieShutdown(Zombie *zombie);

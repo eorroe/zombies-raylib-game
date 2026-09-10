@@ -48,6 +48,28 @@ static Image GenerateZombieSkin(int width, int height) {
     return img;
 }
 
+static Image GenerateBoneTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 235, 225, 210, 255 });
+    for (int i = 0; i < 2500; i++) {
+        int x = rand() % width;
+        int y = rand() % height;
+        int shade = 200 + rand() % 55;
+        ImageDrawPixel(&img, x, y, (Color){ shade, shade - 8, shade - 18, 255 });
+    }
+    for (int i = 0; i < 120; i++) {
+        int x = rand() % width;
+        int y = rand() % height;
+        int r = 3 + rand() % 10;
+        ImageDrawCircle(&img, x, y, r, (Color){ 200, 190, 175, 200 });
+    }
+    for (int i = 0; i < 90; i++) {
+        int x1 = rand() % width;
+        int y1 = rand() % height;
+        ImageDrawLine(&img, x1, y1, x1 + (rand()%25-12), y1 + (rand()%25-12), (Color){ 180, 170, 155, 160 });
+    }
+    return img;
+}
+
 static Image GenerateUniformTexture(int width, int height) {
     Image img = GenImageColor(width, height, (Color){ 60, 90, 180, 255 });
     for (int i = 0; i < 1200; i++) {
@@ -147,6 +169,7 @@ void TextureGenerate(ProceduralTextures *textures) {
     textures->zombieSkin = LoadTextureFromImage(GenerateZombieSkin(256, 256));
     textures->zombieShirt = LoadTextureFromImage(GenerateUniformTexture(256, 256));
     textures->zombiePants = LoadTextureFromImage(GenerateUniformTexture(256, 256));
+    textures->zombieBone = LoadTextureFromImage(GenerateBoneTexture(256, 256));
     textures->bloodDecal = LoadTextureFromImage(GenerateBloodTexture(256, 256));
     textures->concrete = LoadTextureFromImage(GenerateConcreteTexture(256, 256));
     textures->defaultZombieHead = LoadTextureFromImage(GenerateZombieSkin(128, 128));
@@ -203,6 +226,7 @@ void TextureShutdown(ProceduralTextures *textures) {
         UnloadTexture(textures->zombieSkin);
         UnloadTexture(textures->zombieShirt);
         UnloadTexture(textures->zombiePants);
+        UnloadTexture(textures->zombieBone);
         UnloadTexture(textures->bloodDecal);
         UnloadTexture(textures->concrete);
         UnloadTexture(textures->defaultZombieHead);

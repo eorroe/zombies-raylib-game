@@ -126,12 +126,12 @@ void RendererDrawScene(Game *game) {
                 for (int wx = -2; wx <= 2; wx++) {
                     if ((wx + wy) % 2 == 0) continue;
                     float winX = baseX + wx * 0.9f;
-                    float winZ = baseZ + 2.56f;
+                    float winZ = baseZ - 2.56f;
                     float winY = wy * 1.1f;
                     DrawCube((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 90, 110, 150, 220 });
                     DrawCubeWires((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 40, 40, 45, 255 });
 
-                    float awningZ = baseZ + 2.6f;
+                    float awningZ = baseZ - 2.6f;
                     float awningY = winY - 0.5f;
                     if ((wx + wy) % 3 == 0) {
                         DrawCube((Vector3){ winX, awningY, awningZ }, 0.7f, 0.08f, 0.4f, (Color){ 140, 50, 50, 240 });

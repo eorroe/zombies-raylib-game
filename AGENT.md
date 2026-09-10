@@ -98,3 +98,66 @@ Before committing any rendering change:
 | Zombies invisible | Model scale too small | Compare against original constants |
 | HUD invisible | Drawn inside texture mode | Draw HUD after blit, on backbuffer |
 | Zombie heads at wrong positions | `GetWorldToScreen` called inside texture mode | Call after `EndTextureMode`, on backbuffer |
+
+## 8. Headless Testing Workflow (xvfb + Screenshot Analysis)
+
+This project supports automated headless testing via Xvfb. Use this workflow whenever you need to verify rendering changes without a physical display.
+
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `ZOMBIE_AUTO_START=1` | Skips menu and starts gameplay automatically after 30 frames |
+| `ZOMBIE_SHOT=/path/to/screenshot.png` | Saves a screenshot at frame 35 to the specified path |
+| `ZOMBIE_AUTO_QUIT_MS=5000` | Auto-quits after the specified milliseconds (prevents hangs) |
+
+### Command Template
+
+```bash
+cd /workspace/.../sessions/agent_xxx/build
+ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
+  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
+```
+
+### Step-by-Step Workflow
+
+1. **Build first**: `cd build && make -j"$(nproc)"`
+2. **Run headless** with xvfb using the template above
+3. **Verify screenshot exists**: `ls -la /tmp/zombie_test.png`
+4. **Analyze screenshot** with Python/PIL:
+   ```python
+   from PIL import Image
+   img = Image.open('/tmp/zombie_test.png')
+   print(f'Size: {img.size}, Mode: {img.mode}')
+   pixels = list(img.getdata())
+   non_transparent = sum(1 for p in pixels if len(p) < 4 or p[3] > 128)
+   brightness = sum(sum(p[:3])/3 for p in pixels if len(p) >= 3) / len(pixels)
+   white_count = sum(1 for p in pixels if len(p) >= 3 and p[0] > 240 and p[1] > 240 and p[2] > 240)
+   print(f'Non-transparent: {non_transparent}/{len(pixels)}')
+   print(f'Average brightness: {brightness:.1f}')
+   print(f'White-ish pixels: {white_count}')
+   ```
+5. **Visual inspection**: print the screenshot or inspect pixel statistics to confirm the scene is visible, not washed out, and contains expected elements
+
+### Screenshot Timing
+
+The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `src/game.c`). Auto-start triggers at **frame 30** (`autoStartFrame = 30`). This gives 5 frames of gameplay before capture.
+
+### Common Failure Patterns
+
+| Screenshot Result | Likely Cause |
+|-------------------|--------------|
+| File not created | Game crashed before frame 35; check stderr |
+| Solid flat color | `EndTextureMode` missing; scene rendered off-screen |
+| Mostly white / blown out | PBR shader missing tonemap or gamma |
+| Pulsing bright flash | Fire lights with unconstrained HDR |
+| Tiny/empty scene | Model scale too small or camera at wrong position |
+| HUD missing | HUD drawn inside texture mode, not on backbuffer |
+
+### Rules
+
+- Always take a screenshot after rendering changes before declaring success
+- If brightness > 200 average, the scene is likely blown out — check PBR output stages
+- If non-transparent pixels < 50% of frame, the scene may not be rendering to the backbuffer
+- Use `xvfb-run -a` (auto-select display) to avoid conflicts with existing X servers
+- Use `-screen 0 1280x720x24` to match the game's window size and color depth

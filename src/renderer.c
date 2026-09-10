@@ -110,8 +110,8 @@ void RendererDrawScene(Game *game) {
     }
     int lightCount = 4;
     
-    ShaderBeginPBR(    ShaderBeginPBR(    // ShaderBeginPBR(ShaderBeginPBR(&game->shaders);game->shaders);game->shaders);game->shaders);
-    ShaderSetFog(    ShaderSetFog(    // ShaderSetFog(ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);
+    ShaderBeginPBR(&game->shaders);
+    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);
     
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
@@ -295,8 +295,8 @@ void RendererDrawBloodDecals(Game *game) {
 void RendererDrawZombies(Game *game, Shader shader) {
     (void)shader;
     Camera3D cam = CameraGetCamera(&game->camera);
-    ShaderBeginPBR(    ShaderBeginPBR(    // ShaderBeginPBR(ShaderBeginPBR(&game->shaders);game->shaders);game->shaders);game->shaders);
-    ShaderSetFog(    ShaderSetFog(    // ShaderSetFog(ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);
+    ShaderBeginPBR(&game->shaders);
+    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);
     Vector3 lightPositions[4];
     Vector3 lightColors[4];
     float t = GetTime();

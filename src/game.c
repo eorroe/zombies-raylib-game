@@ -22,15 +22,14 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
 }
 
 static Vector3 GetZombieSpawnPoint(void) {
-    int side = rand() % 4;
-    float x = 0.0f, z = 0.0f;
-    switch (side) {
-        case 0: x = -40.0f + (float)(rand() % 80); z = -40.0f; break;
-        case 1: x = -40.0f + (float)(rand() % 80); z = 40.0f; break;
-        case 2: x = -40.0f; z = -40.0f + (float)(rand() % 80); break;
-        case 3: x = 40.0f; z = -40.0f + (float)(rand() % 80); break;
-    }
-    return (Vector3){ x, 0, z };
+    float angle = (float)rand() / RAND_MAX * PI;
+    float radius = 5.0f + rand() % 15;
+    Vector3 pos = {
+        (float)(rand() % 20 - 10),
+        0,
+        (float)(5 + rand() % 20)
+    };
+    return pos;
 }
 
 static void SpawnImageZombie(Game *game, int texIdx) {
@@ -690,7 +689,7 @@ int main(void) {
         }
         
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground((Color){ 245, 240, 232, 255 });
         
         if (game.state == GAME_STATE_MENU || game.menu.active) {
             UIRender(&game.menu);

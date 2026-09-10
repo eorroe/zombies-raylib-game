@@ -50,73 +50,73 @@ void WeaponInit(Weapon *weapon, Shader pbr) {
     weapon->muzzleFlashTimer = 0.0f;
     weapon->aimOffset = (Vector2){ 0 };
 
-    Mesh bodyMesh = GenMeshCube(0.06f, 0.08f, 0.8f);
+    Mesh bodyMesh = GenMeshCube(0.07f, 0.09f, 0.7f);
     g_weaponModels.body = LoadModelFromMesh(bodyMesh);
     g_weaponModels.body.materials[0].shader = pbr;
 
-    Mesh barrelMesh = GenMeshCylinder(0.018f, 0.45f, 24);
+    Mesh barrelMesh = GenMeshCylinder(0.022f, 0.42f, 24);
     g_weaponModels.barrel = LoadModelFromMesh(barrelMesh);
     g_weaponModels.barrel.materials[0].shader = pbr;
 
     for (int i = 0; i < 4; i++) {
-        Mesh ringMesh = GenMeshCylinder(0.025f, 0.006f, 24);
+        Mesh ringMesh = GenMeshCylinder(0.028f, 0.007f, 24);
         g_weaponModels.barrelRings[i] = LoadModelFromMesh(ringMesh);
         g_weaponModels.barrelRings[i].materials[0].shader = pbr;
     }
 
-    Mesh gripMesh = GenMeshCylinder(0.03f, 0.08f, 12);
+    Mesh gripMesh = GenMeshCylinder(0.032f, 0.09f, 12);
     g_weaponModels.grip = LoadModelFromMesh(gripMesh);
     g_weaponModels.grip.materials[0].shader = pbr;
 
-    Mesh magMesh = GenMeshCube(0.035f, 0.07f, 0.025f);
+    Mesh magMesh = GenMeshCube(0.038f, 0.08f, 0.028f);
     g_weaponModels.magazine = LoadModelFromMesh(magMesh);
     g_weaponModels.magazine.materials[0].shader = pbr;
 
-    Mesh stockMesh = GenMeshCube(0.045f, 0.06f, 0.14f);
+    Mesh stockMesh = GenMeshCube(0.05f, 0.065f, 0.15f);
     g_weaponModels.stock = LoadModelFromMesh(stockMesh);
     g_weaponModels.stock.materials[0].shader = pbr;
 
-    Mesh sightMesh = GenMeshCylinder(0.01f, 0.03f, 12);
+    Mesh sightMesh = GenMeshCylinder(0.012f, 0.035f, 12);
     g_weaponModels.sight = LoadModelFromMesh(sightMesh);
     g_weaponModels.sight.materials[0].shader = pbr;
 
-    Mesh triggerMesh = GenMeshCube(0.008f, 0.012f, 0.02f);
+    Mesh triggerMesh = GenMeshCube(0.01f, 0.014f, 0.022f);
     g_weaponModels.trigger = LoadModelFromMesh(triggerMesh);
     g_weaponModels.trigger.materials[0].shader = pbr;
 
-    Mesh handMesh = GenMeshCylinder(0.04f, 0.12f, 12);
+    Mesh handMesh = GenMeshCylinder(0.042f, 0.13f, 12);
     g_weaponModels.hand = LoadModelFromMesh(handMesh);
     g_weaponModels.hand.materials[0].shader = pbr;
 
-    Mesh forearmMesh = GenMeshCylinder(0.035f, 0.18f, 12);
+    Mesh forearmMesh = GenMeshCylinder(0.038f, 0.2f, 12);
     g_weaponModels.forearm = LoadModelFromMesh(forearmMesh);
     g_weaponModels.forearm.materials[0].shader = pbr;
 
-    Mesh muzzleBrakeMesh = GenMeshCylinder(0.028f, 0.02f, 16);
+    Mesh muzzleBrakeMesh = GenMeshCylinder(0.03f, 0.022f, 16);
     g_weaponModels.muzzleBrake = LoadModelFromMesh(muzzleBrakeMesh);
     g_weaponModels.muzzleBrake.materials[0].shader = pbr;
 
-    Mesh handguardMesh = GenMeshCube(0.06f, 0.06f, 0.16f);
+    Mesh handguardMesh = GenMeshCube(0.065f, 0.065f, 0.18f);
     g_weaponModels.handguard = LoadModelFromMesh(handguardMesh);
     g_weaponModels.handguard.materials[0].shader = pbr;
 
-    Mesh triggerGuardMesh = GenMeshCylinder(0.006f, 0.02f, 8);
+    Mesh triggerGuardMesh = GenMeshCylinder(0.007f, 0.022f, 8);
     g_weaponModels.triggerGuard = LoadModelFromMesh(triggerGuardMesh);
     g_weaponModels.triggerGuard.materials[0].shader = pbr;
 
-    Mesh magReleaseMesh = GenMeshCylinder(0.006f, 0.012f, 8);
+    Mesh magReleaseMesh = GenMeshCylinder(0.007f, 0.014f, 8);
     g_weaponModels.magRelease = LoadModelFromMesh(magReleaseMesh);
     g_weaponModels.magRelease.materials[0].shader = pbr;
 
-    Mesh ejectionPortMesh = GenMeshCube(0.02f, 0.008f, 0.03f);
+    Mesh ejectionPortMesh = GenMeshCube(0.022f, 0.01f, 0.035f);
     g_weaponModels.ejectionPort = LoadModelFromMesh(ejectionPortMesh);
     g_weaponModels.ejectionPort.materials[0].shader = pbr;
 
-    Mesh frontSightMesh = GenMeshCylinder(0.006f, 0.02f, 8);
+    Mesh frontSightMesh = GenMeshCylinder(0.007f, 0.022f, 8);
     g_weaponModels.frontSight = LoadModelFromMesh(frontSightMesh);
     g_weaponModels.frontSight.materials[0].shader = pbr;
 
-    Mesh rearSightMesh = GenMeshCube(0.015f, 0.015f, 0.02f);
+    Mesh rearSightMesh = GenMeshCube(0.018f, 0.018f, 0.025f);
     g_weaponModels.rearSight = LoadModelFromMesh(rearSightMesh);
     g_weaponModels.rearSight.materials[0].shader = pbr;
 
@@ -222,8 +222,9 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *inpu
     float cosYaw = cosf(yaw);
     float sinYaw = sinf(yaw);
     
-    float hipY = playerPos.y + 0.45f + 0.45f;
-    float torsoCenterY = hipY + 0.85f * 0.5f;
+    float torsoHeight = 0.85f;
+    float hipY = playerPos.y + torsoHeight * 0.45f;
+    float torsoCenterY = hipY + torsoHeight * 0.5f;
     
     Vector3 torsoOffset = (Vector3){ 0.0f, torsoCenterY, 0.0f };
     Vector3 torsoPos = Vector3Add(playerPos, RotateOffsetY(torsoOffset, cosYaw, sinYaw));
@@ -248,47 +249,47 @@ static void DrawDetailedGun(Vector3 pos, float yawDeg, Color tint) {
     Vector3 bodyPos = pos;
     DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, tint);
 
-    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.25f });
-    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 45, 55, 140, 255 });
+    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.22f });
+    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 45, 48, 52, 255 });
 
     for (int i = 0; i < 4; i++) {
         float t = (float)i / 3.0f;
-        Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.18f });
-        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 85, 170, 255 });
+        Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.16f });
+        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 72, 78, 255 });
     }
 
-    Vector3 muzzlePos = Vector3Add(barrelPos, (Vector3){ 0, 0, 0.45f });
-    DrawModelEx(g_weaponModels.muzzleBrake, muzzlePos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 35, 45, 120, 255 });
+    Vector3 muzzlePos = Vector3Add(barrelPos, (Vector3){ 0, 0, 0.42f });
+    DrawModelEx(g_weaponModels.muzzleBrake, muzzlePos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 35, 38, 42, 255 });
 
-    Vector3 scopePos = Vector3Add(bodyPos, (Vector3){ 0, 0.09f, 0.05f });
-    DrawModelEx(g_weaponModels.sight, scopePos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 70, 160, 255 });
+    Vector3 scopePos = Vector3Add(bodyPos, (Vector3){ 0, 0.09f, 0.02f });
+    DrawModelEx(g_weaponModels.sight, scopePos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 58, 65, 255 });
 
-    Vector3 handguardPos = Vector3Add(pos, (Vector3){ 0, 0, 0.08f });
-    DrawModelEx(g_weaponModels.handguard, handguardPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 75, 165, 255 });
+    Vector3 handguardPos = Vector3Add(pos, (Vector3){ 0, 0, 0.06f });
+    DrawModelEx(g_weaponModels.handguard, handguardPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 62, 70, 255 });
 
-    Vector3 frontSightPos = Vector3Add(handguardPos, (Vector3){ 0, 0.04f, 0.08f });
-    DrawModelEx(g_weaponModels.frontSight, frontSightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 50, 130, 255 });
+    Vector3 frontSightPos = Vector3Add(handguardPos, (Vector3){ 0, 0.04f, 0.07f });
+    DrawModelEx(g_weaponModels.frontSight, frontSightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 42, 48, 255 });
 
     Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.07f, -0.015f });
-    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 80, 60, 40, 255 });
+    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 120, 90, 60, 255 });
 
     Vector3 triggerGuardPos = Vector3Add(gripPos, (Vector3){ 0, -0.025f, 0.01f });
-    DrawModelEx(g_weaponModels.triggerGuard, triggerGuardPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 65, 140, 255 });
+    DrawModelEx(g_weaponModels.triggerGuard, triggerGuardPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 62, 70, 255 });
 
     Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.02f, 0.01f });
-    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 45, 45, 120, 255 });
+    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 45, 48, 55, 255 });
 
     Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.06f, 0.04f });
-    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 60, 145, 255 });
+    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 52, 60, 255 });
 
     Vector3 magReleasePos = Vector3Add(magPos, (Vector3){ 0.02f, 0.0f, 0.0f });
-    DrawModelEx(g_weaponModels.magRelease, magReleasePos, (Vector3){ 1, 0, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 80, 170, 255 });
+    DrawModelEx(g_weaponModels.magRelease, magReleasePos, (Vector3){ 1, 0, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 72, 80, 255 });
 
     Vector3 ejectionPortPos = Vector3Add(bodyPos, (Vector3){ 0.04f, 0.01f, 0.1f });
-    DrawModelEx(g_weaponModels.ejectionPort, ejectionPortPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 50, 130, 255 });
+    DrawModelEx(g_weaponModels.ejectionPort, ejectionPortPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 42, 48, 255 });
 
-    Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.2f });
-    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 65, 150, 255 });
+    Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.18f });
+    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 100, 80, 55, 255 });
 
     Vector3 handPos = Vector3Add(pos, (Vector3){ 0, -0.04f, 0.12f });
     DrawModelEx(g_weaponModels.hand, handPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 200, 160, 130, 255 });

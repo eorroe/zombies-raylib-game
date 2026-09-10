@@ -79,13 +79,13 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->muzzleFlashTimer = 0.0f;
     game->muzzleFlashPos = (Vector3){ 0 };
     
-    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
-    WeaponInit(&game->weapon, game->shaders.pbr);
-    CameraInit(&game->camera, &game->player);
-    
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
     RendererInit(game, screenWidth, screenHeight);
+    
+    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
+    WeaponInit(&game->weapon, game->shaders.pbr);
+    CameraInit(&game->camera, &game->player);
     game->mode = game->menu.mode;
     game->zombieMode = game->menu.zombieMode;
     
@@ -679,6 +679,7 @@ int main(void) {
         
         if (autoStart && frameCount == autoStartFrame && game.state == GAME_STATE_MENU) {
             game.state = GAME_STATE_PLAYING;
+            game.menu.active = false;
             GameInit(&game, screenWidth, screenHeight);
         }
         

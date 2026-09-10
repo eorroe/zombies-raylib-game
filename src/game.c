@@ -5,6 +5,7 @@
 #include "audio.h"
 #include "raymath.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
@@ -658,6 +659,13 @@ int main(void) {
     int autoStartFrame = 30;
     int screenshotFrame = 35;
     
+    bool autoRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
+    int autoRotateStage = 0;
+    float autoRotateAccum = 0.0f;
+    float lastYaw = 0.0f;
+    const float autoRotateSpeed = 9.5f;
+    const float autoRotateAngleThreshold = PI * 0.5f;
+    
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);
         if (IsKeyPressed(KEY_F2)) DebugClear(&game.debug);
@@ -683,8 +691,34 @@ int main(void) {
             GameInit(&game, screenWidth, screenHeight);
         }
         
+        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < 4) {
+            fprintf(stderr, "AUTO_ROTATE: stage=%d yaw=%.3f accum=%.3f\n", autoRotateStage, game.player.yaw, autoRotateAccum);
+            input.mouseDelta.x = autoRotateSpeed;
+            input.mouseDelta.y = 0.0f;
+        }
+        
         if (game.state == GAME_STATE_PLAYING && !game.menu.active) {
             GameUpdate(&game, GetFrameTime(), &input);
+        }
+        
+        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < 4) {
+            float currentYaw = game.player.yaw;
+            float deltaYaw = currentYaw - lastYaw;
+            autoRotateAccum += deltaYaw;
+            lastYaw = currentYaw;
+            
+            while (autoRotateAccum <= -autoRotateAngleThreshold) {
+                autoRotateAccum += autoRotateAngleThreshold;
+                char path[256];
+                snprintf(path, sizeof(path), "/tmp/weapon_yaw_%d.png", autoRotateStage);
+                fprintf(stderr, "AUTO_ROTATE: Taking screenshot %d -> %s\n", autoRotateStage, path);
+                TakeScreenshot(path);
+                autoRotateStage++;
+            }
+            
+            if (autoRotateStage >= 4) {
+                break;
+            }
         }
         
         BeginDrawing();

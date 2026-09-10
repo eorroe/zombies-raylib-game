@@ -99,6 +99,46 @@ Before committing any rendering change:
 | HUD invisible | Drawn inside texture mode | Draw HUD after blit, on backbuffer |
 | Zombie heads at wrong positions | `GetWorldToScreen` called inside texture mode | Call after `EndTextureMode`, on backbuffer |
 
+## Screenshot Workflow Requirement
+
+### When to Use
+
+You MUST run the headless screenshot workflow for **every change that produces a visible/visual result**, including but not limited to:
+
+- Rendering changes
+- Shader changes
+- Model/mesh changes
+- Material/texture changes
+- Animation changes
+- Camera/view changes
+- UI layout/positioning changes
+- Lighting changes
+- Color changes
+- Any change that affects what the user sees on screen
+
+### When to Skip
+
+You MAY skip the screenshot workflow for changes that do **not** produce a visible result, such as:
+
+- Pure logic bug fixes with no visual side effects
+- Refactoring that preserves behavior
+- Documentation/comment changes
+- Build system changes
+- Memory leak fixes
+- Performance optimizations that do not change output
+
+If a fix has both a visual component and a non-visual component, treat it as a visual change and run the workflow.
+
+### Rule
+
+After making a visual change and before declaring success, you must:
+
+1. Build
+2. Run headless with `ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter`
+3. Verify the screenshot exists
+4. Analyze the screenshot with Python/PIL or visually inspect it
+5. Confirm no blown whites, missing geometry, or other regressions before finalizing
+
 ## Headless Testing Workflow
 
 This project supports automated headless testing via Xvfb. Use this workflow whenever you need to verify rendering changes without a physical display.

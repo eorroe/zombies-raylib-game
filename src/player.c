@@ -1,23 +1,14 @@
 #include "player.h"
+#include "zombie_mesh.h"
 #include "raymath.h"
 #include "texture.h"
 #include "input.h"
 #include <stdlib.h>
 #include <math.h>
 
-static Model CreateLimbPivoted(float radius, float length, int slices) {
-    Mesh m = GenMeshCylinder(radius, length, slices);
-    for (int i = 0; i < m.vertexCount; i++) {
-        m.vertices[i * 3 + 1] -= length * 0.5f;
-    }
-    Model model = LoadModelFromMesh(m);
-    return model;
-}
-
-static Model CreateLimb(float radius, float length, int slices) {
-    Mesh m = GenMeshCylinder(radius, length, slices);
-    Model model = LoadModelFromMesh(m);
-    return model;
+static Model LoadHighPolyModel(Mesh mesh) {
+    ZombieMesh_Upload(&mesh);
+    return LoadModelFromMesh(mesh);
 }
 
 static void SetModelTexture(Model *model, Texture2D tex) {
@@ -26,7 +17,20 @@ static void SetModelTexture(Model *model, Texture2D tex) {
     }
 }
 
-void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
+static Vector3 RotateOffsetY(Vector3 offset, float cosYaw, float sinYaw) {
+    return (Vector3){
+        offset.x * cosYaw + offset.z * sinYaw,
+        offset.y,
+        -offset.x * sinYaw + offset.z * cosYaw
+    };
+}
+
+static void DrawLimb(Model model, Vector3 origin, Vector3 offsetDir, Vector3 rotationAxis, float angle, float length) {
+    Vector3 mid = Vector3Add(origin, Vector3Scale(offsetDir, length * 0.5f));
+    DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+}
+
+void PlayerInit(Player *player, Vector3 startPos, Shader pbr, ProceduralTextures *textures) {
     player->position = startPos;
     player->velocity = (Vector3){ 0 };
     player->health = PLAYER_HEALTH;
@@ -38,38 +42,77 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->animTime = 0.0f;
     player->moveDir = (Vector3){ 0 };
 
-    Mesh bodyMesh = GenMeshCylinder(0.4f, 1.2f, 8);
-    player->bodyModel = LoadModelFromMesh(bodyMesh);
+    Mesh torsoMesh = ZombieMesh_CreateTorso(0.55f, 0.85f, 0.5f);
+    player->bodyModel = LoadHighPolyModel(torsoMesh);
     player->bodyModel.materials[0].shader = pbr;
 
-    Mesh headMesh = GenMeshSphere(0.25f, 12, 12);
-    player->headModel = LoadModelFromMesh(headMesh);
+    Mesh spineMesh = ZombieMesh_CreateSpine(0.7f);
+    player->spineModel = LoadHighPolyModel(spineMesh);
+    player->spineModel.materials[0].shader = pbr;
+
+    Mesh ribMesh = ZombieMesh_CreateRibcage(0.5f, 0.6f);
+    player->ribcageModel = LoadHighPolyModel(ribMesh);
+    player->ribcageModel.materials[0].shader = pbr;
+
+    Mesh pelvisMesh = ZombieMesh_CreatePelvis(0.45f, 0.35f);
+    player->pelvisModel = LoadHighPolyModel(pelvisMesh);
+    player->pelvisModel.materials[0].shader = pbr;
+
+    Mesh headMesh = ZombieMesh_CreateHead(0.22f);
+    player->headModel = LoadHighPolyModel(headMesh);
     player->headModel.materials[0].shader = pbr;
 
-    player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
-    player->leftArmModel.materials[0].shader = pbr;
-    player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
-    player->rightArmModel.materials[0].shader = pbr;
-    player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
-    player->leftLegModel.materials[0].shader = pbr;
-    player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
-    player->rightLegModel.materials[0].shader = pbr;
+    Mesh jawMesh = ZombieMesh_CreateJaw(0.22f);
+    player->jawModel = LoadHighPolyModel(jawMesh);
+    player->jawModel.materials[0].shader = pbr;
 
-    Image uniformImg = GenImageColor(256, 256, (Color){ 70, 90, 180, 255 });
-    for (int i = 0; i < 1000; i++) {
-        int x = rand() % 256;
-        int y = rand() % 256;
-        int shade = 50 + rand() % 60;
-        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 10, shade + 30, 255 });
-    }
-    for (int i = 0; i < 80; i++) {
-        int x = rand() % 256;
-        int y = rand() % 256;
-        int r = 4 + rand() % 10;
-        ImageDrawCircle(&uniformImg, x, y, r, (Color){ 40, 60, 160, 200 });
-    }
-    Texture2D uniformTex = LoadTextureFromImage(uniformImg);
-    UnloadImage(uniformImg);
+    Mesh leftUpperArmMesh = ZombieMesh_CreateLimb(0.08f, 0.55f);
+    player->leftUpperArm = LoadHighPolyModel(leftUpperArmMesh);
+    player->leftUpperArm.materials[0].shader = pbr;
+
+    Mesh leftLowerArmMesh = ZombieMesh_CreateLimb(0.06f, 0.5f);
+    player->leftLowerArm = LoadHighPolyModel(leftLowerArmMesh);
+    player->leftLowerArm.materials[0].shader = pbr;
+
+    Mesh rightUpperArmMesh = ZombieMesh_CreateLimb(0.08f, 0.55f);
+    player->rightUpperArm = LoadHighPolyModel(rightUpperArmMesh);
+    player->rightUpperArm.materials[0].shader = pbr;
+
+    Mesh rightLowerArmMesh = ZombieMesh_CreateLimb(0.06f, 0.5f);
+    player->rightLowerArm = LoadHighPolyModel(rightLowerArmMesh);
+    player->rightLowerArm.materials[0].shader = pbr;
+
+    Mesh leftUpperLegMesh = ZombieMesh_CreateLimb(0.1f, 0.45f);
+    player->leftUpperLeg = LoadHighPolyModel(leftUpperLegMesh);
+    player->leftUpperLeg.materials[0].shader = pbr;
+
+    Mesh leftLowerLegMesh = ZombieMesh_CreateLimb(0.08f, 0.45f);
+    player->leftLowerLeg = LoadHighPolyModel(leftLowerLegMesh);
+    player->leftLowerLeg.materials[0].shader = pbr;
+
+    Mesh rightUpperLegMesh = ZombieMesh_CreateLimb(0.1f, 0.45f);
+    player->rightUpperLeg = LoadHighPolyModel(rightUpperLegMesh);
+    player->rightUpperLeg.materials[0].shader = pbr;
+
+    Mesh rightLowerLegMesh = ZombieMesh_CreateLimb(0.08f, 0.45f);
+    player->rightLowerLeg = LoadHighPolyModel(rightLowerLegMesh);
+    player->rightLowerLeg.materials[0].shader = pbr;
+
+    Mesh leftHandMesh = ZombieMesh_CreateHand(0.18f);
+    player->leftHandModel = LoadHighPolyModel(leftHandMesh);
+    player->leftHandModel.materials[0].shader = pbr;
+
+    Mesh rightHandMesh = ZombieMesh_CreateHand(0.18f);
+    player->rightHandModel = LoadHighPolyModel(rightHandMesh);
+    player->rightHandModel.materials[0].shader = pbr;
+
+    Mesh leftFootMesh = ZombieMesh_CreateFoot(0.22f);
+    player->leftFootModel = LoadHighPolyModel(leftFootMesh);
+    player->leftFootModel.materials[0].shader = pbr;
+
+    Mesh rightFootMesh = ZombieMesh_CreateFoot(0.22f);
+    player->rightFootModel = LoadHighPolyModel(rightFootMesh);
+    player->rightFootModel.materials[0].shader = pbr;
 
     Image skinImg = GenImageColor(256, 256, (Color){ 220, 200, 170, 255 });
     for (int i = 0; i < 1500; i++) {
@@ -86,16 +129,29 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     }
     Texture2D skinTex = LoadTextureFromImage(skinImg);
     UnloadImage(skinImg);
-
-    SetModelTexture(&player->bodyModel, uniformTex);
-    SetModelTexture(&player->headModel, skinTex);
-    SetModelTexture(&player->leftArmModel, uniformTex);
-    SetModelTexture(&player->rightArmModel, uniformTex);
-    SetModelTexture(&player->leftLegModel, uniformTex);
-    SetModelTexture(&player->rightLegModel, uniformTex);
-
-    player->uniformTex = uniformTex;
     player->skinTex = skinTex;
+
+    Texture2D camoTex = textures->camo;
+    player->camoTex = camoTex;
+
+    SetModelTexture(&player->bodyModel, camoTex);
+    SetModelTexture(&player->spineModel, textures->zombieBone);
+    SetModelTexture(&player->ribcageModel, textures->zombieBone);
+    SetModelTexture(&player->pelvisModel, textures->zombieBone);
+    SetModelTexture(&player->headModel, skinTex);
+    SetModelTexture(&player->jawModel, skinTex);
+    SetModelTexture(&player->leftUpperArm, camoTex);
+    SetModelTexture(&player->leftLowerArm, camoTex);
+    SetModelTexture(&player->rightUpperArm, camoTex);
+    SetModelTexture(&player->rightLowerArm, camoTex);
+    SetModelTexture(&player->leftUpperLeg, camoTex);
+    SetModelTexture(&player->leftLowerLeg, camoTex);
+    SetModelTexture(&player->rightUpperLeg, camoTex);
+    SetModelTexture(&player->rightLowerLeg, camoTex);
+    SetModelTexture(&player->leftHandModel, skinTex);
+    SetModelTexture(&player->rightHandModel, skinTex);
+    SetModelTexture(&player->leftFootModel, camoTex);
+    SetModelTexture(&player->rightFootModel, camoTex);
 }
 
 void PlayerUpdate(Player *player, InputState *input, float dt) {
@@ -136,66 +192,111 @@ void PlayerRender(Player *player, Shader shader) {
     if (!player->bodyModel.meshCount) return;
 
     float walk = player->isMoving ? sinf(player->animTime) : 0.0f;
-    float armSwing = walk * 0.3f;
+    float armSwing = walk * 0.5f;
+    float legSwing = walk * 0.6f;
 
     float yawDeg = player->yaw * RAD2DEG;
     float cosYaw = cosf(player->yaw);
     float sinYaw = sinf(player->yaw);
+    Vector3 zombieRight = (Vector3){ cosYaw, 0.0f, -sinYaw };
 
-    Vector3 bodyPos = player->position;
-    bodyPos.y += 1.0f;
-    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    float legUpperLen = 0.45f;
+    float legLowerLen = 0.45f;
+    float torsoHeight = 0.85f;
+    float hipY = player->position.y + legUpperLen + legLowerLen;
+    float torsoCenterY = hipY + torsoHeight * 0.5f;
+    float headCenterY = hipY + torsoHeight + 0.22f * 0.9f;
 
-    Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
-    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    Vector3 torsoOffset = (Vector3){ 0.0f, torsoCenterY, 0.0f };
+    Vector3 torsoPos = Vector3Add(player->position, RotateOffsetY(torsoOffset, cosYaw, sinYaw));
+    float bodyY = torsoPos.y;
 
-    Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
-    Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
-    Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f * cosYaw, -0.6f, 0.2f * sinYaw });
-    Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f * cosYaw, -0.6f, -0.2f * sinYaw });
+    DrawModelEx(player->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    DrawModelEx(player->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, yawDeg + armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, yawDeg - armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    Vector3 spineOffset = (Vector3){ 0.0f, bodyY - torsoPos.y - torsoHeight * 0.15f, 0.0f };
+    Vector3 spinePos = Vector3Add(torsoPos, RotateOffsetY(spineOffset, cosYaw, sinYaw));
+    DrawModelEx(player->spineModel, spinePos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 forward = PlayerGetForward(player);
-    Vector3 right = PlayerGetRight(player);
-    float fwd = Vector3DotProduct(player->moveDir, forward);
-    float rightDot = Vector3DotProduct(player->moveDir, right);
+    Vector3 ribOffset = (Vector3){ 0.0f, bodyY - torsoPos.y + torsoHeight * 0.05f, 0.0f };
+    Vector3 ribPos = Vector3Add(torsoPos, RotateOffsetY(ribOffset, cosYaw, sinYaw));
+    DrawModelEx(player->ribcageModel, ribPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    float legSwing = walk * 0.5f;
-    Vector3 leftAxis = (Vector3){ 0, 0, 1 };
-    Vector3 rightAxis = (Vector3){ 0, 0, 1 };
+    Vector3 pelvisOffset = (Vector3){ 0.0f, bodyY - torsoPos.y - torsoHeight * 0.35f, 0.0f };
+    Vector3 pelvisPos = Vector3Add(torsoPos, RotateOffsetY(pelvisOffset, cosYaw, sinYaw));
+    DrawModelEx(player->pelvisModel, pelvisPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    if (player->isMoving) {
-        float moveMag = sqrtf(fwd * fwd + rightDot * rightDot);
-        if (moveMag > 0.001f) {
-            fwd /= moveMag;
-            rightDot /= moveMag;
-        }
+    Vector3 headOffset = (Vector3){ 0.0f, headCenterY - torsoPos.y + torsoCenterY * 0.5f, 0.0f };
+    Vector3 headPos = Vector3Add(torsoPos, RotateOffsetY(headOffset, cosYaw, sinYaw));
+    DrawModelEx(player->headModel, (Vector3){ headPos.x, headPos.y, headPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-        if (fabsf(fwd) > fabsf(rightDot)) {
-            if (fwd < 0.0f) legSwing = -legSwing;
-            leftAxis = rightAxis = PlayerGetRight(player);
-        } else {
-            leftAxis = rightAxis = PlayerGetForward(player);
-        }
-    }
+    Vector3 jawOffset = (Vector3){ 0.0f, headPos.y - torsoPos.y + torsoCenterY * 0.5f - 0.22f * 0.3f, 0.22f * 0.4f };
+    Vector3 jawPos = Vector3Add(torsoPos, RotateOffsetY(jawOffset, cosYaw, sinYaw));
+    DrawModelEx(player->jawModel, (Vector3){ jawPos.x, jawPos.y, jawPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    float leftLegAngle = -legSwing * RAD2DEG;
-    float rightLegAngle = legSwing * RAD2DEG;
-    DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+    Vector3 shoulderLOffset = (Vector3){ -0.55f * 0.6f, torsoCenterY + torsoHeight * 0.35f - torsoPos.y, 0.0f };
+    Vector3 shoulderROffset = (Vector3){ 0.55f * 0.6f, torsoCenterY + torsoHeight * 0.35f - torsoPos.y, 0.0f };
+    Vector3 hipLOffset = (Vector3){ -0.55f * 0.35f, hipY - torsoPos.y, 0.0f };
+    Vector3 hipROffset = (Vector3){ 0.55f * 0.35f, hipY - torsoPos.y, 0.0f };
+
+    Vector3 shoulderL = Vector3Add(torsoPos, RotateOffsetY(shoulderLOffset, cosYaw, sinYaw));
+    Vector3 shoulderR = Vector3Add(torsoPos, RotateOffsetY(shoulderROffset, cosYaw, sinYaw));
+    Vector3 hipL = Vector3Add(torsoPos, RotateOffsetY(hipLOffset, cosYaw, sinYaw));
+    Vector3 hipR = Vector3Add(torsoPos, RotateOffsetY(hipROffset, cosYaw, sinYaw));
+
+    float armAngleX = -0.6f;
+    float armAngleY = -0.8f;
+    Vector3 armOffsetDir = (Vector3){ armAngleX, armAngleY, 0.0f };
+    Vector3 armOffsetDirRotated = RotateOffsetY(armOffsetDir, cosYaw, sinYaw);
+    Vector3 legOffsetDirUpper = (Vector3){ -0.2f, -1.0f, 0.0f };
+    Vector3 legOffsetDirLower = (Vector3){ -0.15f, -1.0f, 0.0f };
+    Vector3 legOffsetDirRotatedUpper = RotateOffsetY(legOffsetDirUpper, cosYaw, sinYaw);
+    Vector3 legOffsetDirRotatedLower = RotateOffsetY(legOffsetDirLower, cosYaw, sinYaw);
+
+    DrawLimb(player->leftUpperArm, shoulderL, armOffsetDirRotated, zombieRight, armSwing, 0.55f);
+    DrawLimb(player->leftLowerArm, Vector3Add(shoulderL, RotateOffsetY((Vector3){ armAngleX * 0.55f, armAngleY * 0.55f, 0.0f }, cosYaw, sinYaw)), RotateOffsetY((Vector3){ armAngleX * 0.7f, armAngleY * 0.8f, 0.0f }, cosYaw, sinYaw), zombieRight, armSwing * 1.3f, 0.5f);
+
+    DrawLimb(player->rightUpperArm, shoulderR, RotateOffsetY((Vector3){ -armAngleX, armAngleY, 0.0f }, cosYaw, sinYaw), zombieRight, -armSwing, 0.55f);
+    DrawLimb(player->rightLowerArm, Vector3Add(shoulderR, RotateOffsetY((Vector3){ -armAngleX * 0.55f, armAngleY * 0.55f, 0.0f }, cosYaw, sinYaw)), RotateOffsetY((Vector3){ -armAngleX * 0.7f, armAngleY * 0.8f, 0.0f }, cosYaw, sinYaw), zombieRight, -armSwing * 1.3f, 0.5f);
+
+    DrawLimb(player->leftUpperLeg, hipL, legOffsetDirRotatedUpper, zombieRight, legSwing, 0.45f);
+    DrawLimb(player->leftLowerLeg, Vector3Add(hipL, RotateOffsetY((Vector3){ -0.2f * 0.45f, -1.0f * 0.45f, 0.0f }, cosYaw, sinYaw)), legOffsetDirRotatedLower, zombieRight, legSwing * 1.2f, 0.45f);
+
+    DrawLimb(player->rightUpperLeg, hipR, RotateOffsetY((Vector3){ 0.2f, -1.0f, 0.0f }, cosYaw, sinYaw), zombieRight, -legSwing, 0.45f);
+    DrawLimb(player->rightLowerLeg, Vector3Add(hipR, RotateOffsetY((Vector3){ 0.2f * 0.45f, -1.0f * 0.45f, 0.0f }, cosYaw, sinYaw)), RotateOffsetY((Vector3){ 0.15f, -1.0f, 0.0f }, cosYaw, sinYaw), zombieRight, -legSwing * 1.2f, 0.45f);
+
+    Vector3 leftHandPos = Vector3Add(shoulderL, RotateOffsetY((Vector3){ armAngleX * 0.55f, armAngleY * 0.55f + 0.5f * 0.5f, 0.0f }, cosYaw, sinYaw));
+    Vector3 rightHandPos = Vector3Add(shoulderR, RotateOffsetY((Vector3){ -armAngleX * 0.55f, armAngleY * 0.55f + 0.5f * 0.5f, 0.0f }, cosYaw, sinYaw));
+    DrawModelEx(player->leftHandModel, leftHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightHandModel, rightHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+
+    Vector3 leftFootPos = Vector3Add(hipL, RotateOffsetY((Vector3){ -0.2f * 0.45f, -1.0f * 0.45f - 0.45f * 0.5f, 0.0f }, cosYaw, sinYaw));
+    Vector3 rightFootPos = Vector3Add(hipR, RotateOffsetY((Vector3){ 0.2f * 0.45f, -1.0f * 0.45f - 0.45f * 0.5f, 0.0f }, cosYaw, sinYaw));
+    DrawModelEx(player->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {
     UnloadModel(player->bodyModel);
     UnloadModel(player->headModel);
-    UnloadModel(player->leftArmModel);
-    UnloadModel(player->rightArmModel);
-    UnloadModel(player->leftLegModel);
-    UnloadModel(player->rightLegModel);
+    UnloadModel(player->jawModel);
+    UnloadModel(player->spineModel);
+    UnloadModel(player->ribcageModel);
+    UnloadModel(player->pelvisModel);
+    UnloadModel(player->leftUpperArm);
+    UnloadModel(player->leftLowerArm);
+    UnloadModel(player->rightUpperArm);
+    UnloadModel(player->rightLowerArm);
+    UnloadModel(player->leftUpperLeg);
+    UnloadModel(player->leftLowerLeg);
+    UnloadModel(player->rightUpperLeg);
+    UnloadModel(player->rightLowerLeg);
+    UnloadModel(player->leftHandModel);
+    UnloadModel(player->rightHandModel);
+    UnloadModel(player->leftFootModel);
+    UnloadModel(player->rightFootModel);
     UnloadTexture(player->uniformTex);
     UnloadTexture(player->skinTex);
+    UnloadTexture(player->camoTex);
 }
 
 void PlayerTakeDamage(Player *player, float damage) {

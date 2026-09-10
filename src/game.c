@@ -83,7 +83,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     TextureGenerate(&game->textures);
     RendererInit(game, screenWidth, screenHeight);
     
-    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
+    PlayerInit(&game->player, (Vector3){ 0, 0, 0 }, game->shaders.pbr, &game->textures);
     WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
     game->mode = game->menu.mode;

@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "input.h"
+#include "texture.h"
 
 #define PLAYER_SPEED 5.0f
 #define PLAYER_HEALTH 100.0f
@@ -19,19 +20,32 @@ typedef struct {
     float pitch;
     Model bodyModel;
     Model headModel;
-    Model leftArmModel;
-    Model rightArmModel;
-    Model leftLegModel;
-    Model rightLegModel;
+    Model jawModel;
+    Model spineModel;
+    Model ribcageModel;
+    Model pelvisModel;
+    Model leftUpperArm;
+    Model leftLowerArm;
+    Model rightUpperArm;
+    Model rightLowerArm;
+    Model leftUpperLeg;
+    Model leftLowerLeg;
+    Model rightUpperLeg;
+    Model rightLowerLeg;
+    Model leftHandModel;
+    Model rightHandModel;
+    Model leftFootModel;
+    Model rightFootModel;
     Texture2D uniformTex;
     Texture2D skinTex;
+    Texture2D camoTex;
     bool isMoving;
     float footstepTimer;
     float animTime;
     Vector3 moveDir;
 } Player;
 
-void PlayerInit(Player *player, Vector3 startPos, Shader pbr);
+void PlayerInit(Player *player, Vector3 startPos, Shader pbr, ProceduralTextures *textures);
 void PlayerUpdate(Player *player, InputState *input, float dt);
 void PlayerRender(Player *player, Shader shader);
 void PlayerShutdown(Player *player);

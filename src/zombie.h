@@ -32,8 +32,10 @@ typedef struct {
     bool active;
     float animTime;
     float walkCycle;
-    Model bodyModel;
-    Model headModel;
+    Model skullModel;
+    Model spineModel;
+    Model ribcageModel;
+    Model pelvisModel;
     Model leftUpperArm;
     Model leftLowerArm;
     Model rightUpperArm;
@@ -42,6 +44,10 @@ typedef struct {
     Model leftLowerLeg;
     Model rightUpperLeg;
     Model rightLowerLeg;
+    Model leftHand;
+    Model rightHand;
+    Model leftFoot;
+    Model rightFoot;
     Texture2D skinTex;
     Texture2D shirtTex;
     Texture2D pantsTex;

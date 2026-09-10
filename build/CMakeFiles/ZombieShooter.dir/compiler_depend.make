@@ -70,9 +70,9 @@ CMakeFiles/ZombieShooter.dir/src/camera.c.o: ../src/camera.c \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
   ../src/player.h \
   ../src/input.h \
+  ../src/texture.h \
   ../src/weapon.h \
   ../src/zombie.h \
-  ../src/texture.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -370,6 +370,8 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
   ../src/input.h \
+  ../src/texture.h \
+  ../src/zombie_mesh.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -393,7 +395,6 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
-  ../src/texture.h \
   /usr/include/stdlib.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
   /usr/include/x86_64-linux-gnu/bits/waitflags.h \
@@ -842,10 +843,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 ../raylib_src/src/raymath.h:
 
-../src/particle.c:
-
-../src/texture.h:
-
 ../src/zombie.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
@@ -853,6 +850,10 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/stdio.h:
 
 ../src/weapon.h:
+
+../src/particle.c:
+
+../src/texture.h:
 
 ../src/input.h:
 

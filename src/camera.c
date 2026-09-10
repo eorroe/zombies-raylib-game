@@ -19,7 +19,6 @@ void CameraInit(GameCamera *cam, Player *player) {
     cam->mode = GAME_CAMERA_MODE_THIRD_PERSON;
     cam->baseMode = GAME_CAMERA_MODE_THIRD_PERSON;
     cam->crouchAmount = 0.0f;
-    cam->crouchTarget = 0.0f;
     player->yaw = 0.0f;
     player->pitch = 0.0f;
 }
@@ -70,13 +69,14 @@ void CameraUpdate(GameCamera *cam, Player *player, float dt) {
         if (cam->firstPersonBlend < targetBlend) cam->firstPersonBlend = targetBlend;
     }
     
+    float crouchTarget = cam->crouchAmount;
     float crouchSpeed = 8.0f;
-    if (cam->crouchTarget > cam->crouchAmount) {
+    if (crouchTarget > cam->crouchAmount) {
         cam->crouchAmount += dt * crouchSpeed;
-        if (cam->crouchAmount > cam->crouchTarget) cam->crouchAmount = cam->crouchTarget;
-    } else if (cam->crouchTarget < cam->crouchAmount) {
+        if (cam->crouchAmount > crouchTarget) cam->crouchAmount = crouchTarget;
+    } else if (crouchTarget < cam->crouchAmount) {
         cam->crouchAmount -= dt * crouchSpeed;
-        if (cam->crouchAmount < cam->crouchTarget) cam->crouchAmount = cam->crouchTarget;
+        if (cam->crouchAmount < crouchTarget) cam->crouchAmount = crouchTarget;
     }
     
     float crouchOffset = cam->crouchAmount * 0.7f;
@@ -127,7 +127,7 @@ GameCameraMode CameraGetMode(GameCamera *cam) {
 }
 
 void CameraSetCrouch(GameCamera *cam, bool crouching) {
-    cam->crouchTarget = crouching ? 1.0f : 0.0f;
+    cam->crouchAmount = crouching ? 1.0f : 0.0f;
 }
 
 float CameraGetCrouchAmount(GameCamera *cam) {

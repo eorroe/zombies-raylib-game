@@ -462,7 +462,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     if (game->firstShotGraceTimer > 0.0f) game->firstShotGraceTimer -= dt;
     PlayerUpdate(&game->player, input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
-    WeaponUpdate(&game->weapon, game->player.position, input, dt);
+    WeaponUpdate(&game->weapon, game->player.position, game->player.yaw, input, dt);
     RendererUpdate(game, dt);
     
     GameApplyCollisions(game);

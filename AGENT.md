@@ -204,6 +204,75 @@ The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `s
 | HUD missing | HUD drawn inside texture mode, not on backbuffer |
 | Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` |
 
+### Systematic Pixel Analysis Algorithm
+
+When analyzing screenshots, follow this **broad-to-narrow** iterative approach:
+
+#### Step 1: Analyze ALL pixels first
+```python
+from PIL import Image
+img = Image.open('/tmp/screenshot.png')
+width, height = img.size
+pixels = list(img.getdata())
+print(f'Total pixels: {len(pixels)}')
+print(f'Size: {width}x{height}')
+```
+
+#### Step 2: Get global statistics
+```python
+brightness = sum(sum(p[:3])/3 for p in pixels if len(p) >= 3) / len(pixels)
+white_count = sum(1 for p in pixels if len(p) >= 3 and p[0] > 240 and p[1] > 240 and p[2] > 240)
+print(f'Average brightness: {brightness:.1f}')
+print(f'White-ish pixels: {white_count}')
+```
+
+#### Step 3: Identify dominant colors across entire image
+```python
+from collections import Counter
+color_counts = Counter()
+for p in pixels:
+    r, g, b = p[:3]
+    qr, qg, qb = r // 16, g // 16, b // 16
+    color_counts[(qr, qg, qb)] += 1
+
+top_colors = color_counts.most_common(10)
+for color, count in top_colors:
+    r, g, b = color[0] * 16 + 8, color[1] * 16 + 8, color[2] * 16 + 8
+    print(f'RGB({r:3d},{g:3d},{b:3d}): {count:6d} pixels ({count/len(pixels)*100:.1f}%)')
+```
+
+#### Step 4: Filter by target color across ENTIRE image
+```python
+# Example: find all blue pixels
+blue_pixels = []
+for y in range(height):
+    for x in range(width):
+        p = pixels[y * width + x]
+        r, g, b = p[:3]
+        if b > 80 and b > r + 5 and b > g + 5:
+            blue_pixels.append((x, y, p[:3]))
+
+print(f'Blue pixels: {len(blue_pixels)}')
+```
+
+#### Step 5: Cluster and analyze filtered pixels
+```python
+from collections import Counter
+y_counts = Counter(y for x, y, c in blue_pixels)
+top_y = y_counts.most_common(10)
+print('Top y positions:')
+for y, count in top_y:
+    xs = [x for x, yy, c in blue_pixels if yy == y]
+    print(f'  y={y}: {count} pixels, x range {min(xs)}-{max(xs)}')
+```
+
+#### Step 6: Refine search based on clusters
+- If one cluster is dominant (e.g., sky), filter it out
+- Focus on remaining clusters
+- Sample pixels around suspected target areas
+
+**Key Principle:** Always analyze the **entire image first**, then iteratively filter. Never start with a small region unless you already know the target location from prior analysis.
+
 ### Rules
 
 - Always take a screenshot after rendering changes before declaring success

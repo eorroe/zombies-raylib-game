@@ -21,7 +21,6 @@ typedef struct {
     GameCameraMode mode;
     GameCameraMode baseMode;
     float crouchAmount;
-    float crouchTarget;
 } GameCamera;
 
 void CameraInit(GameCamera *cam, Player *player);

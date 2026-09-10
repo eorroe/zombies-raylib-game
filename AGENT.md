@@ -1,4 +1,4 @@
-# Agent Instructions: Rendering Rules for doodle-style Branch
+# Agent Instructions: Rendering and Headless Testing Workflow for doodle-style Branch
 
 This file contains mandatory rules for any agent working on rendering code in this project. Violating these rules will cause visible rendering failures.
 

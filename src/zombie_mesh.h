@@ -3,9 +3,8 @@
 
 #include "raylib.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void ZombieMesh_Upload(Mesh *mesh);
+void ZombieMesh_Unload(Mesh *mesh);
 
 Mesh ZombieMesh_CreateTorso(float width, float height, float depth);
 Mesh ZombieMesh_CreateHead(float radius);
@@ -13,12 +12,8 @@ Mesh ZombieMesh_CreateJaw(float radius);
 Mesh ZombieMesh_CreateLimb(float radius, float length);
 Mesh ZombieMesh_CreateHand(float scale);
 Mesh ZombieMesh_CreateFoot(float scale);
-void ZombieMesh_ComputeNormals(Mesh *mesh);
-void ZombieMesh_Upload(Mesh *mesh);
-void ZombieMesh_Unload(Mesh *mesh);
-
-#ifdef __cplusplus
-}
-#endif
+Mesh ZombieMesh_CreateSpine(float height);
+Mesh ZombieMesh_CreateRibcage(float width, float height);
+Mesh ZombieMesh_CreatePelvis(float width, float height);
 
 #endif

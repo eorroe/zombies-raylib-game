@@ -8,6 +8,7 @@ typedef struct {
     Texture2D zombieSkinNormal;
     Texture2D zombieShirt;
     Texture2D zombiePants;
+    Texture2D zombieBone;
     Texture2D bloodDecal;
     Texture2D concrete;
     Texture2D concreteNormal;

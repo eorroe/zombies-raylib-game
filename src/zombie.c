@@ -21,7 +21,7 @@ static void SetModelNormal(Model *model, Texture2D normal) {
     }
 }
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants, Shader pbr) {
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants, Texture2D bone, Shader pbr) {
     zombie->position = position;
     zombie->velocity = (Vector3){ 0 };
     zombie->health = 50.0f + rand() % 50;
@@ -38,6 +38,7 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     zombie->skinNormal = skinNormal;
     zombie->shirtTex = shirt;
     zombie->pantsTex = pants;
+    zombie->boneTex = bone;
     zombie->speed = ZOMBIE_SPEED_BASE;
     zombie->damageFlashTimer = 0.0f;
 
@@ -64,6 +65,21 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     SetModelTexture(&zombie->bodyModel, shirt);
     SetModelNormal(&zombie->bodyModel, skinNormal);
     zombie->bodyModel.materials[0].shader = pbr;
+
+    Mesh spineMesh = ZombieMesh_CreateSpine(torsoH * 0.8f);
+    zombie->spineModel = LoadHighPolyModel(spineMesh);
+    SetModelTexture(&zombie->spineModel, zombie->boneTex);
+    zombie->spineModel.materials[0].shader = pbr;
+
+    Mesh ribcageMesh = ZombieMesh_CreateRibcage(torsoW * 1.1f, torsoH * 0.7f);
+    zombie->ribcageModel = LoadHighPolyModel(ribcageMesh);
+    SetModelTexture(&zombie->ribcageModel, zombie->boneTex);
+    zombie->ribcageModel.materials[0].shader = pbr;
+
+    Mesh pelvisMesh = ZombieMesh_CreatePelvis(torsoW * 0.9f, torsoH * 0.4f);
+    zombie->pelvisModel = LoadHighPolyModel(pelvisMesh);
+    SetModelTexture(&zombie->pelvisModel, zombie->boneTex);
+    zombie->pelvisModel.materials[0].shader = pbr;
 
     Mesh headMesh = ZombieMesh_CreateHead(headR);
     zombie->headModel = LoadHighPolyModel(headMesh);
@@ -244,6 +260,15 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
     DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
+    Vector3 spinePos = (Vector3){ torsoPos.x, bodyY - torsoH * 0.15f, torsoPos.z };
+    DrawModelEx(zombie->spineModel, spinePos, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
+
+    Vector3 ribPos = (Vector3){ torsoPos.x, bodyY + torsoH * 0.05f, torsoPos.z };
+    DrawModelEx(zombie->ribcageModel, ribPos, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
+
+    Vector3 pelvisPos = (Vector3){ torsoPos.x, bodyY - torsoH * 0.35f, torsoPos.z };
+    DrawModelEx(zombie->pelvisModel, pelvisPos, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
+
     if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
         Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };
         float headY = headPos.y;
@@ -325,6 +350,9 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
 
 void ZombieShutdown(Zombie *zombie) {
     UnloadModel(zombie->bodyModel);
+    UnloadModel(zombie->spineModel);
+    UnloadModel(zombie->ribcageModel);
+    UnloadModel(zombie->pelvisModel);
     UnloadModel(zombie->headModel);
     UnloadModel(zombie->jawModel);
     UnloadModel(zombie->leftUpperArm);

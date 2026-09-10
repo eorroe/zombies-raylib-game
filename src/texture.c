@@ -586,6 +586,7 @@ void TextureGenerate(ProceduralTextures *textures) {
 
     textures->zombieShirt = LoadTextureFromImage(GenerateUniformTexture(512, 512));
     textures->zombiePants = LoadTextureFromImage(GenerateUniformTexture(512, 512));
+    textures->zombieBone = LoadTextureFromImage(GenerateZombieSkin(512, 512));
 
     textures->bloodDecal = LoadTextureFromImage(GenerateBloodTexture(512, 512));
 
@@ -645,11 +646,12 @@ void TextureGenerate(ProceduralTextures *textures) {
 
 void TextureShutdown(ProceduralTextures *textures) {
     if (textures->generated) {
-        UnloadTexture(textures->zombieSkin);
-        UnloadTexture(textures->zombieSkinNormal);
-        UnloadTexture(textures->zombieShirt);
-        UnloadTexture(textures->zombiePants);
-        UnloadTexture(textures->bloodDecal);
+    UnloadTexture(textures->zombieSkin);
+    UnloadTexture(textures->zombieSkinNormal);
+    UnloadTexture(textures->zombieShirt);
+    UnloadTexture(textures->zombiePants);
+    UnloadTexture(textures->zombieBone);
+    UnloadTexture(textures->bloodDecal);
         UnloadTexture(textures->concrete);
         UnloadTexture(textures->concreteNormal);
         UnloadTexture(textures->defaultZombieHead);

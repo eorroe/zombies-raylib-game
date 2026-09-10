@@ -804,3 +804,162 @@ Mesh ZombieMesh_CreateFoot(float scale) {
     ComputeMeshNormals(&mesh);
     return mesh;
 }
+
+Mesh ZombieMesh_CreateSpine(float height) {
+    int boneCount = 24;
+    float segmentH = height / (float)boneCount;
+    float radius = 0.06f;
+
+    int ringVerts = 16 + 1;
+    int bodyVerts = ringVerts * 2;
+    int topCenter = bodyVerts;
+    int bottomCenter = bodyVerts + 1;
+    int topRingStart = bottomCenter + 1;
+    int bottomRingStart = topRingStart + 16;
+    int vertexCount = bottomRingStart + 16;
+    int triangleCount = 16 * 2 + 16 * 2;
+
+    Mesh mesh = { 0 };
+    mesh.vertexCount = vertexCount;
+    mesh.triangleCount = triangleCount;
+    mesh.vertices = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.texcoords = (float *)calloc(vertexCount * 2, sizeof(float));
+    mesh.normals = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.colors = (unsigned char *)calloc(vertexCount * 4, sizeof(unsigned char));
+    mesh.indices = (unsigned short *)calloc(triangleCount * 3, sizeof(unsigned short));
+
+    int vi = 0;
+    for (int j = 0; j <= 1; j++) {
+        float y = j == 0 ? -segmentH * 0.5f : segmentH * 0.5f;
+        for (int i = 0; i <= 16; i++) {
+            float u = (float)i / 16.0f;
+            float theta = u * 2.0f * PI;
+            float x = radius * cosf(theta);
+            float z = radius * sinf(theta);
+            int idx = j == 0 ? (bottomRingStart + i) : (topRingStart + i);
+            mesh.vertices[idx * 3] = x;
+            mesh.vertices[idx * 3 + 1] = y;
+            mesh.vertices[idx * 3 + 2] = z;
+            mesh.texcoords[idx * 2] = u;
+            mesh.texcoords[idx * 2 + 1] = j;
+            mesh.colors[idx * 4] = 230;
+            mesh.colors[idx * 4 + 1] = 225;
+            mesh.colors[idx * 4 + 2] = 210;
+            mesh.colors[idx * 4 + 3] = 255;
+        }
+    }
+
+    mesh.vertices[topCenter * 3] = 0;
+    mesh.vertices[topCenter * 3 + 1] = segmentH * 0.5f;
+    mesh.vertices[topCenter * 3 + 2] = 0;
+    mesh.texcoords[topCenter * 2] = 0.5f;
+    mesh.texcoords[topCenter * 2 + 1] = 1.0f;
+    mesh.colors[topCenter * 4] = 230; mesh.colors[topCenter * 4 + 1] = 225;
+    mesh.colors[topCenter * 4 + 2] = 210; mesh.colors[topCenter * 4 + 3] = 255;
+
+    mesh.vertices[bottomCenter * 3] = 0;
+    mesh.vertices[bottomCenter * 3 + 1] = -segmentH * 0.5f;
+    mesh.vertices[bottomCenter * 3 + 2] = 0;
+    mesh.texcoords[bottomCenter * 2] = 0.5f;
+    mesh.texcoords[bottomCenter * 2 + 1] = 0.0f;
+    mesh.colors[bottomCenter * 4] = 230; mesh.colors[bottomCenter * 4 + 1] = 225;
+    mesh.colors[bottomCenter * 4 + 2] = 210; mesh.colors[bottomCenter * 4 + 3] = 255;
+
+    int ii = 0;
+    for (int i = 0; i < 16; i++) {
+        mesh.indices[ii++] = topCenter;
+        mesh.indices[ii++] = topRingStart + ((i + 1) % 16);
+        mesh.indices[ii++] = topRingStart + i;
+    }
+    for (int i = 0; i < 16; i++) {
+        mesh.indices[ii++] = bottomCenter;
+        mesh.indices[ii++] = bottomRingStart + i;
+        mesh.indices[ii++] = bottomRingStart + ((i + 1) % 16);
+    }
+
+    ComputeMeshNormals(&mesh);
+    return mesh;
+}
+
+Mesh ZombieMesh_CreateRibcage(float width, float height) {
+    int ribCount = 12;
+    float ribW = width * 0.8f;
+    float ribH = height * 0.8f;
+    float ribDepth = 0.02f;
+
+    int ringVerts = 24 + 1;
+    int bodyVerts = ringVerts * 2;
+    int topCenter = bodyVerts;
+    int bottomCenter = bodyVerts + 1;
+    int topRingStart = bottomCenter + 1;
+    int bottomRingStart = topRingStart + 24;
+    int vertexCount = bottomRingStart + 24;
+    int triangleCount = 24 * 2 + 24 * 2;
+
+    Mesh mesh = { 0 };
+    mesh.vertexCount = vertexCount;
+    mesh.triangleCount = triangleCount;
+    mesh.vertices = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.texcoords = (float *)calloc(vertexCount * 2, sizeof(float));
+    mesh.normals = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.colors = (unsigned char *)calloc(vertexCount * 4, sizeof(unsigned char));
+    mesh.indices = (unsigned short *)calloc(triangleCount * 3, sizeof(unsigned short));
+
+    int vi = 0;
+    for (int j = 0; j <= 1; j++) {
+        float y = j == 0 ? -ribH * 0.5f : ribH * 0.5f;
+        for (int i = 0; i <= 24; i++) {
+            float u = (float)i / 24.0f;
+            float theta = u * 2.0f * PI;
+            float x = ribW * 0.5f * cosf(theta);
+            float z = ribDepth * sinf(theta);
+            int idx = j == 0 ? (bottomRingStart + i) : (topRingStart + i);
+            mesh.vertices[idx * 3] = x;
+            mesh.vertices[idx * 3 + 1] = y;
+            mesh.vertices[idx * 3 + 2] = z;
+            mesh.texcoords[idx * 2] = u;
+            mesh.texcoords[idx * 2 + 1] = j;
+            mesh.colors[idx * 4] = 230;
+            mesh.colors[idx * 4 + 1] = 225;
+            mesh.colors[idx * 4 + 2] = 210;
+            mesh.colors[idx * 4 + 3] = 255;
+        }
+    }
+
+    mesh.vertices[topCenter * 3] = 0;
+    mesh.vertices[topCenter * 3 + 1] = ribH * 0.5f;
+    mesh.vertices[topCenter * 3 + 2] = 0;
+    mesh.texcoords[topCenter * 2] = 0.5f;
+    mesh.texcoords[topCenter * 2 + 1] = 1.0f;
+    mesh.colors[topCenter * 4] = 230; mesh.colors[topCenter * 4 + 1] = 225;
+    mesh.colors[topCenter * 4 + 2] = 210; mesh.colors[topCenter * 4 + 3] = 255;
+
+    mesh.vertices[bottomCenter * 3] = 0;
+    mesh.vertices[bottomCenter * 3 + 1] = -ribH * 0.5f;
+    mesh.vertices[bottomCenter * 3 + 2] = 0;
+    mesh.texcoords[bottomCenter * 2] = 0.5f;
+    mesh.texcoords[bottomCenter * 2 + 1] = 0.0f;
+    mesh.colors[bottomCenter * 4] = 230; mesh.colors[bottomCenter * 4 + 1] = 225;
+    mesh.colors[bottomCenter * 4 + 2] = 210; mesh.colors[bottomCenter * 4 + 3] = 255;
+
+    int ii = 0;
+    for (int i = 0; i < 24; i++) {
+        mesh.indices[ii++] = topCenter;
+        mesh.indices[ii++] = topRingStart + ((i + 1) % 24);
+        mesh.indices[ii++] = topRingStart + i;
+    }
+    for (int i = 0; i < 24; i++) {
+        mesh.indices[ii++] = bottomCenter;
+        mesh.indices[ii++] = bottomRingStart + i;
+        mesh.indices[ii++] = bottomRingStart + ((i + 1) % 24);
+    }
+
+    ComputeMeshNormals(&mesh);
+    return mesh;
+}
+
+Mesh ZombieMesh_CreatePelvis(float width, float height) {
+    Mesh m = GenMeshCylinder(width * 0.7f, height * 0.5f, 16);
+    return m;
+}
+

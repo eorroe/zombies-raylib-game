@@ -98,63 +98,66 @@ Before committing any rendering change:
 | Zombies invisible | Model scale too small | Compare against original constants |
 | HUD invisible | Drawn inside texture mode | Draw HUD after blit, on backbuffer |
 | Zombie heads at wrong positions | `GetWorldToScreen` called inside texture mode | Call after `EndTextureMode`, on backbuffer |
+| Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` | Call `RendererInit` first so shader is valid |
+| Crouch snaps or doesn't work | Target/current value confused in lerp | Use separate `crouchTarget` and `crouchAmount` |
 
-## Screenshot Workflow Requirement
+## Game Logic Rules
 
-### When to Use
+### 8. Initialization Order
 
-You MUST run the headless screenshot workflow for **every change that produces a visible/visual result**, including but not limited to:
+`GameInit()` MUST follow this order:
+1. `RendererInit()` — initializes shaders first
+2. `PlayerInit()` — needs valid shader for model materials
+3. `WeaponInit()` — needs valid shader for model materials
+4. `CameraInit()` — doesn't need shader
+5. `AudioInit()`, `TextureGenerate()`, etc.
 
-- Rendering changes
-- Shader changes
-- Model/mesh changes
-- Material/texture changes
-- Animation changes
-- Camera/view changes
-- UI layout/positioning changes
-- Lighting changes
-- Color changes
-- Any change that affects what the user sees on screen
+### 9. Main Loop State Machine
 
-### When to Skip
+`main()` MUST:
+- Start with `menu.active = true` and `state = GAME_STATE_MENU`
+- Only call `GameInit()` from `UIUpdate()` when user starts game, or from auto-start path
+- Never call `GameInit()` directly in `main()` before the main loop
 
-You MAY skip the screenshot workflow for changes that do **not** produce a visible result, such as:
+### 10. Input Handling Rules
 
-- Pure logic bug fixes with no visual side effects
-- Refactoring that preserves behavior
-- Documentation/comment changes
-- Build system changes
-- Memory leak fixes
-- Performance optimizations that do not change output
+| Action | Input | Implementation |
+|--------|-------|----------------|
+| Shoot | Left click press | `mouseLeftPressed` (edge trigger) |
+| Hold for 1st person | Right click hold | `mouseRightDown` (level trigger) |
+| Toggle camera mode | C key | `cameraTogglePressed` |
+| Sprint | Shift hold | `shiftPressed` |
+| Crouch | Ctrl hold | `ctrlPressed` |
+| Jump | Space press | `spacePressed` |
 
-If a fix has both a visual component and a non-visual component, treat it as a visual change and run the workflow.
+### 11. Camera Mode System
 
-### Rule
+- `baseMode` — persistent mode set by C key toggle (3rd/1st person)
+- `mode` — current mode, can be temporarily overridden by right-click hold
+- Right-click hold forces `mode = FIRST_PERSON`, release restores `mode = baseMode`
+- `CameraUpdate()` lerps `firstPersonBlend` based on `mode`
 
-After making a visual change and before declaring success, you must:
+### 12. Crouch Implementation
 
-1. Build
-2. Run with `ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 ./ZombieShooter`
-3. Verify the screenshot exists
-4. Analyze the screenshot with Python/PIL or visually inspect it
-5. Confirm no blown whites, missing geometry, or other regressions before finalizing
+- `CameraSetCrouch()` sets `crouchTarget` to 1.0 (crouching) or 0.0 (standing)
+- `CameraUpdate()` lerps `crouchAmount` toward `crouchTarget` at 8.0 units/sec
+- Crouch offset: `crouchAmount * 0.7f` subtracted from both 3rd-person and 1st-person camera Y
 
-**Note:** The game uses raylib's built-in `TakeScreenshot()` when `ZOMBIE_SHOT` is set. This is the preferred method. Only use the xvfb fallback if the environment has no display server at all.
+### 13. Jump Physics
+
+- `Player` struct has `velocityY` and `isGrounded`
+- Jump: `velocityY = PLAYER_JUMP_FORCE` on space press when grounded
+- Gravity: `velocityY -= PLAYER_GRAVITY * dt` each frame
+- Ground check: if `position.y <= 0`, set `velocityY = 0` and `isGrounded = true`
 
 ## Headless Testing Workflow
-
-This project supports automated screenshot capture via raylib's built-in `TakeScreenshot()`. Use this workflow whenever you need to verify rendering changes without a physical display.
-
-### Primary Method: Built-in Screenshot
-
-The game already supports screenshot capture through environment variables. This is the preferred method.
 
 ### Environment Variables
 
 | Variable | Purpose |
 |----------|---------|
 | `ZOMBIE_AUTO_START=1` | Skips menu and starts gameplay automatically after 30 frames |
-| `ZOMBIE_SHOT=/path/to/screenshot.png` | Saves a screenshot at frame 35 to the specified path using raylib's `TakeScreenshot()` |
+| `ZOMBIE_SHOT=/path/to/screenshot.png` | Saves a screenshot at frame 35 to the specified path |
 | `ZOMBIE_AUTO_QUIT_MS=5000` | Auto-quits after the specified milliseconds (prevents hangs) |
 
 ### Command Template
@@ -162,13 +165,13 @@ The game already supports screenshot capture through environment variables. This
 ```bash
 cd /workspace/.../sessions/agent_xxx/build
 ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
-  ./ZombieShooter
+  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
 ```
 
 ### Step-by-Step Workflow
 
 1. **Build first**: `cd build && make -j"$(nproc)"`
-2. **Run** using the template above
+2. **Run headless** with xvfb using the template above
 3. **Verify screenshot exists**: `ls -la /tmp/zombie_test.png`
 4. **Analyze screenshot** with Python/PIL:
    ```python
@@ -185,16 +188,6 @@ ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
    ```
 5. **Visual inspection**: print the screenshot or inspect pixel statistics to confirm the scene is visible, not washed out, and contains expected elements
 
-### Fallback Method: Xvfb (No Display Server)
-
-If the environment has **no display server** at all, use xvfb-run as a fallback:
-
-```bash
-cd /workspace/.../sessions/agent_xxx/build
-ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
-  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
-```
-
 ### Screenshot Timing
 
 The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `src/game.c`). Auto-start triggers at **frame 30** (`autoStartFrame = 30`). This gives 5 frames of gameplay before capture.
@@ -209,12 +202,81 @@ The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `s
 | Pulsing bright flash | Fire lights with unconstrained HDR |
 | Tiny/empty scene | Model scale too small or camera at wrong position |
 | HUD missing | HUD drawn inside texture mode, not on backbuffer |
+| Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` |
+
+### Systematic Pixel Analysis Algorithm
+
+When analyzing screenshots, follow this **broad-to-narrow** iterative approach:
+
+#### Step 1: Analyze ALL pixels first
+```python
+from PIL import Image
+img = Image.open('/tmp/screenshot.png')
+width, height = img.size
+pixels = list(img.getdata())
+print(f'Total pixels: {len(pixels)}')
+print(f'Size: {width}x{height}')
+```
+
+#### Step 2: Get global statistics
+```python
+brightness = sum(sum(p[:3])/3 for p in pixels if len(p) >= 3) / len(pixels)
+white_count = sum(1 for p in pixels if len(p) >= 3 and p[0] > 240 and p[1] > 240 and p[2] > 240)
+print(f'Average brightness: {brightness:.1f}')
+print(f'White-ish pixels: {white_count}')
+```
+
+#### Step 3: Identify dominant colors across entire image
+```python
+from collections import Counter
+color_counts = Counter()
+for p in pixels:
+    r, g, b = p[:3]
+    qr, qg, qb = r // 16, g // 16, b // 16
+    color_counts[(qr, qg, qb)] += 1
+
+top_colors = color_counts.most_common(10)
+for color, count in top_colors:
+    r, g, b = color[0] * 16 + 8, color[1] * 16 + 8, color[2] * 16 + 8
+    print(f'RGB({r:3d},{g:3d},{b:3d}): {count:6d} pixels ({count/len(pixels)*100:.1f}%)')
+```
+
+#### Step 4: Filter by target color across ENTIRE image
+```python
+# Example: find all blue pixels
+blue_pixels = []
+for y in range(height):
+    for x in range(width):
+        p = pixels[y * width + x]
+        r, g, b = p[:3]
+        if b > 80 and b > r + 5 and b > g + 5:
+            blue_pixels.append((x, y, p[:3]))
+
+print(f'Blue pixels: {len(blue_pixels)}')
+```
+
+#### Step 5: Cluster and analyze filtered pixels
+```python
+from collections import Counter
+y_counts = Counter(y for x, y, c in blue_pixels)
+top_y = y_counts.most_common(10)
+print('Top y positions:')
+for y, count in top_y:
+    xs = [x for x, yy, c in blue_pixels if yy == y]
+    print(f'  y={y}: {count} pixels, x range {min(xs)}-{max(xs)}')
+```
+
+#### Step 6: Refine search based on clusters
+- If one cluster is dominant (e.g., sky), filter it out
+- Focus on remaining clusters
+- Sample pixels around suspected target areas
+
+**Key Principle:** Always analyze the **entire image first**, then iteratively filter. Never start with a small region unless you already know the target location from prior analysis.
 
 ### Rules
 
 - Always take a screenshot after rendering changes before declaring success
 - If brightness > 200 average, the scene is likely blown out — check PBR output stages
 - If non-transparent pixels < 50% of frame, the scene may not be rendering to the backbuffer
-- Prefer the built-in `TakeScreenshot()` method via `ZOMBIE_SHOT` over xvfb
-- Only use `xvfb-run` if the environment has no display server available
-- Use `-screen 0 1280x720x24` with xvfb to match the game's window size and color depth
+- Use `xvfb-run -a` (auto-select display) to avoid conflicts with existing X servers
+- Use `-screen 0 1280x720x24` to match the game's window size and color depth

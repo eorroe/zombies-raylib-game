@@ -592,8 +592,113 @@ FOLLOW SKILL.md PROTOCOLS:
 - Do not make assumptions about APIs, paths, or build systems
 ```
 
-<environment_details>
-Current time: 2026-09-07T05:04:35+00:00
-Working directory: /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180
-Workspace root folder: /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180
-</environment_details>
+## 16. Menu Not Showing on First Load
+
+### Mistake
+`main()` in `src/game.c` hardcoded `game.menu.active = false` and `game.state = GAME_STATE_PLAYING`, then immediately called `GameInit()`. This bypassed the menu entirely, starting gameplay directly.
+
+### Root Cause
+- Earlier fix for auto-start behavior was not persisted or was reverted
+- The menu state initialization was left in the old "skip menu" configuration
+
+### Prevention
+- **Rule**: `main()` must initialize `game.menu.active = true` and `game.state = GAME_STATE_MENU`. `GameInit()` must only be called from `UIUpdate()` when the user selects Start Game, or from the auto-start path after the menu has been shown.
+
+---
+
+## 17. Player and Gun Invisible on First Load
+
+### Mistake
+Player model and weapon were invisible on the first game load, but became visible after dying and restarting.
+
+### Root Cause
+`GameInit()` called `PlayerInit()` and `WeaponInit()` BEFORE `RendererInit()`. Both `PlayerInit()` and `WeaponInit()` receive `game->shaders.pbr` as a parameter and assign it to model materials. Since `RendererInit()` is responsible for initializing the shader via `ShaderInit()`, the shader was uninitialized (all zeros) when passed to model creation. After `GameShutdown()` and restart, the shader state was different because it had been previously compiled.
+
+### Prevention
+- **Rule**: `RendererInit()` MUST be called before any function that uses `game->shaders.pbr`. In `GameInit()`, the order must be:
+  1. `RendererInit(game, screenWidth, screenHeight);`
+  2. `PlayerInit(&game->player, startPos, game->shaders.pbr);`
+  3. `WeaponInit(&game->weapon, game->shaders.pbr);`
+  4. `CameraInit(&game->camera, &game->player);`
+
+---
+
+## 18. Crouch Not Working
+
+### Mistake
+Crouch either did nothing or snapped instantly instead of smoothly transitioning.
+
+### Root Cause
+`CameraSetCrouch()` set `cam->crouchAmount` directly to 1.0 or 0.0, but `CameraUpdate()` used `crouchAmount` as both the current value AND the target:
+```c
+float crouchTarget = cam->crouchAmount;  // same as current value!
+if (crouchTarget > cam->crouchAmount) { ... }  // never true
+```
+
+### Prevention
+- **Rule**: Separate target from current value. Use `crouchTarget` for the desired state and `crouchAmount` for the smoothed current state. `CameraSetCrouch()` sets the target, `CameraUpdate()` lerps `crouchAmount` toward `crouchTarget`.
+
+---
+
+## 19. Shooting on Mouse Release Instead of Press
+
+### Mistake
+Gun fired on `mouseLeftReleased` instead of `mouseLeftPressed`, causing delayed/unreliable shooting.
+
+### Root Cause
+Old ADS system used left mouse press to aim and release to shoot. When removing ADS, the shoot trigger was not updated to `mouseLeftPressed`.
+
+### Prevention
+- **Rule**: Shooting must use `mouseLeftPressed` (edge trigger on press), not `mouseLeftReleased` or `mouseLeftDown` (level trigger). This ensures one shot per click.
+
+---
+
+## 20. Right-Click Toggle Instead of Hold for First Person
+
+### Mistake
+Right-click toggled scope mode instead of holding for temporary first-person view.
+
+### Root Cause
+Old ADS system used `IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)` to toggle `scopeActive`. The new requirement is hold-to-view in first person.
+
+### Prevention
+- **Rule**: Use `input->mouseRightDown` (level trigger) for hold-to-activate behavior. Use `IsMouseButtonPressed()` only for toggle actions.
+
+---
+
+## 21. Missing Jump Physics
+
+### Mistake
+No jump mechanic existed.
+
+### Implementation**
+- Added `velocityY`, `isGrounded` to `Player` struct
+- Added `PLAYER_JUMP_FORCE` and `PLAYER_GRAVITY` constants
+- `PlayerUpdate()` applies gravity each frame and jumps on `spacePressed` when grounded
+- Camera height follows player Y position
+
+---
+
+## Updated Prevention Checklist
+
+### For AI (Rendering-Specific)
+- [ ] Every `BeginTextureMode(target)` has a matching `EndTextureMode()` + blit
+- [ ] PBR shader has tone map AND gamma correction
+- [ ] PBR shader has full GGX BRDF if using normal/metallic
+- [ ] Ambient is ≤ 0.08 * albedo * ao
+- [ ] Model replacements match or exceed original scale
+- [ ] Build succeeds with zero errors
+- [ ] Screenshot taken and visually verified (no blown whites, scene visible)
+
+### For AI (Game Logic-Specific)
+- [ ] `main()` starts with `menu.active = true` and `GAME_STATE_MENU`
+- [ ] `GameInit()` calls `RendererInit()` before `PlayerInit()`/`WeaponInit()`
+- [ ] Shooting uses `mouseLeftPressed`, not `mouseLeftReleased`
+- [ ] Hold actions use `mouseRightDown`/`shiftPressed`/`ctrlPressed`, not `IsMouseButtonPressed()`
+- [ ] Crouch uses separate target/current variables with lerp
+- [ ] Jump uses `velocityY` with gravity and ground check
+
+### For User (Rendering-Specific)
+- [ ] When adding a render pass, verify the full frame lifecycle: backbuffer → render target → post-process → backbuffer
+- [ ] Screenshot the game after shader changes to check for blown-out whites or missing detail
+- [ ] Compare model sizes visually against reference screenshots when changing mesh generation

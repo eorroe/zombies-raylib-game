@@ -711,6 +711,7 @@ int main(void) {
         
         if (autoStart && frameCount == autoStartFrame && game.state == GAME_STATE_MENU) {
             game.state = GAME_STATE_PLAYING;
+            game.menu.active = false;
             GameInit(&game, screenWidth, screenHeight);
         }
         

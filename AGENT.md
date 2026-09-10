@@ -1,8 +1,8 @@
-# Agent Instructions: Rendering and Headless Testing Workflow for doodle-style Branch
+# Agent Instructions
 
-This file contains mandatory rules for any agent working on rendering code in this project. Violating these rules will cause visible rendering failures.
+## Rendering Rules
 
-## 1. Render Texture Lifecycle
+### 1. Render Texture Lifecycle
 
 Every render texture target MUST follow this exact lifecycle:
 
@@ -25,7 +25,7 @@ DrawTextureRec(target.texture, (Rectangle){0, 0, width, -height}, (Vector2){0, 0
 - Never draw HUD or billboards while still inside texture mode
 - If you add `BeginTextureMode()`, you must add the matching blit immediately
 
-## 2. PBR Shader Output Contract
+### 2. PBR Shader Output Contract
 
 The PBR fragment shader MUST output LDR color in [0,1] range. The required pipeline is:
 
@@ -52,7 +52,7 @@ albedo + lighting (HDR) → tone map → gamma correct → finalColor
 - Keep full GGX BRDF if normal maps or metallic/roughness are used
 - At minimum, keep tone map + gamma if reducing lighting model
 
-## 3. Post-Processing Shader
+### 3. Post-Processing Shader
 
 The post-process shader MUST apply at least gamma correction if the PBR shader does not.
 
@@ -60,7 +60,7 @@ Current post-process output: `pow(col, vec3(1.0 / 2.2))` — keep this.
 
 If you add ACESFilm or other tone mapping to post-process, ensure it's not duplicated in PBR.
 
-## 4. Model Replacement Rules
+### 4. Model Replacement Rules
 
 When replacing any mesh/model:
 
@@ -69,7 +69,7 @@ When replacing any mesh/model:
 3. Y-position math must be recalculated from actual bone lengths, not hardcoded offsets
 4. Original silhouette must not shrink without explicit user approval
 
-## 5. Shader Uniform Updates
+### 5. Shader Uniform Updates
 
 When setting shader uniforms in `RendererDrawZombies()` or similar:
 
@@ -77,7 +77,7 @@ When setting shader uniforms in `RendererDrawZombies()` or similar:
 - Light attenuation should use proper distance falloff: `1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist)`
 - Fire light flicker is ±15-25% — without tonemapping this will cause visible white flash
 
-## 6. Pre-Commit Rendering Checklist
+### 6. Pre-Commit Rendering Checklist
 
 Before committing any rendering change:
 - [ ] `BeginTextureMode` has matching `EndTextureMode` + blit
@@ -88,7 +88,7 @@ Before committing any rendering change:
 - [ ] Build succeeds with zero errors
 - [ ] Screenshot taken and visually verified (no blown whites, scene visible)
 
-## 7. Failure Symptoms and Causes
+### 7. Failure Symptoms and Causes
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
@@ -99,7 +99,7 @@ Before committing any rendering change:
 | HUD invisible | Drawn inside texture mode | Draw HUD after blit, on backbuffer |
 | Zombie heads at wrong positions | `GetWorldToScreen` called inside texture mode | Call after `EndTextureMode`, on backbuffer |
 
-## 8. Headless Testing Workflow (xvfb + Screenshot Analysis)
+## Headless Testing Workflow
 
 This project supports automated headless testing via Xvfb. Use this workflow whenever you need to verify rendering changes without a physical display.
 

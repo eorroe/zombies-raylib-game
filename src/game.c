@@ -433,6 +433,9 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     if (game->firstShotGraceTimer > 0.0f) game->firstShotGraceTimer -= dt;
     PlayerUpdate(&game->player, input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
+    if (input->cameraTogglePressed) {
+        CameraToggleMode(&game->camera);
+    }
     WeaponUpdate(&game->weapon, game->player.position, input, dt);
     RendererUpdate(game, dt);
     
@@ -609,10 +612,12 @@ void GameRender(Game *game) {
     RendererDrawScene(game);
     RendererDrawBloodDecals(game);
     RendererDrawZombies(game, game->shaders.pbr);
-    if (CameraGetFirstPersonBlend(&game->camera) < 0.5f) {
+    if (CameraGetMode(&game->camera) == GAME_CAMERA_MODE_THIRD_PERSON) {
         RendererDrawPlayer(&game->player, game->shaders.pbr);
+        WeaponRender(&game->weapon, cam, game->player.yaw);
+    } else {
+        WeaponRenderFirstPerson(&game->weapon, cam, game->player.yaw);
     }
-    WeaponRender(&game->weapon, cam, game->player.yaw);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
     RendererDrawZombieHeads(game);

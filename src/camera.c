@@ -13,9 +13,10 @@ void CameraInit(GameCamera *cam, Player *player) {
     cam->distance = 4.0f;
     cam->height = 2.0f;
     cam->smoothSpeed = 5.0f;
-    cam->firstPersonBlend = 1.0f;
+    cam->firstPersonBlend = 0.0f;
     cam->adsBlend = 0.0f;
     cam->isAiming = false;
+    cam->mode = GAME_CAMERA_MODE_THIRD_PERSON;
     player->yaw = 0.0f;
     player->pitch = 0.0f;
 }
@@ -56,6 +57,16 @@ void CameraUpdate(GameCamera *cam, Player *player, float dt) {
     Vector3 finalFpPos = Vector3Lerp(fpPos, adsPos, adsT);
     Vector3 finalFpTarget = Vector3Lerp(fpTarget, adsTarget, adsT);
     
+    float targetBlend = (cam->mode == GAME_CAMERA_MODE_FIRST_PERSON) ? 1.0f : 0.0f;
+    float blendSpeed = 4.0f;
+    if (targetBlend > cam->firstPersonBlend) {
+        cam->firstPersonBlend += dt * blendSpeed;
+        if (cam->firstPersonBlend > targetBlend) cam->firstPersonBlend = targetBlend;
+    } else if (targetBlend < cam->firstPersonBlend) {
+        cam->firstPersonBlend -= dt * blendSpeed;
+        if (cam->firstPersonBlend < targetBlend) cam->firstPersonBlend = targetBlend;
+    }
+    
     float t = cam->firstPersonBlend;
     cam->camera.position = Vector3Lerp(desiredPos, finalFpPos, t);
     cam->camera.target = Vector3Lerp(tpTarget, finalFpTarget, t);
@@ -84,4 +95,16 @@ float CameraGetADSBlend(GameCamera *cam) {
 
 void CameraSetAiming(GameCamera *cam, bool aiming) {
     cam->isAiming = aiming;
+}
+
+void CameraToggleMode(GameCamera *cam) {
+    cam->mode = (cam->mode == GAME_CAMERA_MODE_THIRD_PERSON) ? GAME_CAMERA_MODE_FIRST_PERSON : GAME_CAMERA_MODE_THIRD_PERSON;
+}
+
+void CameraSetMode(GameCamera *cam, GameCameraMode mode) {
+    cam->mode = mode;
+}
+
+GameCameraMode CameraGetMode(GameCamera *cam) {
+    return cam->mode;
 }

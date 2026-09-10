@@ -12,6 +12,7 @@ void InputUpdate(InputState *input, bool menuActive) {
     input->interactPressed = IsKeyPressed(KEY_E);
     input->menuPressed = IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_P);
     input->escapePressed = IsKeyPressed(KEY_ESCAPE);
+    input->cameraTogglePressed = IsKeyPressed(KEY_C);
     input->scrollDelta = GetMouseWheelMove();
     input->upPressed = IsKeyDown(KEY_UP) || IsKeyDown(KEY_W);
     input->downPressed = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S);

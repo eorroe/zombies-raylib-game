@@ -172,7 +172,6 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt
 }
 
 void WeaponRender(Weapon *weapon, Camera3D camera, float yaw) {
-    (void)camera;
     if (weapon->reloading) return;
 
     float recoilOffset = weapon->recoil * 0.02f;
@@ -185,6 +184,58 @@ void WeaponRender(Weapon *weapon, Camera3D camera, float yaw) {
     float swayX = sinf(weapon->swayTimer) * 0.003f;
     float swayY = cosf(weapon->swayTimer * 0.7f) * 0.002f;
     pos = Vector3Add(pos, Vector3Scale(right, swayX));
+    pos = Vector3Add(pos, Vector3Scale(up, swayY));
+
+    float yawDeg = yaw * RAD2DEG;
+
+    Vector3 bodyPos = pos;
+    DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 85, 170, 255 });
+
+    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.15f });
+    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 55, 65, 255 });
+
+    for (int i = 0; i < 4; i++) {
+        float t = (float)i / 3.0f;
+        Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.15f });
+        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 120, 115, 110, 255 });
+    }
+
+    Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.07f, -0.015f });
+    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 100, 80, 60, 255 });
+
+    Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.055f, 0.04f });
+    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 60, 70, 255 });
+
+    Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.15f });
+    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 65, 70, 75, 255 });
+
+    Vector3 sightPos = Vector3Add(pos, (Vector3){ 0, 0.07f, 0.03f });
+    DrawModelEx(g_weaponModels.sight, sightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 40, 45, 255 });
+
+    Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.02f, 0.01f });
+    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 40, 45, 255 });
+
+    if (weapon->muzzleFlashTimer > 0) {
+        DrawSphere(barrelPos, 0.1f, YELLOW);
+    }
+}
+
+void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw) {
+    if (weapon->reloading) return;
+
+    Vector3 forward = Vector3Normalize(Vector3Subtract(camera.target, camera.position));
+    Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, camera.up));
+    Vector3 up = Vector3Normalize(Vector3CrossProduct(right, forward));
+
+    float recoilOffset = weapon->recoil * 0.02f;
+    Vector3 basePos = Vector3Add(camera.position, Vector3Scale(forward, 0.5f));
+    basePos = Vector3Add(basePos, Vector3Scale(right, 0.25f));
+    basePos = Vector3Add(basePos, Vector3Scale(up, -0.2f));
+    basePos.z -= recoilOffset;
+
+    float swayX = sinf(weapon->swayTimer) * 0.003f;
+    float swayY = cosf(weapon->swayTimer * 0.7f) * 0.002f;
+    Vector3 pos = Vector3Add(basePos, Vector3Scale(right, swayX));
     pos = Vector3Add(pos, Vector3Scale(up, swayY));
 
     float yawDeg = yaw * RAD2DEG;

@@ -26,6 +26,8 @@ CMakeFiles/ZombieShooter.dir/src/debug.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h \
  /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/raylib_src/src/raymath.h \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -36,4 +38,6 @@ CMakeFiles/ZombieShooter.dir/src/debug.c.o: \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h /usr/include/string.h \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
- /usr/include/strings.h
+ /usr/include/strings.h \
+ /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
+ /usr/include/x86_64-linux-gnu/bits/string_fortified.h

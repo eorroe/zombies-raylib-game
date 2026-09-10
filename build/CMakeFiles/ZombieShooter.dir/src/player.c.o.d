@@ -6,6 +6,8 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
  /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/src/input.h \
+ /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/src/texture.h \
+ /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/src/zombie_mesh.h \
  /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/raylib_src/src/raymath.h \
  /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -27,9 +29,8 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: \
  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
- /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/src/texture.h \
- /usr/include/stdlib.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h /usr/include/stdlib.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
@@ -48,10 +49,13 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: \
  /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
+ /usr/include/x86_64-linux-gnu/bits/select2.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
  /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
  /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
- /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib.h

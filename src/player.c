@@ -242,12 +242,12 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 pelvisPos = Vector3Add(torsoPos, RotateOffsetY(pelvisOffset, cosYaw, sinYaw));
     DrawModelEx(player->pelvisModel, pelvisPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 headOffset = (Vector3){ 0.0f, headCenterY - torsoPos.y + torsoCenterY * 0.5f, 0.0f };
+    Vector3 headOffset = (Vector3){ 0.0f, headCenterY - torsoPos.y, 0.0f };
     Vector3 headPos = Vector3Add(torsoPos, RotateOffsetY(headOffset, cosYaw, sinYaw));
     DrawModelEx(player->headModel, (Vector3){ headPos.x, headPos.y, headPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 jawOffset = (Vector3){ 0.0f, headPos.y - torsoPos.y + torsoCenterY * 0.5f - 0.22f * 0.3f, 0.22f * 0.4f };
-    Vector3 jawPos = Vector3Add(torsoPos, RotateOffsetY(jawOffset, cosYaw, sinYaw));
+    Vector3 jawOffset = (Vector3){ 0.0f, -0.22f * 0.3f, 0.22f * 0.4f };
+    Vector3 jawPos = Vector3Add(headPos, RotateOffsetY(jawOffset, cosYaw, sinYaw));
     DrawModelEx(player->jawModel, (Vector3){ jawPos.x, jawPos.y, jawPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
     Vector3 shoulderLOffset = (Vector3){ -0.55f * 0.6f, torsoCenterY + torsoHeight * 0.35f - torsoPos.y, 0.0f };

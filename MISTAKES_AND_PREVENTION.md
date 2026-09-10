@@ -373,17 +373,108 @@ The last update succeeded because it **iteratively fixed each compilation error*
 
 ---
 
-## Final Working State
+## 13. Render Texture Lifecycle Mismatch (Invisible Scene)
 
-- **Build**: `./run.sh` (Linux) or `run.bat` (Windows) successfully clones raylib, builds it, builds the game, and runs it
-- **Compilation**: Clean build with no errors (only harmless macro redefinition warnings)
-- **Architecture**: Modular `src/` directory with clean header/implementation pairs
-- **Paths**: All project paths are relative; only CMake cache contains absolute paths (expected and unavoidable)
+### Mistake
+`RendererBegin()` called `BeginTextureMode(game->sceneTarget)` to render the 3D scene into an off-screen texture, but `RendererEnd()` only called `EndMode3D()`. It never called `EndTextureMode()`, and nothing ever drew `sceneTarget` back to the backbuffer with `DrawRenderTexture()` or `DrawTextureRec()`. Result: the entire 3D scene was invisible, and only the flat `ClearBackground(paper)` color appeared on screen.
 
+### Root Cause
+- Added render-texture scaffolding in `RendererInit()` and `RendererBegin()` without implementing the matching `EndTextureMode()` and blit step in `RendererEnd()`
+- `postProcessTarget` was allocated but never written to or drawn
+- The pipeline was half-rewired: scene renders off-screen, but the result is never presented
+
+### Why It Failed
+The render pipeline flow became:
+```
+BeginDrawing()
+ClearBackground(paper)          → backbuffer
+BeginTextureMode(sceneTarget)    → redirect to off-screen
+  DrawScene, DrawZombies, ...    → sceneTarget (unseen)
+EndMode3D()                      → still inside texture mode!
+DrawHUD, DrawZombieHeads         → sceneTarget (unseen)
+EndDrawing()                     → presents backbuffer (just paper)
+```
+
+### Prevention
+- **For AI**: Whenever adding `BeginTextureMode()`, immediately add the matching `EndTextureMode()` + blit in the corresponding end function. The lifecycle must be balanced in the same function pair.
+- **Rule**: `BeginTextureMode(target)` MUST be paired with `EndTextureMode()` before any 2D overlay draws. After `EndTextureMode()`, draw the texture to the backbuffer with `DrawTextureRec(target.texture, ...)` before drawing HUD elements.
 
 ---
 
-## Original Prompt Used
+## 14. PBR Shader Stripped of Tone Mapping and Gamma Correction (Bright White Flash)
+
+### Mistake
+The `pbrFragShader` was simplified by removing:
+- Reinhard tonemapping: `color = color / (color + vec3(1.0))`
+- Gamma correction: `color = pow(color, vec3(1.0 / 2.2))`
+- Full GGX BRDF (specular, Fresnel, geometry-Smith)
+- Directional light integration
+- Fog and proper ambient scaling
+
+Replaced with flat Lambertian diffuse and `albedo * 0.55` ambient (10× the original `vec3(0.05,0.05,0.08) * albedo * ao`). Without tonemapping, HDR values from PBR lighting clipped to white. Combined with fire-light flicker (±25% oscillation), this produced a visible bright white flash pulsing every frame.
+
+### Root Cause
+- Attempted to simplify the shader without understanding that PBR lighting produces HDR values that must be tone-mapped before display
+- Removed the ACESFilm tonemapper from the post-process shader as well, leaving no HDR→LDR conversion anywhere in the pipeline
+- Increased ambient 10× to compensate for missing indirect lighting, but this just made the white worse
+
+### Why It Failed
+PBR lighting equations naturally produce values >> 1.0. Without tonemapping:
+1. `ambient * 0.55` alone pushes surfaces to ~55% gray even with no lights
+2. Point lights with `1.2f * flicker` intensity add unbounded diffuse
+3. No gamma correction means the display receives linear HDR values, which appear blown-out
+
+### Prevention
+- **For AI**: Never remove tonemapping or gamma correction from a PBR shader. If simplifying, keep at minimum: Reinhard or ACESFilm tonemap + gamma 2.2. The full GGX BRDF must stay if specular/normal maps are used.
+- **Rule**: A PBR fragment shader MUST output LDR color in [0,1] range. The pipeline is: `albedo + lighting → tone map → gamma correct → framebuffer`. If any stage is missing, the image will be wrong.
+- **Rule**: `postProcess` shader must also apply at least gamma correction if the PBR shader does not.
+
+---
+
+## 15. Zombie Model Scale and Proportion Collapse
+
+### Mistake
+When converting zombies from simple limb cylinders to detailed skeleton meshes, the new bone dimensions were ~40-50% of the original:
+- Original: torso 0.60×0.90, head radius 0.28, limb radius 0.13, arm length 0.70, leg length 0.80
+- New skeleton: spine radius 0.08, ribcage radius 0.23, arm radius 0.035-0.04 (length 0.50-0.55), leg radius 0.045-0.055 (length 0.60-0.65)
+
+The original torso mass (`bodyModel`, solid cylinder) was removed entirely and replaced with three disconnected thin cylinders (spine, ribcage, pelvis) that don't form a visible body mass.
+
+### Root Cause
+- New `zombie_mesh.c` functions used hardcoded tiny dimensions without comparing against original size constants in `zombie.h`
+- Y-position math was rebuilt on the tiny new bone lengths, compounding the size problem
+- The `CreateSkullMesh()`, `CreateBoneMesh()`, `CreateRibcageMesh()`, `CreatePelvisMesh()` functions used arbitrary small values
+
+### Prevention
+- **For AI**: When replacing a model, measure the original bounding box first. New meshes must have equal or greater visual mass. Compare against `TORSO_WIDTH`, `TORSO_HEIGHT`, `HEAD_RADIUS`, `LIMB_RADIUS`, `ARM_*_LEN`, `LEG_*_LEN` in the header.
+- **Rule**: If a feature replaces visual elements, the replacement must be at least as visually prominent as the original. Never shrink the player-visible silhouette without explicit approval.
+
+---
+
+## Summary Table of Rendering Failures
+
+| # | Failure | Root Cause | Prevention |
+|---|---------|------------|------------|
+| 13 | Render texture never presented | `EndTextureMode()` + blit missing | Pair every `BeginTextureMode` with `EndTextureMode` + `DrawTextureRec` |
+| 14 | Bright white HDR flash | Tonemap, gamma, GGX, ambient all removed | PBR shader MUST output LDR [0,1] via tone map + gamma |
+| 15 | Zombies invisible (too small) | Skeleton meshes 40-50% original scale | New meshes must match or exceed original bounding volume |
+
+---
+
+## Updated Prevention Checklist
+
+### For AI (Rendering-Specific)
+- [ ] Every `BeginTextureMode(target)` has a matching `EndTextureMode()` in the same function pair
+- [ ] After `EndTextureMode()`, draw the render texture to the backbuffer before any 2D overlays
+- [ ] PBR fragment shader includes: Reinhard/ACES tonemap, gamma 2.2, full GGX BRDF, proper ambient
+- [ ] Post-process shader includes at minimum gamma correction if PBR does not
+- [ ] When replacing models, compare new bounding box against original constants in the header
+- [ ] Never increase ambient light beyond `vec3(0.04-0.06) * albedo * ao` without adding indirect lighting
+
+### For User (Rendering-Specific)
+- [ ] When adding a render pass, verify the full frame lifecycle: backbuffer → render target → post-process → backbuffer
+- [ ] Screenshot the game after shader changes to check for blown-out whites or missing detail
+- [ ] Compare model sizes visually against reference screenshots when changing mesh generation
 
 ```
 1 - I want to build a zombie game that are all trying to kill the main character with a startup menu that allows uploading images to use as the HEAD of 3D zombies. So zombies will have their own default bloody generated zombies, and some zombies will randomly spawn and have 1 of the uploaded images covering / placed over zombie head every frame chosen at random from uploaded images. The character must have a shooting gun that allows aiming to scope down zombies. The start menu must allow uploading images and choosing between modes: Rounds or Endless and 2 other modes where either all zombies are generated using the images or most zombies are default zombies without any images and randomly 1 zombie gets spawned with head of 1 of the randomly chosen images and after being killed seconds later another zombie out of the group of zombies spawns as another randomly picked image for zombie. 2 - As many as necessary to make the game as high graphic AAA quality level. All textures, meshes, animations, and audio must be procedurally generated at load time 3 - Irrelevant as you will build the game. 4 - Web/HTML5 and Windows

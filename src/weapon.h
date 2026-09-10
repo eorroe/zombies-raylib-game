@@ -28,7 +28,6 @@ typedef struct {
     bool reloading;
     float reloadTimer;
     float recoil;
-    bool scopeActive;
     Model model;
     float muzzleFlashTimer;
     float swayTimer;

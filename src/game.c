@@ -70,7 +70,6 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->round = 0;
     game->nonImageDeathsSinceLastImage = 0;
     game->gameTime = 0.0f;
-    game->scopeActive = false;
     game->firstShotFired = false;
     game->firstShotGraceTimer = 0.3f;
     game->zombieCount = 0;
@@ -464,15 +463,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (input->mouseLeftPressed) {
-        CameraSetAiming(&game->camera, true);
-    }
-    
-    if (input->mouseLeftReleased) {
-        CameraSetAiming(&game->camera, false);
-    }
-    
-    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
+    if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         game->firstShotFired = true;
@@ -589,9 +580,12 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     
     
     if (IsKeyPressed(KEY_R)) WeaponReload(&game->weapon);
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) game->scopeActive = !game->scopeActive;
-    if (game->scopeActive) CameraApplyScope(&game->camera, true);
-    else CameraApplyScope(&game->camera, false);
+    if (input->mouseRightDown) {
+        CameraSetMode(&game->camera, GAME_CAMERA_MODE_FIRST_PERSON);
+    } else {
+        CameraSetMode(&game->camera, game->camera.baseMode);
+    }
+    CameraSetCrouch(&game->camera, input->ctrlPressed);
     
     ParticleSystemUpdate(game->particles, game->particleCount, dt);
     

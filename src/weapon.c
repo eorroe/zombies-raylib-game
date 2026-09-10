@@ -40,7 +40,6 @@ void WeaponInit(Weapon *weapon, Shader pbr) {
     weapon->reloading = false;
     weapon->reloadTimer = 0.0f;
     weapon->recoil = 0.0f;
-    weapon->scopeActive = false;
     weapon->muzzleFlashTimer = 0.0f;
     weapon->aimOffset = (Vector2){ 0 };
 

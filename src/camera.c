@@ -17,6 +17,8 @@ void CameraInit(GameCamera *cam, Player *player) {
     cam->adsBlend = 0.0f;
     cam->isAiming = false;
     cam->mode = GAME_CAMERA_MODE_THIRD_PERSON;
+    cam->baseMode = GAME_CAMERA_MODE_THIRD_PERSON;
+    cam->crouchAmount = 0.0f;
     player->yaw = 0.0f;
     player->pitch = 0.0f;
 }
@@ -67,6 +69,20 @@ void CameraUpdate(GameCamera *cam, Player *player, float dt) {
         if (cam->firstPersonBlend < targetBlend) cam->firstPersonBlend = targetBlend;
     }
     
+    float crouchTarget = cam->crouchAmount;
+    float crouchSpeed = 8.0f;
+    if (crouchTarget > cam->crouchAmount) {
+        cam->crouchAmount += dt * crouchSpeed;
+        if (cam->crouchAmount > crouchTarget) cam->crouchAmount = crouchTarget;
+    } else if (crouchTarget < cam->crouchAmount) {
+        cam->crouchAmount -= dt * crouchSpeed;
+        if (cam->crouchAmount < crouchTarget) cam->crouchAmount = crouchTarget;
+    }
+    
+    float crouchOffset = cam->crouchAmount * 0.7f;
+    desiredPos.y -= crouchOffset;
+    finalFpPos.y -= crouchOffset;
+    
     float t = cam->firstPersonBlend;
     cam->camera.position = Vector3Lerp(desiredPos, finalFpPos, t);
     cam->camera.target = Vector3Lerp(tpTarget, finalFpTarget, t);
@@ -98,7 +114,8 @@ void CameraSetAiming(GameCamera *cam, bool aiming) {
 }
 
 void CameraToggleMode(GameCamera *cam) {
-    cam->mode = (cam->mode == GAME_CAMERA_MODE_THIRD_PERSON) ? GAME_CAMERA_MODE_FIRST_PERSON : GAME_CAMERA_MODE_THIRD_PERSON;
+    cam->baseMode = (cam->baseMode == GAME_CAMERA_MODE_THIRD_PERSON) ? GAME_CAMERA_MODE_FIRST_PERSON : GAME_CAMERA_MODE_THIRD_PERSON;
+    cam->mode = cam->baseMode;
 }
 
 void CameraSetMode(GameCamera *cam, GameCameraMode mode) {
@@ -107,4 +124,12 @@ void CameraSetMode(GameCamera *cam, GameCameraMode mode) {
 
 GameCameraMode CameraGetMode(GameCamera *cam) {
     return cam->mode;
+}
+
+void CameraSetCrouch(GameCamera *cam, bool crouching) {
+    cam->crouchAmount = crouching ? 1.0f : 0.0f;
+}
+
+float CameraGetCrouchAmount(GameCamera *cam) {
+    return cam->crouchAmount;
 }

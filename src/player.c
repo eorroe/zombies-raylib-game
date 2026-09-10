@@ -113,7 +113,9 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
     
     if (player->isMoving) {
         moveDir = Vector3Normalize(moveDir);
-        player->velocity = Vector3Scale(moveDir, PLAYER_SPEED);
+        float speed = PLAYER_SPEED;
+        if (input->shiftPressed) speed *= 2.0f;
+        player->velocity = Vector3Scale(moveDir, speed);
         player->position = Vector3Add(player->position, Vector3Scale(player->velocity, dt));
         player->animTime += dt * 8.0f;
         player->moveDir = moveDir;

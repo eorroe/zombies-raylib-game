@@ -19,6 +19,8 @@ typedef struct {
     float adsBlend;
     bool isAiming;
     GameCameraMode mode;
+    GameCameraMode baseMode;
+    float crouchAmount;
 } GameCamera;
 
 void CameraInit(GameCamera *cam, Player *player);
@@ -31,5 +33,7 @@ void CameraSetAiming(GameCamera *cam, bool aiming);
 void CameraToggleMode(GameCamera *cam);
 void CameraSetMode(GameCamera *cam, GameCameraMode mode);
 GameCameraMode CameraGetMode(GameCamera *cam);
+void CameraSetCrouch(GameCamera *cam, bool crouching);
+float CameraGetCrouchAmount(GameCamera *cam);
 
 #endif

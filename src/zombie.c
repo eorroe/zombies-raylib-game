@@ -260,13 +260,13 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
     DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
-    Vector3 spinePos = (Vector3){ torsoPos.x, bodyY - torsoH * 0.15f, torsoPos.z };
+    Vector3 spinePos = (Vector3){ torsoPos.x, bodyY - zombie->torsoHeight * 0.15f, torsoPos.z };
     DrawModelEx(zombie->spineModel, spinePos, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
-    Vector3 ribPos = (Vector3){ torsoPos.x, bodyY + torsoH * 0.05f, torsoPos.z };
+    Vector3 ribPos = (Vector3){ torsoPos.x, bodyY + zombie->torsoHeight * 0.05f, torsoPos.z };
     DrawModelEx(zombie->ribcageModel, ribPos, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
-    Vector3 pelvisPos = (Vector3){ torsoPos.x, bodyY - torsoH * 0.35f, torsoPos.z };
+    Vector3 pelvisPos = (Vector3){ torsoPos.x, bodyY - zombie->torsoHeight * 0.35f, torsoPos.z };
     DrawModelEx(zombie->pelvisModel, pelvisPos, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
 
     if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
@@ -336,6 +336,16 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
 
     DrawLimb(zombie->rightUpperLeg, hipR, (Vector3){ 0.2f, -1.0f, 0 }, climbing ? 0.5f : legSwing, zombie->legUpperLen);
     DrawLimb(zombie->rightLowerLeg, Vector3Add(hipR, (Vector3){ 0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen, 0 }), (Vector3){ 0.15f, -1.0f, 0 }, climbing ? 0.3f : legSwing * 1.2f, zombie->legLowerLen);
+
+    DrawSphere(shoulderL, zombie->limbRadius * 1.2f, bodyColor);
+    DrawSphere(shoulderR, zombie->limbRadius * 1.2f, bodyColor);
+    DrawSphere(Vector3Add(shoulderL, (Vector3){ armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen, 0 }), zombie->limbRadius * 1.0f, bodyColor);
+    DrawSphere(Vector3Add(shoulderR, (Vector3){ -armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen, 0 }), zombie->limbRadius * 1.0f, bodyColor);
+
+    DrawSphere(hipL, zombie->limbRadius * 1.3f, bodyColor);
+    DrawSphere(hipR, zombie->limbRadius * 1.3f, bodyColor);
+    DrawSphere(Vector3Add(hipL, (Vector3){ -0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen, 0 }), zombie->limbRadius * 1.1f, bodyColor);
+    DrawSphere(Vector3Add(hipR, (Vector3){ 0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen, 0 }), zombie->limbRadius * 1.1f, bodyColor);
 
     Vector3 leftHandPos = Vector3Add(shoulderL, (Vector3){ armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen + zombie->armLowerLen * 0.5f, climbReach * 0.5f });
     Vector3 rightHandPos = Vector3Add(shoulderR, (Vector3){ -armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen + zombie->armLowerLen * 0.5f, climbReach * 0.5f });

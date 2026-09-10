@@ -222,22 +222,15 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *inpu
     float cosYaw = cosf(yaw);
     float sinYaw = sinf(yaw);
     
-    float torsoHeight = 0.85f;
-    float hipY = playerPos.y + torsoHeight * 0.45f;
-    float torsoCenterY = hipY + torsoHeight * 0.5f;
-    
-    Vector3 torsoOffset = (Vector3){ 0.0f, torsoCenterY, 0.0f };
-    Vector3 torsoPos = Vector3Add(playerPos, RotateOffsetY(torsoOffset, cosYaw, sinYaw));
-    
-    Vector3 shoulderROffset = (Vector3){ 0.55f * 0.6f, torsoCenterY + 0.85f * 0.35f - torsoPos.y, 0.0f };
-    Vector3 shoulderR = Vector3Add(torsoPos, RotateOffsetY(shoulderROffset, cosYaw, sinYaw));
-    
-    Vector3 armOffsetDirRight = RotateOffsetY((Vector3){ -0.6f, -0.8f, 0.0f }, cosYaw, sinYaw);
-    Vector3 elbowR = Vector3Add(shoulderR, Vector3Scale(armOffsetDirRight, 0.55f));
-    
-    weapon->position = elbowR;
+    Vector3 bodyPos = playerPos;
+    bodyPos.y += 0.45f;
+
+    Vector3 shoulderR = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
+
+    Vector3 handOffset = RotateOffsetY((Vector3){ 0.0f, -0.35f, 0.15f }, cosYaw, sinYaw);
+    weapon->position = Vector3Add(shoulderR, handOffset);
     weapon->direction = (Vector3){ 0, 0, 1 };
-    
+
     weapon->swayTimer += dt * 8.0f;
 }
 

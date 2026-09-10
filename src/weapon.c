@@ -199,7 +199,15 @@ void WeaponInit(Weapon *weapon, Shader pbr) {
     SetModelTexture(&g_weaponModels.rearSight, g_weaponModels.metalTex);
 }
 
-void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt) {
+static Vector3 RotateOffsetY(Vector3 offset, float cosYaw, float sinYaw) {
+    return (Vector3){
+        offset.x * cosYaw + offset.z * sinYaw,
+        offset.y,
+        -offset.x * sinYaw + offset.z * cosYaw
+    };
+}
+
+void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *input, float dt) {
     (void)input;
     if (weapon->reloading) {
         weapon->reloadTimer -= dt;
@@ -211,10 +219,23 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt
     if (weapon->recoil > 0) weapon->recoil -= dt * 2.0f;
     if (weapon->muzzleFlashTimer > 0) weapon->muzzleFlashTimer -= dt;
     
-    weapon->position = playerPos;
-    weapon->position.x += 0.25f;
-    weapon->position.y += 0.55f;
-    weapon->position.z += 0.15f;
+    float cosYaw = cosf(yaw);
+    float sinYaw = sinf(yaw);
+    
+    float hipY = playerPos.y + 0.45f + 0.45f;
+    float torsoCenterY = hipY + 0.85f * 0.5f;
+    
+    Vector3 torsoOffset = (Vector3){ 0.0f, torsoCenterY, 0.0f };
+    Vector3 torsoPos = Vector3Add(playerPos, RotateOffsetY(torsoOffset, cosYaw, sinYaw));
+    
+    Vector3 shoulderROffset = (Vector3){ 0.55f * 0.6f, torsoCenterY + 0.85f * 0.35f - torsoPos.y, 0.0f };
+    Vector3 shoulderR = Vector3Add(torsoPos, RotateOffsetY(shoulderROffset, cosYaw, sinYaw));
+    
+    Vector3 armOffsetDirRight = RotateOffsetY((Vector3){ 0.6f, -0.8f, 0.0f }, cosYaw, sinYaw);
+    Vector3 elbowR = Vector3Add(shoulderR, Vector3Scale(armOffsetDirRight, 0.55f));
+    Vector3 wristR = Vector3Add(elbowR, Vector3Scale(armOffsetDirRight, 0.5f));
+    
+    weapon->position = wristR;
     weapon->direction = (Vector3){ 0, 0, 1 };
     
     weapon->swayTimer += dt * 8.0f;

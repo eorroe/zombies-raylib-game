@@ -42,7 +42,7 @@ typedef struct {
 } Weapon;
 
 void WeaponInit(Weapon *weapon, Shader pbr);
-void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt);
+void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *input, float dt);
 void WeaponRender(Weapon *weapon, Camera3D camera, float yaw);
 void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw);
 void WeaponShoot(Weapon *weapon);

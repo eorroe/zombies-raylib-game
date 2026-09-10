@@ -435,7 +435,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     if (input->cameraTogglePressed) {
         CameraToggleMode(&game->camera);
     }
-    WeaponUpdate(&game->weapon, game->player.position, input, dt);
+    WeaponUpdate(&game->weapon, game->player.position, game->player.yaw, input, dt);
     RendererUpdate(game, dt);
     
     GameApplyCollisions(game);

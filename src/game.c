@@ -688,7 +688,7 @@ int main(void) {
     double startTime = GetTime();
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
-    int screenshotFrame = 5;
+    int screenshotFrame = 35;
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);

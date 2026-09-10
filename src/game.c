@@ -645,9 +645,8 @@ int main(void) {
     
     Game game = { 0 };
     UIInit(&game.menu, screenWidth, screenHeight);
-    game.menu.active = false;
-    game.state = GAME_STATE_PLAYING;
-    GameInit(&game, screenWidth, screenHeight);
+    game.menu.active = true;
+    game.state = GAME_STATE_MENU;
     
     InputState input;
     int frameCount = 0;

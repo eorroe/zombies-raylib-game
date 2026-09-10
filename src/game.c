@@ -14,7 +14,7 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
         texIdx = texIdx % game->zombieHeadTextureCount;
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
-    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieShirt, game->textures.zombiePants, game->textures.zombieBone);
+    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieSkinNormal, game->textures.zombieShirt, game->textures.zombiePants, game->textures.zombieBone, game->shaders.pbr);
     game->zombies[idx].speed = ZOMBIE_SPEED_BASE;
     if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
         game->zombies[idx].speed = ZOMBIE_SPEED_BASE * 2.0f;

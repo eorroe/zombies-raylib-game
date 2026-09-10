@@ -33,7 +33,9 @@ typedef struct {
     bool active;
     float animTime;
     float walkCycle;
-    Model skullModel;
+    Model bodyModel;
+    Model headModel;
+    Model jawModel;
     Model spineModel;
     Model ribcageModel;
     Model pelvisModel;
@@ -45,10 +47,10 @@ typedef struct {
     Model leftLowerLeg;
     Model rightUpperLeg;
     Model rightLowerLeg;
-    Model leftHand;
-    Model rightHand;
-    Model leftFoot;
-    Model rightFoot;
+    Model leftHandModel;
+    Model rightHandModel;
+    Model leftFootModel;
+    Model rightFootModel;
     Texture2D skinTex;
     Texture2D skinNormal;
     Texture2D shirtTex;
@@ -68,7 +70,7 @@ typedef struct {
     float limbRadius;
 } Zombie;
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D shirt, Texture2D pants, Texture2D bone);
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants, Texture2D bone, Shader pbr);
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired);
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader);
 void ZombieShutdown(Zombie *zombie);

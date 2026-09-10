@@ -232,7 +232,7 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *inpu
     Vector3 shoulderROffset = (Vector3){ 0.55f * 0.6f, torsoCenterY + 0.85f * 0.35f - torsoPos.y, 0.0f };
     Vector3 shoulderR = Vector3Add(torsoPos, RotateOffsetY(shoulderROffset, cosYaw, sinYaw));
     
-    Vector3 armOffsetDirRight = RotateOffsetY((Vector3){ 0.6f, -0.8f, 0.0f }, cosYaw, sinYaw);
+    Vector3 armOffsetDirRight = RotateOffsetY((Vector3){ -0.6f, -0.8f, 0.0f }, cosYaw, sinYaw);
     Vector3 elbowR = Vector3Add(shoulderR, Vector3Scale(armOffsetDirRight, 0.55f));
     
     weapon->position = elbowR;

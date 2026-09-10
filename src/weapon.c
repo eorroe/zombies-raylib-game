@@ -226,9 +226,7 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *inpu
     bodyPos.y += 0.45f;
 
     Vector3 shoulderR = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
-
-    Vector3 handOffset = RotateOffsetY((Vector3){ 0.0f, -0.35f, 0.15f }, cosYaw, sinYaw);
-    weapon->position = Vector3Add(shoulderR, handOffset);
+    weapon->position = Vector3Add(shoulderR, (Vector3){ 0.0f, -0.35f, 0.15f });
     weapon->direction = (Vector3){ 0, 0, 1 };
 
     weapon->swayTimer += dt * 8.0f;

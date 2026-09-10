@@ -71,37 +71,40 @@ static const char *pbrFragShader =
 
     "    vec3 N = normalize(fragNormal);\n"
     "    vec3 normalTex = texture(texture1, fragTexCoord).rgb * 2.0 - 1.0;\n"
-    "    N = normalize(mix(N, normalize(N + normalTex), 0.0));\n"
+    "    N = normalize(mix(N, normalize(N + normalTex), 0.5));\n"
 
     "    vec3 V = normalize(-fragPosition);\n"
     "    vec3 R = reflect(-V, N);\n"
 
-    "    float ao = 1.0;\n"
+    "    float ao = 0.5 + 0.5 * N.y;\n"
 
     "    vec3 F0 = mix(vec3(0.04), albedo, metallic);\n"
 
-    "    vec3 lightPos[4];\n"
-    "    lightPos[0] = vec3(-4.0, 1.5, 12.0);\n"
-    "    lightPos[1] = vec3(0.0, 0.5, 2.0);\n"
-    "    lightPos[2] = vec3(8.0, 2.0, 8.0);\n"
-    "    lightPos[3] = vec3(-8.0, 0.3, -4.0);\n"
-    "    vec3 lightCol[4];\n"
-    "    lightCol[0] = vec3(2.0, 0.9, 0.15);\n"
-    "    lightCol[1] = vec3(2.0, 1.0, 0.23);\n"
-    "    lightCol[2] = vec3(2.0, 1.0, 0.23);\n"
-    "    lightCol[3] = vec3(2.0, 1.1, 0.31);\n"
     "    vec3 Lo = vec3(0.0);\n"
     "    for (int i = 0; i < 8; i++) {\n"
+    "        if (i >= lightCount) break;\n"
     "        vec3 L = normalize(lightPos[i] - fragPosition);\n"
     "        vec3 H = normalize(V + L);\n"
     "        float dist = length(lightPos[i] - fragPosition);\n"
     "        float attenuation = 1.0 / (1.0 + 0.07 * dist + 0.017 * dist * dist);\n"
     "        vec3 radiance = lightCol[i] * attenuation;\n"
+
+    "        float NDF = DistributionGGX(N, H, roughness);\n"
+    "        float G   = GeometrySmith(N, V, L, roughness);\n"
+    "        vec3 F    = FresnelSchlick(max(dot(H, V), 0.0), F0);\n"
+
+    "        vec3 kS = F;\n"
+    "        vec3 kD = (1.0 - kS) * (1.0 - metallic);\n"
+
+    "        vec3 numerator    = NDF * G * F;\n"
+    "        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);\n"
+    "        vec3 specular     = numerator / max(denominator, 0.001);\n"
+
     "        float NdotL = max(dot(N, L), 0.0);\n"
     "        Lo += (kD * albedo / PI + specular) * radiance * NdotL;\n"
     "    }\n"
 
-    "    vec3 ambient = vec3(1.0) * albedo * ao;\n"
+    "    vec3 ambient = vec3(0.03) * albedo * ao;\n"
 
     "    vec3 color = ambient + Lo;\n"
 

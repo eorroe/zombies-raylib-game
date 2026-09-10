@@ -29,7 +29,7 @@ typedef struct {
 
 static WeaponModels g_weaponModels;
 
-void WeaponInit(Weapon *weapon) {
+void WeaponInit(Weapon *weapon, Shader pbr) {
     weapon->position = (Vector3){ 0.3f, 0.8f, 0.2f };
     weapon->direction = (Vector3){ 0, 0, 1 };
     weapon->ammo = MAX_AMMO;
@@ -42,29 +42,37 @@ void WeaponInit(Weapon *weapon) {
 
     Mesh bodyMesh = GenMeshCube(0.12f, 0.15f, 0.35f);
     g_weaponModels.body = LoadModelFromMesh(bodyMesh);
+    g_weaponModels.body.materials[0].shader = pbr;
 
     Mesh barrelMesh = GenMeshCylinder(0.025f, 0.22f, 16);
     g_weaponModels.barrel = LoadModelFromMesh(barrelMesh);
+    g_weaponModels.barrel.materials[0].shader = pbr;
 
     for (int i = 0; i < 4; i++) {
         Mesh ringMesh = GenMeshCylinder(0.03f, 0.008f, 16);
         g_weaponModels.barrelRings[i] = LoadModelFromMesh(ringMesh);
+        g_weaponModels.barrelRings[i].materials[0].shader = pbr;
     }
 
     Mesh gripMesh = GenMeshCylinder(0.035f, 0.09f, 8);
     g_weaponModels.grip = LoadModelFromMesh(gripMesh);
+    g_weaponModels.grip.materials[0].shader = pbr;
 
     Mesh magMesh = GenMeshCube(0.04f, 0.07f, 0.025f);
     g_weaponModels.magazine = LoadModelFromMesh(magMesh);
+    g_weaponModels.magazine.materials[0].shader = pbr;
 
     Mesh stockMesh = GenMeshCube(0.045f, 0.06f, 0.09f);
     g_weaponModels.stock = LoadModelFromMesh(stockMesh);
+    g_weaponModels.stock.materials[0].shader = pbr;
 
     Mesh sightMesh = GenMeshCylinder(0.012f, 0.03f, 8);
     g_weaponModels.sight = LoadModelFromMesh(sightMesh);
+    g_weaponModels.sight.materials[0].shader = pbr;
 
     Mesh triggerMesh = GenMeshCube(0.01f, 0.015f, 0.025f);
     g_weaponModels.trigger = LoadModelFromMesh(triggerMesh);
+    g_weaponModels.trigger.materials[0].shader = pbr;
 
     Image metalImg = GenImageColor(256, 256, (Color){ 160, 160, 165, 255 });
     for (int i = 0; i < 600; i++) {

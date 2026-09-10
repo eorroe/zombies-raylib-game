@@ -58,7 +58,7 @@ static void UIHandleUploadGallery(MenuState *menu, InputState *input, Game *game
 }
 
 void UIInit(MenuState *menu, int screenWidth, int screenHeight) {
-    menu->active = true;
+    menu->active = false;
     menu->selectedItem = 0;
     menu->mode = GAME_MODE_ROUNDS;
     menu->zombieMode = ZOMBIE_MODE_MIXED;

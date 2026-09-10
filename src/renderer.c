@@ -93,12 +93,6 @@ void RendererUpdate(Game *game, float dt) {
 void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
-    BeginTextureMode(game->sceneTarget);
-    
-    int w = game->sceneTarget.texture.width;
-    int h = game->sceneTarget.texture.height;
-    DrawRectangleGradientV(0, 0, w, h / 2, (Color){ 45, 30, 35, 255 }, (Color){ 80, 50, 45, 255 });
-    DrawRectangleGradientV(0, h / 2, w, h / 2, (Color){ 80, 50, 45, 255 }, (Color){ 40, 22, 18, 255 });
     
     BeginMode3D(camera);
 }
@@ -112,12 +106,12 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 1.0f * flicker, (0.45f + i * 0.05f) * flicker, (0.08f + i * 0.04f) * flicker };
+        lightColors[i] = (Vector3){ 2.0f * flicker, (0.9f + i * 0.1f) * flicker, (0.15f + i * 0.08f) * flicker };
     }
     int lightCount = 4;
     
-    ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.035f);
+    ShaderBeginPBR(    ShaderBeginPBR(    // ShaderBeginPBR(ShaderBeginPBR(&game->shaders);game->shaders);game->shaders);game->shaders);
+    ShaderSetFog(    ShaderSetFog(    // ShaderSetFog(ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);
     
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
@@ -126,11 +120,7 @@ void RendererDrawScene(Game *game) {
     SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCount, &lightCount, SHADER_UNIFORM_INT);
     
     SetPBRMaterial(game, game->textures.asphalt, (Texture2D){0}, 0.0f, 0.9f);
-    if (game->textures.generated && game->textures.asphalt.id != 0) {
-        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, WHITE);
-    } else {
-        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 60, 58, 55, 255 });
-    }
+    DrawCube((Vector3){ 0, 0.1, 0 }, 20, 0.2f, 20, WHITE);
     
     SetPBRMaterial(game, game->textures.wood, game->textures.crateNormal, 0.0f, 0.8f);
     for (int i = 0; i < 16; i++) {
@@ -305,9 +295,26 @@ void RendererDrawBloodDecals(Game *game) {
 void RendererDrawZombies(Game *game, Shader shader) {
     (void)shader;
     Camera3D cam = CameraGetCamera(&game->camera);
-    for (int i = 0; i < game->zombieCount; i++) {
-        ZombieRender(&game->zombies[i], cam, game->zombieHeadTextures, game->zombieHeadTextureCount, shader);
+    ShaderBeginPBR(    ShaderBeginPBR(    // ShaderBeginPBR(ShaderBeginPBR(&game->shaders);game->shaders);game->shaders);game->shaders);
+    ShaderSetFog(    ShaderSetFog(    // ShaderSetFog(ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.005f);
+    Vector3 lightPositions[4];
+    Vector3 lightColors[4];
+    float t = GetTime();
+    for (int i = 0; i < 4; i++) {
+        lightPositions[i] = fireLightPositions[i];
+        float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
+        lightColors[i] = (Vector3){ 2.0f * flicker, (0.9f + i * 0.1f) * flicker, (0.15f + i * 0.08f) * flicker };
     }
+    int lightCount = 4;
+    for (int i = 0; i < 4; i++) {
+        SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
+        SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCol[i], &lightColors[i], SHADER_UNIFORM_VEC3);
+    }
+    SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCount, &lightCount, SHADER_UNIFORM_INT);
+    for (int i = 0; i < game->zombieCount; i++) {
+        ZombieRender(&game->zombies[i], cam, game->zombieHeadTextures, game->zombieHeadTextureCount, game->shaders.pbr);
+    }
+    ShaderEnd(&game->shaders);
 }
 
 void RendererDrawZombieHeads(Game *game) {
@@ -428,11 +435,6 @@ void RendererDrawScope(Game *game) {
 void RendererEnd(Game *game) {
     (void)game;
     EndMode3D();
-    EndTextureMode();
-
-    BeginShaderMode(game->shaders.postProcess);
-    DrawTexturePro(game->sceneTarget.texture, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, -(float)game->sceneTarget.texture.height }, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, (float)game->sceneTarget.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-    EndShaderMode();
 }
 
 void RendererShutdown(Game *game) {

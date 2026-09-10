@@ -26,7 +26,7 @@ static void SetModelTexture(Model *model, Texture2D tex) {
     }
 }
 
-void PlayerInit(Player *player, Vector3 startPos) {
+void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->position = startPos;
     player->velocity = (Vector3){ 0 };
     player->health = PLAYER_HEALTH;
@@ -40,14 +40,20 @@ void PlayerInit(Player *player, Vector3 startPos) {
 
     Mesh bodyMesh = GenMeshCylinder(0.4f, 1.2f, 8);
     player->bodyModel = LoadModelFromMesh(bodyMesh);
+    player->bodyModel.materials[0].shader = pbr;
 
     Mesh headMesh = GenMeshSphere(0.25f, 12, 12);
     player->headModel = LoadModelFromMesh(headMesh);
+    player->headModel.materials[0].shader = pbr;
 
     player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
+    player->leftArmModel.materials[0].shader = pbr;
     player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
+    player->rightArmModel.materials[0].shader = pbr;
     player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->leftLegModel.materials[0].shader = pbr;
     player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->rightLegModel.materials[0].shader = pbr;
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
     for (int i = 0; i < 800; i++) {

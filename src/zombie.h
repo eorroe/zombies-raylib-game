@@ -65,7 +65,7 @@ typedef struct {
     float limbRadius;
 } Zombie;
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants);
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants, Shader pbr);
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired);
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader);
 void ZombieShutdown(Zombie *zombie);

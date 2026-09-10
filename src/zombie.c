@@ -21,7 +21,7 @@ static void SetModelNormal(Model *model, Texture2D normal) {
     }
 }
 
-void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants) {
+void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants, Shader pbr) {
     zombie->position = position;
     zombie->velocity = (Vector3){ 0 };
     zombie->health = 50.0f + rand() % 50;
@@ -63,76 +63,91 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     zombie->bodyModel = LoadHighPolyModel(torsoMesh);
     SetModelTexture(&zombie->bodyModel, shirt);
     SetModelNormal(&zombie->bodyModel, skinNormal);
+    zombie->bodyModel.materials[0].shader = pbr;
 
     Mesh headMesh = ZombieMesh_CreateHead(headR);
     zombie->headModel = LoadHighPolyModel(headMesh);
     SetModelTexture(&zombie->headModel, skin);
     SetModelNormal(&zombie->headModel, skinNormal);
+    zombie->headModel.materials[0].shader = pbr;
 
     Mesh jawMesh = ZombieMesh_CreateJaw(headR);
     zombie->jawModel = LoadHighPolyModel(jawMesh);
     SetModelTexture(&zombie->jawModel, skin);
     SetModelNormal(&zombie->jawModel, skinNormal);
+    zombie->jawModel.materials[0].shader = pbr;
 
     Mesh leftUpperArmMesh = ZombieMesh_CreateLimb(limbR, armUpper);
     zombie->leftUpperArm = LoadHighPolyModel(leftUpperArmMesh);
     SetModelTexture(&zombie->leftUpperArm, shirt);
     SetModelNormal(&zombie->leftUpperArm, skinNormal);
+    zombie->leftUpperArm.materials[0].shader = pbr;
 
     Mesh leftLowerArmMesh = ZombieMesh_CreateLimb(limbR * 0.8f, armLower);
     zombie->leftLowerArm = LoadHighPolyModel(leftLowerArmMesh);
     SetModelTexture(&zombie->leftLowerArm, skin);
     SetModelNormal(&zombie->leftLowerArm, skinNormal);
+    zombie->leftLowerArm.materials[0].shader = pbr;
 
     Mesh rightUpperArmMesh = ZombieMesh_CreateLimb(limbR, armUpper);
     zombie->rightUpperArm = LoadHighPolyModel(rightUpperArmMesh);
     SetModelTexture(&zombie->rightUpperArm, shirt);
     SetModelNormal(&zombie->rightUpperArm, skinNormal);
+    zombie->rightUpperArm.materials[0].shader = pbr;
 
     Mesh rightLowerArmMesh = ZombieMesh_CreateLimb(limbR * 0.8f, armLower);
     zombie->rightLowerArm = LoadHighPolyModel(rightLowerArmMesh);
     SetModelTexture(&zombie->rightLowerArm, skin);
     SetModelNormal(&zombie->rightLowerArm, skinNormal);
+    zombie->rightLowerArm.materials[0].shader = pbr;
 
     Mesh leftUpperLegMesh = ZombieMesh_CreateLimb(limbR * 1.1f, legUpper);
     zombie->leftUpperLeg = LoadHighPolyModel(leftUpperLegMesh);
     SetModelTexture(&zombie->leftUpperLeg, pants);
     SetModelNormal(&zombie->leftUpperLeg, skinNormal);
+    zombie->leftUpperLeg.materials[0].shader = pbr;
 
     Mesh leftLowerLegMesh = ZombieMesh_CreateLimb(limbR * 0.9f, legLower);
     zombie->leftLowerLeg = LoadHighPolyModel(leftLowerLegMesh);
     SetModelTexture(&zombie->leftLowerLeg, pants);
     SetModelNormal(&zombie->leftLowerLeg, skinNormal);
+    zombie->leftLowerLeg.materials[0].shader = pbr;
 
     Mesh rightUpperLegMesh = ZombieMesh_CreateLimb(limbR * 1.1f, legUpper);
     zombie->rightUpperLeg = LoadHighPolyModel(rightUpperLegMesh);
     SetModelTexture(&zombie->rightUpperLeg, pants);
     SetModelNormal(&zombie->rightUpperLeg, skinNormal);
+    zombie->rightUpperLeg.materials[0].shader = pbr;
 
     Mesh rightLowerLegMesh = ZombieMesh_CreateLimb(limbR * 0.9f, legLower);
     zombie->rightLowerLeg = LoadHighPolyModel(rightLowerLegMesh);
     SetModelTexture(&zombie->rightLowerLeg, pants);
     SetModelNormal(&zombie->rightLowerLeg, skinNormal);
+    zombie->rightLowerLeg.materials[0].shader = pbr;
 
     Mesh leftHandMesh = ZombieMesh_CreateHand(limbR * 6.0f);
     zombie->leftHandModel = LoadHighPolyModel(leftHandMesh);
     SetModelTexture(&zombie->leftHandModel, skin);
     SetModelNormal(&zombie->leftHandModel, skinNormal);
+    zombie->leftHandModel.materials[0].shader = pbr;
 
     Mesh rightHandMesh = ZombieMesh_CreateHand(limbR * 6.0f);
     zombie->rightHandModel = LoadHighPolyModel(rightHandMesh);
     SetModelTexture(&zombie->rightHandModel, skin);
     SetModelNormal(&zombie->rightHandModel, skinNormal);
+    zombie->rightHandModel.materials[0].shader = pbr;
 
     Mesh leftFootMesh = ZombieMesh_CreateFoot(limbR * 5.0f);
     zombie->leftFootModel = LoadHighPolyModel(leftFootMesh);
     SetModelTexture(&zombie->leftFootModel, pants);
     SetModelNormal(&zombie->leftFootModel, skinNormal);
+    zombie->leftFootModel.materials[0].shader = pbr;
 
     Mesh rightFootMesh = ZombieMesh_CreateFoot(limbR * 5.0f);
     zombie->rightFootModel = LoadHighPolyModel(rightFootMesh);
     SetModelTexture(&zombie->rightFootModel, pants);
     SetModelNormal(&zombie->rightFootModel, skinNormal);
+    zombie->rightFootModel.materials[0].shader = pbr;
 }
 
 void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFired) {

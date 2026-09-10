@@ -14,7 +14,7 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
         texIdx = texIdx % game->zombieHeadTextureCount;
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
-    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieSkinNormal, game->textures.zombieShirt, game->textures.zombiePants);
+    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieSkinNormal, game->textures.zombieShirt, game->textures.zombiePants, game->shaders.pbr);
     game->zombies[idx].speed = ZOMBIE_SPEED_BASE;
     if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
         game->zombies[idx].speed = ZOMBIE_SPEED_BASE * 2.0f;
@@ -87,8 +87,8 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->muzzleFlashTimer = 0.0f;
     game->muzzleFlashPos = (Vector3){ 0 };
     
-    PlayerInit(&game->player, (Vector3){ 0, 0, 0 });
-    WeaponInit(&game->weapon);
+    PlayerInit(&game->player, (Vector3){ 0, 0, 0 }, game->shaders.pbr);
+    WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
     
     AudioInit(&game->audio);
@@ -536,8 +536,9 @@ int main(void) {
     
     Game game = { 0 };
     UIInit(&game.menu, screenWidth, screenHeight);
-    DebugInit(&game.debug, 10.0f);
-    game.state = GAME_STATE_MENU;
+    game.menu.active = false;
+    game.state = GAME_STATE_PLAYING;
+    GameInit(&game, screenWidth, screenHeight);
     
     InputState input;
     int frameCount = 0;
@@ -548,7 +549,7 @@ int main(void) {
     double startTime = GetTime();
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
-    int screenshotFrame = 120;
+    int screenshotFrame = 5;
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);

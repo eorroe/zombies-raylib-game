@@ -134,21 +134,27 @@ If a fix has both a visual component and a non-visual component, treat it as a v
 After making a visual change and before declaring success, you must:
 
 1. Build
-2. Run headless with `ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter`
+2. Run with `ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 ./ZombieShooter`
 3. Verify the screenshot exists
 4. Analyze the screenshot with Python/PIL or visually inspect it
 5. Confirm no blown whites, missing geometry, or other regressions before finalizing
 
+**Note:** The game uses raylib's built-in `TakeScreenshot()` when `ZOMBIE_SHOT` is set. This is the preferred method. Only use the xvfb fallback if the environment has no display server at all.
+
 ## Headless Testing Workflow
 
-This project supports automated headless testing via Xvfb. Use this workflow whenever you need to verify rendering changes without a physical display.
+This project supports automated screenshot capture via raylib's built-in `TakeScreenshot()`. Use this workflow whenever you need to verify rendering changes without a physical display.
+
+### Primary Method: Built-in Screenshot
+
+The game already supports screenshot capture through environment variables. This is the preferred method.
 
 ### Environment Variables
 
 | Variable | Purpose |
 |----------|---------|
 | `ZOMBIE_AUTO_START=1` | Skips menu and starts gameplay automatically after 30 frames |
-| `ZOMBIE_SHOT=/path/to/screenshot.png` | Saves a screenshot at frame 35 to the specified path |
+| `ZOMBIE_SHOT=/path/to/screenshot.png` | Saves a screenshot at frame 35 to the specified path using raylib's `TakeScreenshot()` |
 | `ZOMBIE_AUTO_QUIT_MS=5000` | Auto-quits after the specified milliseconds (prevents hangs) |
 
 ### Command Template
@@ -156,13 +162,13 @@ This project supports automated headless testing via Xvfb. Use this workflow whe
 ```bash
 cd /workspace/.../sessions/agent_xxx/build
 ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
-  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
+  ./ZombieShooter
 ```
 
 ### Step-by-Step Workflow
 
 1. **Build first**: `cd build && make -j"$(nproc)"`
-2. **Run headless** with xvfb using the template above
+2. **Run** using the template above
 3. **Verify screenshot exists**: `ls -la /tmp/zombie_test.png`
 4. **Analyze screenshot** with Python/PIL:
    ```python
@@ -178,6 +184,16 @@ ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
    print(f'White-ish pixels: {white_count}')
    ```
 5. **Visual inspection**: print the screenshot or inspect pixel statistics to confirm the scene is visible, not washed out, and contains expected elements
+
+### Fallback Method: Xvfb (No Display Server)
+
+If the environment has **no display server** at all, use xvfb-run as a fallback:
+
+```bash
+cd /workspace/.../sessions/agent_xxx/build
+ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
+  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
+```
 
 ### Screenshot Timing
 
@@ -199,5 +215,6 @@ The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `s
 - Always take a screenshot after rendering changes before declaring success
 - If brightness > 200 average, the scene is likely blown out — check PBR output stages
 - If non-transparent pixels < 50% of frame, the scene may not be rendering to the backbuffer
-- Use `xvfb-run -a` (auto-select display) to avoid conflicts with existing X servers
-- Use `-screen 0 1280x720x24` to match the game's window size and color depth
+- Prefer the built-in `TakeScreenshot()` method via `ZOMBIE_SHOT` over xvfb
+- Only use `xvfb-run` if the environment has no display server available
+- Use `-screen 0 1280x720x24` with xvfb to match the game's window size and color depth

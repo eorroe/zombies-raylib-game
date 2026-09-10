@@ -16,6 +16,8 @@ typedef struct {
     int pbrLocLightPos[8];
     int pbrLocLightCol[8];
     int pbrLocLightCount;
+    int pbrLocDirLightDir;
+    int pbrLocDirLightCol;
     int postLocTime;
     int postLocResolution;
     int scopeLocTime;
@@ -29,6 +31,7 @@ void ShaderBeginPostProcess(ShaderManager *shaders);
 void ShaderBeginScope(ShaderManager *shaders);
 void ShaderEnd(ShaderManager *shaders);
 void ShaderSetFog(ShaderManager *shaders, Vector3 fogColor, float fogDensity);
+void ShaderSetDirectionalLight(ShaderManager *shaders, Vector3 dir, Vector3 col);
 void ShaderShutdown(ShaderManager *shaders);
 
 #endif

@@ -60,6 +60,13 @@ void RendererInit(Game *game, int screenWidth, int screenHeight) {
     }
     game->buildingModel.materials[0].shader = game->shaders.pbr;
     
+    Mesh trainMesh = GenMeshCube(12.0f, 3.5f, 3.0f);
+    game->trainModel = LoadModelFromMesh(trainMesh);
+    if (game->textures.generated && game->textures.metal.id != 0) {
+        SetModelTexture(&game->trainModel, game->textures.metal, game->textures.metalNormal);
+    }
+    game->trainModel.materials[0].shader = game->shaders.pbr;
+    
     Mesh floorMesh = GenMeshPlane(50, 50, 50, 50);
     game->floorModel = LoadModelFromMesh(floorMesh);
     if (game->textures.generated && game->textures.asphalt.id != 0) {
@@ -73,6 +80,34 @@ void RendererInit(Game *game, int screenWidth, int screenHeight) {
         SetModelTexture(&game->bloodDecalModel, game->textures.bloodDecal, (Texture2D){0});
     }
     game->bloodDecalModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh fencePostMesh = GenMeshCylinder(0.08f, 1.2f, 8);
+    game->fenceModel = LoadModelFromMesh(fencePostMesh);
+    if (game->textures.generated && game->textures.fence.id != 0) {
+        SetModelTexture(&game->fenceModel, game->textures.fence, game->textures.metalNormal);
+    }
+    game->fenceModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh containerMesh = GenMeshCube(2.4f, 1.2f, 6.0f);
+    game->containerModel = LoadModelFromMesh(containerMesh);
+    if (game->textures.generated && game->textures.container.id != 0) {
+        SetModelTexture(&game->containerModel, game->textures.container, game->textures.containerNormal);
+    }
+    game->containerModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh platformMesh = GenMeshCube(4.0f, 0.6f, 1.5f);
+    game->platformModel = LoadModelFromMesh(platformMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->platformModel, game->textures.concrete, game->textures.concreteNormal);
+    }
+    game->platformModel.materials[0].shader = game->shaders.pbr;
+    
+    Mesh rubbleMesh = GenMeshCube(0.3f, 0.15f, 0.3f);
+    game->rubbleModel = LoadModelFromMesh(rubbleMesh);
+    if (game->textures.generated && game->textures.concrete.id != 0) {
+        SetModelTexture(&game->rubbleModel, game->textures.concrete, (Texture2D){0});
+    }
+    game->rubbleModel.materials[0].shader = game->shaders.pbr;
     
     fireLightPositions[0] = (Vector3){ -4.0f, 1.5f, 12.0f };
     fireLightPositions[1] = (Vector3){ 0.0f, 0.5f, 2.0f };
@@ -93,14 +128,14 @@ void RendererUpdate(Game *game, float dt) {
 void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
-    BeginTextureMode(game->sceneTarget);
     
-    int w = game->sceneTarget.texture.width;
-    int h = game->sceneTarget.texture.height;
-    DrawRectangleGradientV(0, 0, w, h / 2, (Color){ 45, 30, 35, 255 }, (Color){ 80, 50, 45, 255 });
-    DrawRectangleGradientV(0, h / 2, w, h / 2, (Color){ 80, 50, 45, 255 }, (Color){ 40, 22, 18, 255 });
+    int w = 1280;
+    int h = 720;
+    DrawRectangleGradientV(0, 0, w, h / 2, (Color){ 120, 160, 220, 255 }, (Color){ 220, 180, 120, 255 });
+    DrawRectangleGradientV(0, h / 2, w, h / 2, (Color){ 220, 180, 120, 255 }, (Color){ 180, 120, 80, 255 });
     
     BeginMode3D(camera);
+    rlDisableBackfaceCulling();
 }
 
 void RendererDrawScene(Game *game) {
@@ -112,12 +147,13 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 1.0f * flicker, (0.45f + i * 0.05f) * flicker, (0.08f + i * 0.04f) * flicker };
+        lightColors[i] = (Vector3){ 1.2f * flicker, 0.7f * flicker, 0.4f * flicker };
     }
     int lightCount = 4;
     
     ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.035f);
+    ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 1.2f, 0.9f, 0.7f });
     
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
@@ -125,105 +161,56 @@ void RendererDrawScene(Game *game) {
     }
     SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightCount, &lightCount, SHADER_UNIFORM_INT);
     
+    SetPBRMaterial(game, game->textures.concrete, game->textures.concreteNormal, 0.1f, 0.7f);
+    DrawGrid(50, 1.0f);
+    
     SetPBRMaterial(game, game->textures.asphalt, (Texture2D){0}, 0.0f, 0.9f);
-    if (game->textures.generated && game->textures.asphalt.id != 0) {
-        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, WHITE);
-    } else {
-        DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 60, 58, 55, 255 });
+    DrawPlane((Vector3){ 0, 0.02f, 0 }, (Vector2){ 50, 50 }, WHITE);
+    
+    SetPBRMaterial(game, game->textures.container, game->textures.containerNormal, 0.6f, 0.5f);
+    DrawModel(game->containerModel, (Vector3){ 0, 0.6f, 0 }, 1.0f, WHITE);
+    for (int i = 0; i < 6; i++) {
+        float x = -10.0f + i * 3.5f;
+        Vector3 containerPos = { x, 0.6f, -6.0f - (i % 2) * 1.0f };
+        DrawModel(game->containerModel, containerPos, 1.0f, WHITE);
+    }
+    for (int i = 0; i < 4; i++) {
+        float x = -10.0f + i * 3.5f;
+        Vector3 containerPos = { x, 0.6f, -10.0f };
+        DrawModel(game->containerModel, containerPos, 1.0f, (Color){ 180, 80, 50, 255 });
     }
     
-    SetPBRMaterial(game, game->textures.wood, game->textures.crateNormal, 0.0f, 0.8f);
-    for (int i = 0; i < 16; i++) {
-        float angle = i * PI * 0.25f;
-        float radius = 5.0f + (i % 3) * 3.0f;
-        Vector3 cratePos = {
-            cosf(angle) * radius,
-            0.3f,
-            sinf(angle) * radius
-        };
-        DrawModel(game->crateModel, cratePos, 1.0f, WHITE);
+    SetPBRMaterial(game, game->textures.fence, game->textures.metalNormal, 0.8f, 0.4f);
+    for (int i = 0; i < 20; i++) {
+        float x = -8.0f + i * 0.8f;
+        DrawModel(game->fenceModel, (Vector3){ x, 0.6f, 4.0f }, 1.0f, WHITE);
+        DrawModel(game->fenceModel, (Vector3){ x, 0.6f, 4.5f }, 1.0f, WHITE);
     }
-    
-    SetPBRMaterial(game, game->textures.metal, game->textures.metalNormal, 0.9f, 0.35f);
-    for (int i = 0; i < 10; i++) {
-        float angle = i * PI * 0.5f + 0.3f;
-        float radius = 3.0f + (i % 2) * 3.0f;
-        Vector3 barrelPos = {
-            cosf(angle) * radius,
-            0.4f,
-            sinf(angle) * radius
-        };
-        DrawModel(game->barrelModel, barrelPos, 1.0f, WHITE);
-    }
-    
-    SetPBRMaterial(game, game->textures.metal, game->textures.metalNormal, 0.7f, 0.5f);
-    for (int i = 0; i < 5; i++) {
-        float angle = i * PI * 1.2f + 0.7f;
-        float radius = 10.0f + (i % 2) * 5.0f;
-        Vector3 carPos = {
-            cosf(angle) * radius,
-            0.6f,
-            sinf(angle) * radius
-        };
-        DrawCube(carPos, 2.0f, 1.0f, 4.0f, (Color){ 40, 35, 30, 255 });
-        DrawCube((Vector3){ carPos.x, carPos.y + 0.7f, carPos.z - 1.2f }, 1.6f, 0.6f, 1.8f, (Color){ 30, 30, 35, 255 });
-    }
-    
-    SetPBRMaterial(game, game->textures.wood, game->textures.crateNormal, 0.0f, 0.9f);
-    for (int i = 0; i < 8; i++) {
-        float angle = i * PI * 0.75f + 1.5f;
-        float radius = 8.0f + (i % 3) * 4.0f;
-        Vector3 debrisPos = {
-            cosf(angle) * radius,
-            0.15f,
-            sinf(angle) * radius
-        };
-        DrawCube(debrisPos, 0.4f + (i % 2) * 0.3f, 0.15f, 0.4f + (i % 3) * 0.2f, (Color){ 60, 45, 30, 255 });
+    for (int i = 0; i < 20; i++) {
+        float x = -8.0f + i * 0.8f;
+        float barY = 0.3f + (i % 3) * 0.35f;
+        DrawCube((Vector3){ x, barY, 4.0f }, 0.04f, 0.04f, 2.0f, (Color){ 50, 50, 55, 255 });
+        DrawCube((Vector3){ x, barY, 4.5f }, 0.04f, 0.04f, 2.0f, (Color){ 50, 50, 55, 255 });
     }
     
     SetPBRMaterial(game, game->textures.concrete, game->textures.concreteNormal, 0.1f, 0.7f);
-    for (int i = 0; i < 6; i++) {
-        float angle = i * PI * 0.5f + 0.2f;
-        float radius = 12.0f + (i % 2) * 6.0f;
-        Vector3 bodyPos = {
-            cosf(angle) * radius,
-            0.1f,
-            sinf(angle) * radius
-        };
-        DrawCube(bodyPos, 0.5f, 0.15f, 1.8f, (Color){ 35, 30, 28, 255 });
-        DrawSphere((Vector3){ bodyPos.x, bodyPos.y + 0.25f, bodyPos.z - 0.6f }, 0.2f, (Color){ 200, 170, 150, 255 });
+    DrawModel(game->platformModel, (Vector3){ 8.0f, 0.3f, 3.0f }, 1.0f, WHITE);
+    DrawModel(game->platformModel, (Vector3){ 12.0f, 0.3f, 3.0f }, 1.0f, (Color){ 110, 105, 100, 255 });
+    DrawCube((Vector3){ 10.0f, 0.55f, 4.2f }, 4.5f, 0.3f, 0.3f, (Color){ 80, 75, 70, 255 });
+    
+    for (int i = 0; i < 40; i++) {
+        float x = -20.0f + (i % 20) * 2.0f + (i / 20) * 0.5f;
+        float z = -5.0f + (i % 7) * 1.5f;
+        float y = 0.08f + (i % 3) * 0.04f;
+        DrawModel(game->rubbleModel, (Vector3){ x, y, z }, 1.0f, (Color){ 90, 85, 80, 255 });
     }
     
-    for (int i = 0; i < 4; i++) {
-        float angle = i * PI * 0.5f + PI * 0.25f;
-        float radius = 16.0f;
-        Vector3 tirePos = {
-            cosf(angle) * radius,
-            0.25f,
-            sinf(angle) * radius
-        };
-        DrawCylinder(tirePos, 0.35f, 0.35f, 0.12f, 12, (Color){ 20, 20, 20, 255 });
-    }
-    
-    BeginBlendMode(BLEND_ADDITIVE);
-    for (int i = 0; i < 4; i++) {
-        float t = GetTime();
-        for (int p = 0; p < 25; p++) {
-            float ft = t * 3.0f + p * 1.7f + i * 5.0f;
-            float fx = fireLightPositions[i].x + sinf(ft * 2.3f) * 0.4f;
-            float fy = fireLightPositions[i].y + fmodf(ft * 0.8f, 1.5f) + 0.3f;
-            float fz = fireLightPositions[i].z + cosf(ft * 1.9f) * 0.4f;
-            float alpha = 0.6f - fmodf(ft * 0.8f, 1.5f) * 0.4f;
-            if (alpha < 0.0f) alpha = 0.0f;
-            float size = 0.08f + fmodf(ft, 1.0f) * 0.12f;
-            DrawSphere((Vector3){ fx, fy, fz }, size, (Color){ 255, 160 + (int)(fmodf(ft, 1.0f) * 80.0f), 40, (unsigned char)(alpha * 255) });
-        }
-    }
-    EndBlendMode();
-    
-    {
-        Vector3 wallPos = { 0, 0.75f, -10.0f };
-        DrawModel(game->wallModel, wallPos, 1.0f, WHITE);
+    SetPBRMaterial(game, game->textures.concrete, game->textures.concreteNormal, 0.1f, 0.7f);
+    for (int i = 0; i < 8; i++) {
+        float x = -14.0f + i * 3.0f;
+        float z = 14.0f + (i % 2) * 2.0f;
+        float h = 1.2f + (i % 4) * 0.8f;
+        DrawCube((Vector3){ x, h * 0.5f, z }, 0.5f, h * 0.5f, 1.5f, (Color){ 70, 65, 60, 255 });
     }
     
     SetPBRMaterial(game, game->textures.brick, (Texture2D){0}, 0.0f, 0.85f);
@@ -263,12 +250,24 @@ void RendererDrawScene(Game *game) {
     
     BeginBlendMode(BLEND_ADDITIVE);
     for (int i = 0; i < 4; i++) {
-        Vector3 beamPos = { fireLightPositions[i].x, fireLightPositions[i].y + 1.5f, fireLightPositions[i].z };
-        DrawCylinder(beamPos, 0.1f, 2.5f, 3.0f, 8, (Color){ 255, 150, 50, 18 });
-        DrawSphere((Vector3){ fireLightPositions[i].x, 0.05f, fireLightPositions[i].z }, 2.2f, (Color){ 255, 180, 80, 35 });
-        DrawSphere((Vector3){ fireLightPositions[i].x, 0.05f, fireLightPositions[i].z }, 0.15f, (Color){ 255, 240, 200, 255 });
+        float t = GetTime();
+        for (int p = 0; p < 25; p++) {
+            float ft = t * 3.0f + p * 1.7f + i * 5.0f;
+            float fx = fireLightPositions[i].x + sinf(ft * 2.3f) * 0.4f;
+            float fy = fireLightPositions[i].y + fmodf(ft * 0.8f, 1.5f) + 0.3f;
+            float fz = fireLightPositions[i].z + cosf(ft * 1.9f) * 0.4f;
+            float alpha = 0.6f - fmodf(ft * 0.8f, 1.5f) * 0.4f;
+            if (alpha < 0.0f) alpha = 0.0f;
+            float size = 0.06f + fmodf(ft, 1.0f) * 0.1f;
+            DrawSphere((Vector3){ fx, fy, fz }, size, (Color){ 255, 160 + (int)(fmodf(ft, 1.0f) * 80.0f), 40, (unsigned char)(alpha * 255) });
+        }
     }
     EndBlendMode();
+    
+    {
+        Vector3 wallPos = { 0, 0.75f, -10.0f };
+        DrawModel(game->wallModel, wallPos, 1.0f, WHITE);
+    }
     
     for (int i = 0; i < 180; i++) {
         float t = GetTime() * 0.5f + i * 3.31f;
@@ -304,16 +303,18 @@ void RendererDrawBloodDecals(Game *game) {
 
 void RendererDrawZombies(Game *game, Shader shader) {
     (void)shader;
+    printf("ZOMBIES: count=%d\n", game->zombieCount);
     Camera3D cam = CameraGetCamera(&game->camera);
     ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.08, 0.05, 0.12 }, 0.035f);
+    ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 1.2f, 0.9f, 0.7f });
     Vector3 lightPositions[4];
     Vector3 lightColors[4];
     float t = GetTime();
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 1.0f * flicker, (0.45f + i * 0.05f) * flicker, (0.08f + i * 0.04f) * flicker };
+        lightColors[i] = (Vector3){ 1.2f * flicker, 0.7f * flicker, 0.4f * flicker };
     }
     int lightCount = 4;
     for (int i = 0; i < 4; i++) {
@@ -393,48 +394,36 @@ void RendererDrawParticles(Particle *particles, int count) {
 }
 
 void RendererDrawHUD(Game *game) {
-    DrawRectangle(0, 0, game->sceneTarget.texture.width, 60, ColorAlpha(BLACK, 0.5f));
-    int x = 20;
-    int gap = 10;
-    int y = 20;
-    int fontSize = 30;
-    Color color = WHITE;
-
-    const char *scoreText = TextFormat("Score: %d", game->score);
-    DrawText(scoreText, x, y, fontSize, color);
-    x += MeasureText(scoreText, fontSize) + gap;
-
-    const char *killsText = TextFormat("Kills: %d", game->totalDeadZombies);
-    DrawText(killsText, x, y, fontSize, color);
-    x += MeasureText(killsText, fontSize) + gap;
-
-    const char *healthText = TextFormat("Health: %.0f", game->player.health);
-    DrawText(healthText, x, y, fontSize, color);
-    x += MeasureText(healthText, fontSize) + gap;
-
-    const char *ammoText = TextFormat("Ammo: %d", game->weapon.ammo);
-    DrawText(ammoText, x, y, fontSize, color);
-    x += MeasureText(ammoText, fontSize) + gap;
-
-    const char *modeText = TextFormat("Mode: %s", (game->mode == GAME_MODE_ROUNDS) ? "Rounds" : "Endless");
-    DrawText(modeText, x, y, fontSize, color);
-    x += MeasureText(modeText, fontSize) + gap;
-
-    if (game->mode == GAME_MODE_ROUNDS) {
-        const char *roundText = TextFormat("Round: %d", game->round);
-        DrawText(roundText, x, y, fontSize, color);
-        x += MeasureText(roundText, fontSize) + gap;
-    }
-
-    if (game->weapon.reloading) {
-        DrawText("RELOADING...", x, y, fontSize, YELLOW);
+    int w = game->sceneTarget.texture.width;
+    int h = game->sceneTarget.texture.height;
+    
+    DrawRectangle(0, h - 70, w, 70, ColorAlpha(BLACK, 0.6f));
+    
+    int ammoX = w - 20;
+    int ammoY = h - 45;
+    const char *ammoText = TextFormat("%d / %d", game->weapon.ammo, MAX_AMMO);
+    int ammoW = MeasureText(ammoText, 28);
+    DrawText(ammoText, ammoX - ammoW, ammoY, 28, WHITE);
+    
+    int healthX = 20;
+    int healthY = h - 45;
+    float healthPct = game->player.health / game->player.maxHealth;
+    DrawRectangle(healthX, healthY, 200, 18, (Color){ 60, 60, 60, 200 });
+    DrawRectangle(healthX, healthY, (int)(200 * healthPct), 18, (Color){ 180, 40, 40, 255 });
+    DrawRectangleLines(healthX, healthY, 200, 18, WHITE);
+    DrawText(TextFormat("%.0f", game->player.health), healthX + 205, healthY, 20, WHITE);
+    
+    if (CameraGetADSBlend(&game->camera) > 0.5f || CameraGetFirstPersonBlend(&game->camera) > 0.5f) {
+        int cx = w / 2;
+        int cy = h / 2;
+        DrawLine(cx - 12, cy, cx - 4, cy, (Color){ 200, 200, 200, 180 });
+        DrawLine(cx + 4, cy, cx + 12, cy, (Color){ 200, 200, 200, 180 });
+        DrawLine(cx, cy - 12, cx, cy - 4, (Color){ 200, 200, 200, 180 });
+        DrawLine(cx, cy + 4, cx, cy + 12, (Color){ 200, 200, 200, 180 });
     }
     
-    if (CameraGetFirstPersonBlend(&game->camera) > 0.5f) {
-        int cx = game->sceneTarget.texture.width / 2;
-        int cy = game->sceneTarget.texture.height / 2;
-        DrawLine(cx - 10, cy, cx + 10, cy, RED);
-        DrawLine(cx, cy - 10, cx, cy + 10, RED);
+    if (game->weapon.reloading) {
+        DrawText("RELOADING", w / 2 - MeasureText("RELOADING", 20) / 2, h - 65, 20, YELLOW);
     }
 }
 
@@ -445,11 +434,6 @@ void RendererDrawScope(Game *game) {
 void RendererEnd(Game *game) {
     (void)game;
     EndMode3D();
-    EndTextureMode();
-
-    BeginShaderMode(game->shaders.postProcess);
-    DrawTexturePro(game->sceneTarget.texture, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, -(float)game->sceneTarget.texture.height }, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, (float)game->sceneTarget.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-    EndShaderMode();
 }
 
 void RendererShutdown(Game *game) {
@@ -459,6 +443,11 @@ void RendererShutdown(Game *game) {
     if (game->barrelModel.meshCount > 0) UnloadModel(game->barrelModel);
     if (game->wallModel.meshCount > 0) UnloadModel(game->wallModel);
     if (game->buildingModel.meshCount > 0) UnloadModel(game->buildingModel);
+    if (game->trainModel.meshCount > 0) UnloadModel(game->trainModel);
     if (game->floorModel.meshCount > 0) UnloadModel(game->floorModel);
     if (game->bloodDecalModel.meshCount > 0) UnloadModel(game->bloodDecalModel);
+    if (game->fenceModel.meshCount > 0) UnloadModel(game->fenceModel);
+    if (game->containerModel.meshCount > 0) UnloadModel(game->containerModel);
+    if (game->platformModel.meshCount > 0) UnloadModel(game->platformModel);
+    if (game->rubbleModel.meshCount > 0) UnloadModel(game->rubbleModel);
 }

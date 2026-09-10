@@ -30,6 +30,8 @@ static const char *pbrFragShader =
     "uniform vec3 lightPos[8];\n"
     "uniform vec3 lightCol[8];\n"
     "uniform int lightCount;\n"
+    "uniform vec3 dirLightDir;\n"
+    "uniform vec3 dirLightCol;\n"
     "uniform float metallic;\n"
     "uniform float roughness;\n"
     "uniform vec3 fogColor;\n"
@@ -86,7 +88,7 @@ static const char *pbrFragShader =
     "        vec3 L = normalize(lightPos[i] - fragPosition);\n"
     "        vec3 H = normalize(V + L);\n"
     "        float dist = length(lightPos[i] - fragPosition);\n"
-    "        float attenuation = 1.0 / (1.0 + 0.07 * dist + 0.017 * dist * dist);\n"
+    "    float attenuation = 1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist);\n"
     "        vec3 radiance = lightCol[i] * attenuation;\n"
 
     "        float NDF = DistributionGGX(N, H, roughness);\n"
@@ -104,7 +106,16 @@ static const char *pbrFragShader =
     "        Lo += (kD * albedo / PI + specular) * radiance * NdotL;\n"
     "    }\n"
 
-    "    vec3 ambient = vec3(0.03) * albedo * ao;\n"
+    "    vec3 Ldir = normalize(dirLightDir);\n"
+    "    float NdotLdir = max(dot(N, Ldir), 0.0);\n"
+    "    vec3 dirRadiance = dirLightCol * NdotLdir * 10.0;\n"
+    "    vec3 Hdir = normalize(V + Ldir);\n"
+    "    vec3 Fdir = FresnelSchlick(max(dot(Hdir, V), 0.0), F0);\n"
+    "    vec3 kSdir = Fdir;\n"
+    "    vec3 kDdir = (1.0 - kSdir) * (1.0 - metallic);\n"
+    "    Lo += kDdir * albedo * dirRadiance + kSdir * dirRadiance;\n"
+
+    "    vec3 ambient = vec3(0.05, 0.05, 0.08) * albedo * ao;\n"
 
     "    vec3 color = ambient + Lo;\n"
 
@@ -170,33 +181,37 @@ static const char *postFragShader =
     "    vec2 d = uv - center;\n"
     "    float edgeDist = length(d);\n"
 
-    "    vec2 chromaticOffset = d * edgeDist * 0.02;\n"
+    "    vec2 chromaticOffset = d * edgeDist * 0.015;\n"
     "    float r = texture(texture0, uv + chromaticOffset).r;\n"
     "    float g = texture(texture0, uv).g;\n"
     "    float b = texture(texture0, uv - chromaticOffset).b;\n"
     "    vec3 col = vec3(r, g, b);\n"
 
-    "    vec3 bloom = sampleBloom(texture0, uv, 0.9);\n"
-    "    col += bloom * 0.35;\n"
+    "    vec3 bloom = sampleBloom(texture0, uv, 0.85);\n"
+    "    col += bloom * 0.2;\n"
 
     "    col = ACESFilm(col);\n"
 
     "    float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));\n"
     "    float shadowMask = 1.0 - smoothstep(0.05, 0.35, lum);\n"
-    "    col = mix(col, col * vec3(1.05, 0.92, 0.78), shadowMask * 0.45);\n"
+    "    col = mix(col, col * vec3(1.08, 0.95, 0.78), shadowMask * 0.5);\n"
 
-    "    col = mix(col, col * vec3(1.0, 0.95, 0.85), smoothstep(0.35, 0.75, lum) * 0.25);\n"
+    "    col = mix(col, col * vec3(1.0, 0.95, 0.85), smoothstep(0.35, 0.75, lum) * 0.3);\n"
 
     "    col = mix(col, vec3(0.0), smoothstep(0.0, 0.04, lum) * 0.55);\n"
 
     "    col = mix(col, col * vec3(0.95, 0.9, 1.1), smoothstep(0.4, 1.0, lum) * 0.2);\n"
 
+    "    float hazeFactor = smoothstep(0.3, 0.9, edgeDist * 1.4);\n"
+    "    vec3 hazeColor = vec3(0.65, 0.52, 0.38);\n"
+    "    col = mix(col, hazeColor, hazeFactor * 0.15);\n"
+
     "    float depthFog = smoothstep(0.15, 0.85, edgeDist * 1.5);\n"
-    "    vec3 fogColor = vec3(0.08, 0.05, 0.18);\n"
-    "    col = mix(col, fogColor, depthFog * 0.45);\n"
+    "    vec3 fogColor = vec3(0.6, 0.5, 0.4);\n"
+    "    col = mix(col, fogColor, depthFog * 0.2);\n"
 
     "    float vignette = smoothstep(0.5, 1.3, edgeDist * 2.2);\n"
-    "    col *= 1.0 - vignette * 0.55;\n"
+    "    col *= 1.0 - vignette * 0.3;\n"
 
     "    float grain = fract(sin(dot(uv + vec2(time * 0.001, fract(time * 0.618)), vec2(12.9898, 78.233))) * 43758.5453);\n"
     "    float grainVal = (grain - 0.5) * 0.07;\n"
@@ -290,8 +305,9 @@ void ShaderInit(ShaderManager *shaders, int screenWidth, int screenHeight) {
     shaders->pbrLocLightCol[6] = GetShaderLocation(shaders->pbr, "lightCol[6]");
     shaders->pbrLocLightCol[7] = GetShaderLocation(shaders->pbr, "lightCol[7]");
     shaders->pbrLocLightCount = GetShaderLocation(shaders->pbr, "lightCount");
+    shaders->pbrLocDirLightDir = GetShaderLocation(shaders->pbr, "dirLightDir");
+    shaders->pbrLocDirLightCol = GetShaderLocation(shaders->pbr, "dirLightCol");
     shaders->pbrLocMetallic = GetShaderLocation(shaders->pbr, "metallic");
-    shaders->pbrLocRoughness = GetShaderLocation(shaders->pbr, "roughness");
     shaders->pbrLocFogColor = GetShaderLocation(shaders->pbr, "fogColor");
     shaders->pbrLocFogDensity = GetShaderLocation(shaders->pbr, "fogDensity");
     shaders->postLocTime = GetShaderLocation(shaders->postProcess, "time");
@@ -329,6 +345,11 @@ void ShaderEnd(ShaderManager *shaders) {
 void ShaderSetFog(ShaderManager *shaders, Vector3 fogColor, float fogDensity) {
     SetShaderValue(shaders->pbr, shaders->pbrLocFogColor, &fogColor, SHADER_UNIFORM_VEC3);
     SetShaderValue(shaders->pbr, shaders->pbrLocFogDensity, &fogDensity, SHADER_UNIFORM_FLOAT);
+}
+
+void ShaderSetDirectionalLight(ShaderManager *shaders, Vector3 dir, Vector3 col) {
+    SetShaderValue(shaders->pbr, shaders->pbrLocDirLightDir, &dir, SHADER_UNIFORM_VEC3);
+    SetShaderValue(shaders->pbr, shaders->pbrLocDirLightCol, &col, SHADER_UNIFORM_VEC3);
 }
 
 void ShaderShutdown(ShaderManager *shaders) {

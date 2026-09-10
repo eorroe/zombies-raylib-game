@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-static float FastHashNoise(int x, int y) {
+float FastHashNoise(int x, int y) {
     int n = x * 374761393 + y * 668265263;
     n = (n ^ (n >> 13)) * 1274126177;
     n = n ^ (n >> 16);
     return (n & 0x7fffffff) / (float)0x7fffffff;
 }
 
-static float SmoothValueNoise(int x, int y, float frequency) {
+float SmoothValueNoise(int x, int y, float frequency) {
     int ix = (int)(x * frequency);
     int iy = (int)(y * frequency);
     float fx = x * frequency - ix;
@@ -25,7 +25,7 @@ static float SmoothValueNoise(int x, int y, float frequency) {
            (v01 * (1.0f - tx) + v11 * tx) * ty;
 }
 
-static float FractalNoise(int x, int y, int octaves, float persistence) {
+float FractalNoise(int x, int y, int octaves, float persistence) {
     float total = 0.0f;
     float frequency = 1.0f;
     float amplitude = 1.0f;
@@ -105,26 +105,26 @@ static void AddNoiseLayer(Image *img, float scale, float amplitude, int octaves)
     }
 }
 
-static Image GenerateZombieSkin(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 135, 145, 125, 255 });
-    unsigned char *data = (unsigned char *)img.data;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            float baseNoise = FractalNoise(x, y, 6, 0.5f);
-            float poreNoise = FractalNoise(x + 100, y + 100, 4, 0.6f);
-            int idx = (y * width + x) * 4;
-            int r = (int)(130 + baseNoise * 50 + poreNoise * 20);
-            int g = (int)(140 + baseNoise * 45 + poreNoise * 18);
-            int b = (int)(115 + baseNoise * 35 + poreNoise * 15);
-            if (r > 255) r = 255; if (r < 80) r = 80;
-            if (g > 255) g = 255; if (g < 80) g = 80;
-            if (b > 255) b = 255; if (b < 60) b = 60;
-            data[idx + 0] = (unsigned char)r;
-            data[idx + 1] = (unsigned char)g;
-            data[idx + 2] = (unsigned char)b;
-            data[idx + 3] = 255;
-        }
-    }
+ static Image GenerateZombieSkin(int width, int height) {
+     Image img = GenImageColor(width, height, (Color){ 200, 195, 185, 255 });
+     unsigned char *data = (unsigned char *)img.data;
+     for (int y = 0; y < height; y++) {
+         for (int x = 0; x < width; x++) {
+             float baseNoise = FractalNoise(x, y, 6, 0.5f);
+             float poreNoise = FractalNoise(x + 100, y + 100, 4, 0.6f);
+             int idx = (y * width + x) * 4;
+             int r = (int)(190 + baseNoise * 50 + poreNoise * 25);
+             int g = (int)(185 + baseNoise * 45 + poreNoise * 22);
+             int b = (int)(175 + baseNoise * 40 + poreNoise * 20);
+             if (r > 255) r = 255; if (r < 140) r = 140;
+             if (g > 255) g = 255; if (g < 140) g = 140;
+             if (b > 255) b = 255; if (b < 130) b = 130;
+             data[idx + 0] = (unsigned char)r;
+             data[idx + 1] = (unsigned char)g;
+             data[idx + 2] = (unsigned char)b;
+             data[idx + 3] = 255;
+         }
+     }
     for (int i = 0; i < 3000; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
@@ -397,29 +397,150 @@ static Image GenerateBrickTexture(int width, int height) {
     return img;
 }
 
-static Image GenerateWoodTexture(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 140, 100, 60, 255 });
+static Image GenerateCamoTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 80, 90, 60, 255 });
     unsigned char *data = (unsigned char *)img.data;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            float grain = sinf(x * 0.1f + FractalNoise(x, y, 4, 0.5f) * 3.0f) * 0.5f + 0.5f;
-            float n = FractalNoise(x + 100, y + 100, 3, 0.5f);
+            float n1 = FractalNoise(x, y, 4, 0.5f);
+            float n2 = FractalNoise(x + 100, y + 100, 3, 0.6f);
             int idx = (y * width + x) * 4;
-            int shade = (int)(130 + grain * 40 + n * 20);
-            if (shade > 255) shade = 255;
-            if (shade < 80) shade = 80;
-            data[idx + 0] = (unsigned char)(shade + 10);
-            data[idx + 1] = (unsigned char)(shade - 5);
-            data[idx + 2] = (unsigned char)(shade - 30);
+            int base = (int)(75 + n1 * 40 + n2 * 20);
+            if (base > 255) base = 255;
+            if (base < 40) base = 40;
+            int r = base;
+            int g = (int)(base + 10 + n2 * 15);
+            int b = (int)(base - 15 + n1 * 10);
+            if (g > 255) g = 255;
+            if (b < 30) b = 30;
+            data[idx + 0] = (unsigned char)r;
+            data[idx + 1] = (unsigned char)g;
+            data[idx + 2] = (unsigned char)b;
             data[idx + 3] = 255;
         }
+    }
+    for (int i = 0; i < 60; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int w = 20 + rand() % 80;
+        int h = 10 + rand() % 40;
+        int angle = rand() % 360;
+        Color patch1 = { 50, 65, 35, 200 };
+        Color patch2 = { 110, 100, 70, 180 };
+        ImageDrawRectangle(&img, cx, cy, w, h, i % 2 == 0 ? patch1 : patch2);
+    }
+    for (int i = 0; i < 200; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 1 + rand() % 3;
+        ImageDrawCircle(&img, cx, cy, r, (Color){ 60, 75, 40, 150 });
+    }
+    return img;
+}
+
+static Image GenerateFenceTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 55, 55, 60, 255 });
+    unsigned char *data = (unsigned char *)img.data;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            float n = FractalNoise(x, y, 3, 0.5f);
+            int idx = (y * width + x) * 4;
+            int shade = (int)(50 + n * 25);
+            if (shade > 255) shade = 255;
+            if (shade < 30) shade = 30;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)shade;
+            data[idx + 2] = (unsigned char)(shade + 3);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 80; i++) {
+        int x1 = rand() % width;
+        int y1 = rand() % height;
+        int len = 10 + rand() % 40;
+        Color scratch = { 40, 40, 45, 120 };
+        ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 5 - 2), scratch);
+    }
+    for (int i = 0; i < 30; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 2 + rand() % 8;
+        Color rust = { 100, 70, 50, 140 };
+        ImageDrawCircle(&img, cx, cy, r, rust);
+    }
+    return img;
+}
+
+static Image GenerateContainerTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 160, 70, 50, 255 });
+    unsigned char *data = (unsigned char *)img.data;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            float n = FractalNoise(x + 300, y + 300, 4, 0.5f);
+            int idx = (y * width + x) * 4;
+            int shade = (int)(155 + n * 35);
+            if (shade > 255) shade = 255;
+            if (shade < 90) shade = 90;
+            data[idx + 0] = (unsigned char)(shade + 10);
+            data[idx + 1] = (unsigned char)(shade - 30);
+            data[idx + 2] = (unsigned char)(shade - 40);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 15; i++) {
+        int x1 = rand() % width;
+        int y1 = rand() % height;
+        int len = 30 + rand() % 100;
+        Color peel = { 120, 50, 30, 160 };
+        ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 10 - 5), peel);
+    }
+    for (int i = 0; i < 40; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 2 + rand() % 10;
+        Color rust = { 140, 90, 40, 180 };
+        ImageDrawCircle(&img, cx, cy, r, rust);
     }
     for (int i = 0; i < 20; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
         int r = 5 + rand() % 20;
-        Color knot = { 90, 60, 30, 200 };
+        Color dent = { 100, 45, 30, 120 };
+        ImageDrawCircle(&img, cx, cy, r, dent);
+    }
+    return img;
+}
+
+static Image GenerateWoodTexture(int width, int height) {
+    Image img = GenImageColor(width, height, (Color){ 120, 85, 50, 255 });
+    unsigned char *data = (unsigned char *)img.data;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            float grain = sinf(x * 0.08f + FractalNoise(x, y, 4, 0.5f) * 3.5f) * 0.5f + 0.5f;
+            float n = FractalNoise(x + 100, y + 100, 3, 0.5f);
+            int idx = (y * width + x) * 4;
+            int shade = (int)(110 + grain * 35 + n * 25);
+            if (shade > 255) shade = 255;
+            if (shade < 60) shade = 60;
+            data[idx + 0] = (unsigned char)(shade + 8);
+            data[idx + 1] = (unsigned char)(shade - 8);
+            data[idx + 2] = (unsigned char)(shade - 30);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 25; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 4 + rand() % 18;
+        Color knot = { 70, 45, 20, 210 };
         ImageDrawCircle(&img, cx, cy, r, knot);
+    }
+    for (int i = 0; i < 30; i++) {
+        int x1 = rand() % width;
+        int y1 = rand() % height;
+        int len = 10 + rand() % 40;
+        Color crack = { 70, 40, 20, 160 };
+        ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 6 - 3), crack);
     }
     return img;
 }
@@ -508,6 +629,17 @@ void TextureGenerate(ProceduralTextures *textures) {
     textures->wood = LoadTextureFromImage(GenerateWoodTexture(512, 512));
     textures->fireGlow = LoadTextureFromImage(GenerateFireGlowTexture(256, 256));
 
+    textures->camo = LoadTextureFromImage(GenerateCamoTexture(512, 512));
+    textures->fence = LoadTextureFromImage(GenerateFenceTexture(512, 512));
+
+    Image containerImg = GenerateContainerTexture(512, 512);
+    Image containerHeight = ExtractGrayscaleHeightMap(containerImg);
+    Image containerNormal = GenerateNormalMapFromHeightMap(containerHeight, 2.0f);
+    textures->container = LoadTextureFromImage(containerImg);
+    textures->containerNormal = LoadTextureFromImage(containerNormal);
+    UnloadImage(containerImg);
+    UnloadImage(containerNormal);
+
     textures->generated = true;
 }
 
@@ -533,6 +665,10 @@ void TextureShutdown(ProceduralTextures *textures) {
         UnloadTexture(textures->brick);
         UnloadTexture(textures->wood);
         UnloadTexture(textures->fireGlow);
+        UnloadTexture(textures->camo);
+        UnloadTexture(textures->fence);
+        UnloadTexture(textures->container);
+        UnloadTexture(textures->containerNormal);
         textures->generated = false;
     }
 }

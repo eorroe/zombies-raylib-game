@@ -109,8 +109,11 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
         player->moveDir = (Vector3){ 0 };
     }
     
-    player->yaw -= input->mouseDelta.x * 0.003f;
-    player->pitch -= input->mouseDelta.y * 0.003f;
+    Vector2 mouseDelta = InputGetMouseDelta(input);
+    if (fabsf(mouseDelta.x) < 100.0f && fabsf(mouseDelta.y) < 100.0f) {
+        player->yaw -= mouseDelta.x * 0.003f;
+        player->pitch -= mouseDelta.y * 0.003f;
+    }
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }
 

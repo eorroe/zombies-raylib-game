@@ -24,6 +24,10 @@ typedef struct {
     Texture2D barrelNormal;
     Texture2D crate;
     Texture2D crateNormal;
+    Texture2D camo;
+    Texture2D fence;
+    Texture2D container;
+    Texture2D containerNormal;
     bool generated;
 } ProceduralTextures;
 
@@ -31,9 +35,11 @@ void TextureGenerate(ProceduralTextures *textures);
 void TextureShutdown(ProceduralTextures *textures);
 Texture2D TextureCreateBloodSplatter(int width, int height);
 Texture2D TextureCreateZombieSkin(int width, int height);
+Texture2D TextureCreateNoiseTexture(int width, int height, float intensity);
 Texture2D TextureCreateUniformTexture(int width, int height);
 Texture2D TextureCreateConcreteTexture(int width, int height);
 Texture2D TextureCreateMetalTexture(int width, int height);
+float FractalNoise(int x, int y, int octaves, float persistence);
 Texture2D TextureCreateNoiseTexture(int width, int height, float intensity);
 
 #endif

@@ -34,7 +34,7 @@ static void SpawnImageZombie(Game *game, int texIdx) {
 
 static void SpawnWave(Game *game) {
     game->round++;
-    game->zombiesRemaining = 10 + game->round * 5;
+    game->zombiesRemaining = 30 + game->round * 10;
     if (game->zombiesRemaining > MAX_ZOMBIES) game->zombiesRemaining = MAX_ZOMBIES;
     game->nonImageDeathsSinceLastImage = 0;
     bool usedImages[16] = { false };
@@ -45,24 +45,54 @@ static void SpawnWave(Game *game) {
         imageCount = 1;
         usedImages[rand() % game->zombieHeadTextureCount] = true;
     }
-    for (int i = 0; i < game->zombiesRemaining; i++) {
-        float angle = (float)i / game->zombiesRemaining * 2.0f * PI + (rand() % 100) / 5000.0f;
-        float radius = 5.0f + rand() % 12;
-        Vector3 pos = {
-            cosf(angle) * radius,
-            0,
-            sinf(angle) * radius
-        };
+    
+    int fenceZombies = 8 + game->round * 3;
+    int groupCount = 4 + game->round;
+    float groupSpacing = 15.0f / (float)groupCount;
+    
+    for (int g = 0; g < groupCount && game->zombieCount < game->zombiesRemaining; g++) {
+        int groupSize = 4 + rand() % 6;
+        float groupCenterX = -4.0f + (rand() % 8);
+        float groupCenterZ = 6.0f + g * groupSpacing;
+        
+        for (int j = 0; j < groupSize && game->zombieCount < game->zombiesRemaining; j++) {
+            float offsetX = (rand() % 100 - 50) / 40.0f;
+            float offsetZ = (rand() % 100 - 50) / 40.0f;
+            Vector3 pos = {
+                groupCenterX + offsetX,
+                0,
+                groupCenterZ + offsetZ
+            };
+            ZombieType type = ZOMBIE_TYPE_DEFAULT;
+            int texIdx = 0;
+            if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
+                type = ZOMBIE_TYPE_IMAGE_HEAD;
+                texIdx = game->zombieCount % game->zombieHeadTextureCount;
+            } else if (game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0 && game->zombieCount == 0 && imageCount > 0) {
+                type = ZOMBIE_TYPE_IMAGE_HEAD;
+                for (int k = 0; k < game->zombieHeadTextureCount; k++) {
+                    if (usedImages[k]) { texIdx = k; break; }
+                }
+            }
+            SpawnZombie(game, pos, type, texIdx);
+        }
+    }
+    
+    for (int i = 0; i < fenceZombies && game->zombieCount < game->zombiesRemaining; i++) {
+        float x = -4.0f + (rand() % 8);
+        Vector3 pos = { x, 0, 4.5f + (rand() % 100) / 50.0f };
+        SpawnZombie(game, pos, ZOMBIE_TYPE_DEFAULT, 0);
+    }
+    
+    for (int i = game->zombieCount; i < game->zombiesRemaining; i++) {
+        float x = -6.0f + rand() % 12;
+        float z = 5.0f + rand() % 15;
+        Vector3 pos = { x, 0, z };
         ZombieType type = ZOMBIE_TYPE_DEFAULT;
         int texIdx = 0;
         if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
             type = ZOMBIE_TYPE_IMAGE_HEAD;
             texIdx = i % game->zombieHeadTextureCount;
-        } else if (game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0 && i == 0 && imageCount > 0) {
-            type = ZOMBIE_TYPE_IMAGE_HEAD;
-            for (int j = 0; j < game->zombieHeadTextureCount; j++) {
-                if (usedImages[j]) { texIdx = j; break; }
-            }
         }
         SpawnZombie(game, pos, type, texIdx);
     }
@@ -87,7 +117,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->muzzleFlashTimer = 0.0f;
     game->muzzleFlashPos = (Vector3){ 0 };
     
-    PlayerInit(&game->player, (Vector3){ 0, 0, 0 }, game->shaders.pbr);
+    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
     WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
     
@@ -162,6 +192,69 @@ static void GameApplyCollisions(Game *game) {
             } else {
                 game->player.position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
             }
+        }
+    }
+    
+    for (int i = 0; i < 6; i++) {
+        float x = -10.0f + i * 3.5f;
+        float z = -6.0f - (i % 2) * 1.0f;
+        Vector3 containerPos = { x, 0.6f, z };
+        Vector3 containerSize = { 2.4f, 1.2f, 6.0f };
+        if (PointInAABB(p, containerPos, containerSize)) {
+            float dx = p.x - containerPos.x;
+            float dz = p.z - containerPos.z;
+            float halfX = containerSize.x * 0.5f + radius;
+            float halfZ = containerSize.z * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->player.position.x = containerPos.x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->player.position.z = containerPos.z + (dz > 0 ? halfZ : -halfZ);
+            }
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        float x = -10.0f + i * 3.5f;
+        float z = -10.0f;
+        Vector3 containerPos = { x, 0.6f, z };
+        Vector3 containerSize = { 2.4f, 1.2f, 6.0f };
+        if (PointInAABB(p, containerPos, containerSize)) {
+            float dx = p.x - containerPos.x;
+            float dz = p.z - containerPos.z;
+            float halfX = containerSize.x * 0.5f + radius;
+            float halfZ = containerSize.z * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->player.position.x = containerPos.x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->player.position.z = containerPos.z + (dz > 0 ? halfZ : -halfZ);
+            }
+        }
+    }
+    
+    Vector3 fenceCenter = { 0, 0.6f, 8.5f };
+    Vector3 fenceSize = { 30.0f, 1.2f, 2.0f };
+    if (PointInAABB(p, fenceCenter, fenceSize)) {
+        float dx = p.x - fenceCenter.x;
+        float dz = p.z - fenceCenter.z;
+        float halfX = fenceSize.x * 0.5f + radius;
+        float halfZ = fenceSize.z * 0.5f + radius;
+        if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+            game->player.position.x = fenceCenter.x + (dx > 0 ? halfX : -halfX);
+        } else {
+            game->player.position.z = fenceCenter.z + (dz > 0 ? halfZ : -halfZ);
+        }
+    }
+    
+    Vector3 platformCenter = { 10.0f, 0.3f, 3.0f };
+    Vector3 platformSize = { 4.5f, 0.6f, 1.5f };
+    if (PointInAABB(p, platformCenter, platformSize)) {
+        float dx = p.x - platformCenter.x;
+        float dz = p.z - platformCenter.z;
+        float halfX = platformSize.x * 0.5f + radius;
+        float halfZ = platformSize.z * 0.5f + radius;
+        if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+            game->player.position.x = platformCenter.x + (dx > 0 ? halfX : -halfX);
+        } else {
+            game->player.position.z = platformCenter.z + (dz > 0 ? halfZ : -halfZ);
         }
     }
     
@@ -254,6 +347,52 @@ static void GameApplyZombieCollisions(Game *game) {
                 } else {
                     game->zombies[i].position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
                 }
+            }
+        }
+        
+        for (int c = 0; c < 10; c++) {
+            float x = -10.0f + c * 3.5f;
+            float z = (c < 6) ? (-6.0f - (c % 2) * 1.0f) : (-10.0f);
+            Vector3 containerPos = { x, 0.6f, z };
+            Vector3 containerSize = { 2.4f, 1.2f, 6.0f };
+            if (PointInAABB(p, containerPos, containerSize)) {
+                float dx = p.x - containerPos.x;
+                float dz = p.z - containerPos.z;
+                float halfX = containerSize.x * 0.5f + radius;
+                float halfZ = containerSize.z * 0.5f + radius;
+                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                    game->zombies[i].position.x = containerPos.x + (dx > 0 ? halfX : -halfX);
+                } else {
+                    game->zombies[i].position.z = containerPos.z + (dz > 0 ? halfZ : -halfZ);
+                }
+            }
+        }
+        
+        Vector3 fenceCenter = { 0, 0.6f, 8.5f };
+        Vector3 fenceSize = { 30.0f, 1.2f, 2.0f };
+        if (PointInAABB(p, fenceCenter, fenceSize)) {
+            float dx = p.x - fenceCenter.x;
+            float dz = p.z - fenceCenter.z;
+            float halfX = fenceSize.x * 0.5f + radius;
+            float halfZ = fenceSize.z * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->zombies[i].position.x = fenceCenter.x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->zombies[i].position.z = fenceCenter.z + (dz > 0 ? halfZ : -halfZ);
+            }
+        }
+        
+        Vector3 platformCenter = { 10.0f, 0.3f, 3.0f };
+        Vector3 platformSize = { 4.5f, 0.6f, 1.5f };
+        if (PointInAABB(p, platformCenter, platformSize)) {
+            float dx = p.x - platformCenter.x;
+            float dz = p.z - platformCenter.z;
+            float halfX = platformSize.x * 0.5f + radius;
+            float halfZ = platformSize.z * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->zombies[i].position.x = platformCenter.x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->zombies[i].position.z = platformCenter.z + (dz > 0 ? halfZ : -halfZ);
             }
         }
         

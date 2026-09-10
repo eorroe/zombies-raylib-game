@@ -29,11 +29,15 @@ static void SetModelTexture(Model *model, Texture2D tex) {
 void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->position = startPos;
     player->velocity = (Vector3){ 0 };
+    player->velocityY = 0.0f;
+    player->isGrounded = true;
     player->health = PLAYER_HEALTH;
     player->maxHealth = PLAYER_HEALTH;
     player->yaw = 0.0f;
     player->pitch = 0.0f;
     player->isMoving = false;
+    player->isSprinting = false;
+    player->isCrouching = false;
     player->footstepTimer = 0.0f;
     player->animTime = 0.0f;
     player->moveDir = (Vector3){ 0 };
@@ -101,12 +105,31 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
     
     if (player->isMoving) {
         moveDir = Vector3Normalize(moveDir);
-        player->velocity = Vector3Scale(moveDir, PLAYER_SPEED);
+        float speed = PLAYER_SPEED;
+        if (input->shiftPressed) speed = PLAYER_SPRINT_SPEED;
+        player->velocity = Vector3Scale(moveDir, speed);
         player->position = Vector3Add(player->position, Vector3Scale(player->velocity, dt));
         player->animTime += dt * 8.0f;
         player->moveDir = moveDir;
     } else {
         player->moveDir = (Vector3){ 0 };
+    }
+    
+    player->isSprinting = input->shiftPressed && player->isMoving;
+    player->isCrouching = input->ctrlPressed;
+    
+    if (input->spacePressed && player->isGrounded) {
+        player->velocityY = PLAYER_JUMP_FORCE;
+        player->isGrounded = false;
+    }
+    
+    player->velocityY -= PLAYER_GRAVITY * dt;
+    player->position.y += player->velocityY * dt;
+    
+    if (player->position.y <= 0.0f) {
+        player->position.y = 0.0f;
+        player->velocityY = 0.0f;
+        player->isGrounded = true;
     }
     
     Vector2 mouseDelta = InputGetMouseDelta(input);

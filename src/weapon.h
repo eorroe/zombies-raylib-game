@@ -28,7 +28,6 @@ typedef struct {
     bool reloading;
     float reloadTimer;
     float recoil;
-    bool scopeActive;
     Model model;
     float muzzleFlashTimer;
     float swayTimer;
@@ -38,6 +37,7 @@ typedef struct {
 void WeaponInit(Weapon *weapon, Shader pbr);
 void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt);
 void WeaponRender(Weapon *weapon, Camera3D camera, float yaw);
+void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw);
 void WeaponShoot(Weapon *weapon);
 void WeaponReload(Weapon *weapon);
 bool WeaponCanShoot(Weapon *weapon);

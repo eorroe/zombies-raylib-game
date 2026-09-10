@@ -24,7 +24,6 @@ typedef struct Game {
     int round;
     int zombiesRemaining;
     float gameTime;
-    bool scopeActive;
     bool firstShotFired;
     float firstShotGraceTimer;
     int nonImageDeathsSinceLastImage;

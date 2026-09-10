@@ -107,7 +107,6 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->round = 0;
     game->nonImageDeathsSinceLastImage = 0;
     game->gameTime = 0.0f;
-    game->scopeActive = false;
     game->firstShotFired = false;
     game->firstShotGraceTimer = 0.3f;
     game->zombieCount = 0;
@@ -117,13 +116,13 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->muzzleFlashTimer = 0.0f;
     game->muzzleFlashPos = (Vector3){ 0 };
     
+    RendererInit(game, screenWidth, screenHeight);
     PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
     WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
     
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
-    RendererInit(game, screenWidth, screenHeight);
     game->mode = game->menu.mode;
     game->zombieMode = game->menu.zombieMode;
     
@@ -491,15 +490,18 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (input->mouseLeftPressed) {
-        CameraSetAiming(&game->camera, true);
+    if (input->cameraTogglePressed) {
+        CameraToggleMode(&game->camera);
     }
     
-    if (input->mouseLeftReleased) {
-        CameraSetAiming(&game->camera, false);
+    if (input->mouseRightDown) {
+        CameraSetMode(&game->camera, GAME_CAMERA_MODE_FIRST_PERSON);
+    } else {
+        CameraSetMode(&game->camera, game->camera.baseMode);
     }
+    CameraSetCrouch(&game->camera, input->ctrlPressed);
     
-    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
+    if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
         WeaponShoot(&game->weapon);
         AudioPlayGunshot(&game->audio);
         game->firstShotFired = true;
@@ -616,9 +618,6 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     
     
     if (IsKeyPressed(KEY_R)) WeaponReload(&game->weapon);
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) game->scopeActive = !game->scopeActive;
-    if (game->scopeActive) CameraApplyScope(&game->camera, true);
-    else CameraApplyScope(&game->camera, false);
     
     ParticleSystemUpdate(game->particles, game->particleCount, dt);
     
@@ -639,10 +638,12 @@ void GameRender(Game *game) {
     RendererDrawScene(game);
     RendererDrawBloodDecals(game);
     RendererDrawZombies(game, game->shaders.pbr);
-    if (CameraGetFirstPersonBlend(&game->camera) < 0.5f) {
+    if (CameraGetMode(&game->camera) == GAME_CAMERA_MODE_THIRD_PERSON) {
         RendererDrawPlayer(&game->player, game->shaders.pbr);
+        WeaponRender(&game->weapon, cam, game->player.yaw);
+    } else {
+        WeaponRenderFirstPerson(&game->weapon, cam, game->player.yaw);
     }
-    WeaponRender(&game->weapon, cam, game->player.yaw);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
     RendererDrawZombieHeads(game);
@@ -675,9 +676,8 @@ int main(void) {
     
     Game game = { 0 };
     UIInit(&game.menu, screenWidth, screenHeight);
-    game.menu.active = false;
-    game.state = GAME_STATE_PLAYING;
-    GameInit(&game, screenWidth, screenHeight);
+    game.menu.active = true;
+    game.state = GAME_STATE_MENU;
     
     InputState input;
     int frameCount = 0;

@@ -195,11 +195,11 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
             zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
         }
         
-        if (fabsf(zombie->position.z - FENCE_Z) < 0.8f && zombie->position.z < FENCE_Z + 0.5f) {
+        if (fabsf(zombie->position.z - FENCE_Z) < 0.8f && zombie->position.z > FENCE_Z) {
             zombie->position.z += dt * 1.5f;
+            if (zombie->position.z > FENCE_Z + 0.5f) zombie->position.z = FENCE_Z + 0.5f;
             zombie->position.y += dt * 0.8f;
             if (zombie->position.y > 1.2f) zombie->position.y = 1.2f;
-            if (zombie->position.z > FENCE_Z + 0.5f) zombie->position.z = FENCE_Z + 0.5f;
         }
     }
     if (zombie->attackCooldown > 0) zombie->attackCooldown -= dt;
@@ -288,7 +288,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     DrawModelEx(zombie->pelvisModel, pelvisPos, (Vector3){ 0, 1, 0 }, zombie->yaw * RAD2DEG, (Vector3){ 1, 1, 1 }, bodyColor);
 
     if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
-        Vector3 headOffset = (Vector3){ 0.0f, headCenterY - torsoPos.y + torsoCenterY * 0.5f, 0.0f };
+        Vector3 headOffset = (Vector3){ 0.0f, headCenterY - torsoPos.y, 0.0f };
         Vector3 headPos = Vector3Add(torsoPos, RotateOffsetY(headOffset, cosYaw, sinYaw));
         float headY = headPos.y;
         if (zombie->dying) {
@@ -307,8 +307,8 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         }
         DrawModelEx(zombie->headModel, (Vector3){ headPos.x, headY, headPos.z }, (Vector3){ 0, 1, 0 }, zombie->yaw * RAD2DEG, (Vector3){ 1, 1, 1 }, headColor);
         if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
-            Vector3 jawOffset = (Vector3){ 0.0f, headY - torsoPos.y + torsoCenterY * 0.5f - zombie->headRadius * 0.3f, zombie->headRadius * 0.4f };
-            Vector3 jawPos = Vector3Add(torsoPos, RotateOffsetY(jawOffset, cosYaw, sinYaw));
+            Vector3 jawOffset = (Vector3){ 0.0f, -zombie->headRadius * 0.3f, zombie->headRadius * 0.4f };
+            Vector3 jawPos = Vector3Add(headPos, RotateOffsetY(jawOffset, cosYaw, sinYaw));
             float jawY = jawPos.y;
             if (zombie->dying) {
                 float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);

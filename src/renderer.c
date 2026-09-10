@@ -79,6 +79,11 @@ void RendererDrawScene(Game *game) {
         DrawPlane((Vector3){ 0, 0.006f, sz + 7 }, (Vector2){ 89.6f, 5.2f }, (Color){ 185, 180, 170, 255 });
     }
 
+    for (int cx = -42; cx <= 42; cx += 12) {
+        DrawPlane((Vector3){ cx + 6, 0.007f, 3.5f }, (Vector2){ 4.0f, 1.0f }, (Color){ 220, 215, 205, 255 });
+        DrawPlane((Vector3){ cx + 6, 0.008f, 3.5f }, (Vector2){ 3.8f, 0.8f }, (Color){ 235, 230, 220, 255 });
+    }
+
     for (int i = 0; i < 24; i++) {
         float angle = i * PI * 0.25f;
         float radius = 6.0f + (i % 3) * 4.0f;

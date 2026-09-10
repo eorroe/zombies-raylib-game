@@ -247,16 +247,20 @@ void PlayerRender(Player *player, Shader shader) {
     float armAngleY = -0.8f;
     Vector3 armOffsetDir = (Vector3){ armAngleX, armAngleY, 0.0f };
     Vector3 armOffsetDirRotated = RotateOffsetY(armOffsetDir, cosYaw, sinYaw);
+    Vector3 armOffsetDirRight = RotateOffsetY((Vector3){ -armAngleX, armAngleY, 0.0f }, cosYaw, sinYaw);
     Vector3 legOffsetDirUpper = (Vector3){ -0.2f, -1.0f, 0.0f };
     Vector3 legOffsetDirLower = (Vector3){ -0.15f, -1.0f, 0.0f };
     Vector3 legOffsetDirRotatedUpper = RotateOffsetY(legOffsetDirUpper, cosYaw, sinYaw);
     Vector3 legOffsetDirRotatedLower = RotateOffsetY(legOffsetDirLower, cosYaw, sinYaw);
 
-    DrawLimb(player->leftUpperArm, shoulderL, armOffsetDirRotated, zombieRight, armSwing, 0.55f);
-    DrawLimb(player->leftLowerArm, Vector3Add(shoulderL, RotateOffsetY((Vector3){ armAngleX * 0.55f, armAngleY * 0.55f, 0.0f }, cosYaw, sinYaw)), RotateOffsetY((Vector3){ armAngleX * 0.7f, armAngleY * 0.8f, 0.0f }, cosYaw, sinYaw), zombieRight, armSwing * 1.3f, 0.5f);
+    Vector3 elbowL = Vector3Add(shoulderL, Vector3Scale(armOffsetDirRotated, 0.55f));
+    Vector3 elbowR = Vector3Add(shoulderR, Vector3Scale(armOffsetDirRight, 0.55f));
 
-    DrawLimb(player->rightUpperArm, shoulderR, RotateOffsetY((Vector3){ -armAngleX, armAngleY, 0.0f }, cosYaw, sinYaw), zombieRight, -armSwing, 0.55f);
-    DrawLimb(player->rightLowerArm, Vector3Add(shoulderR, RotateOffsetY((Vector3){ -armAngleX * 0.55f, armAngleY * 0.55f, 0.0f }, cosYaw, sinYaw)), RotateOffsetY((Vector3){ -armAngleX * 0.7f, armAngleY * 0.8f, 0.0f }, cosYaw, sinYaw), zombieRight, -armSwing * 1.3f, 0.5f);
+    DrawLimb(player->leftUpperArm, shoulderL, armOffsetDirRotated, zombieRight, armSwing, 0.55f);
+    DrawLimb(player->leftLowerArm, elbowL, armOffsetDirRotated, zombieRight, armSwing * 1.3f, 0.5f);
+
+    DrawLimb(player->rightUpperArm, shoulderR, armOffsetDirRight, zombieRight, -armSwing, 0.55f);
+    DrawLimb(player->rightLowerArm, elbowR, armOffsetDirRight, zombieRight, -armSwing * 1.3f, 0.5f);
 
     DrawLimb(player->leftUpperLeg, hipL, legOffsetDirRotatedUpper, zombieRight, legSwing, 0.45f);
     DrawLimb(player->leftLowerLeg, Vector3Add(hipL, RotateOffsetY((Vector3){ -0.2f * 0.45f, -1.0f * 0.45f, 0.0f }, cosYaw, sinYaw)), legOffsetDirRotatedLower, zombieRight, legSwing * 1.2f, 0.45f);
@@ -264,8 +268,10 @@ void PlayerRender(Player *player, Shader shader) {
     DrawLimb(player->rightUpperLeg, hipR, RotateOffsetY((Vector3){ 0.2f, -1.0f, 0.0f }, cosYaw, sinYaw), zombieRight, -legSwing, 0.45f);
     DrawLimb(player->rightLowerLeg, Vector3Add(hipR, RotateOffsetY((Vector3){ 0.2f * 0.45f, -1.0f * 0.45f, 0.0f }, cosYaw, sinYaw)), RotateOffsetY((Vector3){ 0.15f, -1.0f, 0.0f }, cosYaw, sinYaw), zombieRight, -legSwing * 1.2f, 0.45f);
 
-    Vector3 leftHandPos = Vector3Add(shoulderL, RotateOffsetY((Vector3){ armAngleX * 0.55f, armAngleY * 0.55f + 0.5f * 0.5f, 0.0f }, cosYaw, sinYaw));
-    Vector3 rightHandPos = Vector3Add(shoulderR, RotateOffsetY((Vector3){ -armAngleX * 0.55f, armAngleY * 0.55f + 0.5f * 0.5f, 0.0f }, cosYaw, sinYaw));
+    Vector3 wristL = Vector3Add(elbowL, Vector3Scale(armOffsetDirRotated, 0.5f));
+    Vector3 wristR = Vector3Add(elbowR, Vector3Scale(armOffsetDirRight, 0.5f));
+    Vector3 leftHandPos = wristL;
+    Vector3 rightHandPos = wristR;
     DrawModelEx(player->leftHandModel, leftHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
     DrawModelEx(player->rightHandModel, rightHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 

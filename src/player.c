@@ -30,6 +30,23 @@ static void DrawLimb(Model model, Vector3 origin, Vector3 offsetDir, Vector3 rot
     DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
+static void DrawBone(Model model, Vector3 start, Vector3 end, float meshLength, Color color) {
+    Vector3 mid = Vector3Scale(Vector3Add(start, end), 0.5f);
+    Vector3 dir = Vector3Normalize(Vector3Subtract(end, start));
+    float segmentLength = Vector3Length(Vector3Subtract(end, start));
+
+    Vector3 up = (Vector3){0, 1, 0};
+    Vector3 axis = Vector3CrossProduct(up, dir);
+    float angle = 0.0f;
+    if (Vector3Length(axis) > 0.001f) {
+        axis = Vector3Normalize(axis);
+        angle = acosf(Clamp(Vector3DotProduct(up, dir), -1.0f, 1.0f)) * RAD2DEG;
+    }
+
+    float scaleY = segmentLength / meshLength;
+    DrawModelEx(model, mid, axis, angle, (Vector3){ 1, scaleY, 1 }, color);
+}
+
 void PlayerInit(Player *player, Vector3 startPos, Shader pbr, ProceduralTextures *textures) {
     player->position = startPos;
     player->velocity = (Vector3){ 0 };
@@ -256,11 +273,11 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 elbowL = Vector3Add(shoulderL, Vector3Scale(armOffsetDirRotated, 0.55f));
     Vector3 elbowR = Vector3Add(shoulderR, Vector3Scale(armOffsetDirRight, 0.55f));
 
-    DrawLimb(player->leftUpperArm, shoulderL, armOffsetDirRotated, zombieRight, armSwing, 0.55f);
-    DrawLimb(player->leftLowerArm, elbowL, armOffsetDirRotated, zombieRight, armSwing * 1.3f, 0.5f);
+    DrawBone(player->leftUpperArm, shoulderL, elbowL, 0.55f, WHITE);
+    DrawBone(player->leftLowerArm, elbowL, Vector3Add(elbowL, Vector3Scale(armOffsetDirRotated, 0.5f)), 0.5f, WHITE);
 
-    DrawLimb(player->rightUpperArm, shoulderR, armOffsetDirRight, zombieRight, -armSwing, 0.55f);
-    DrawLimb(player->rightLowerArm, elbowR, armOffsetDirRight, zombieRight, -armSwing * 1.3f, 0.5f);
+    DrawBone(player->rightUpperArm, shoulderR, elbowR, 0.55f, WHITE);
+    DrawBone(player->rightLowerArm, elbowR, Vector3Add(elbowR, Vector3Scale(armOffsetDirRight, 0.5f)), 0.5f, WHITE);
 
     DrawLimb(player->leftUpperLeg, hipL, legOffsetDirRotatedUpper, zombieRight, legSwing, 0.45f);
     DrawLimb(player->leftLowerLeg, Vector3Add(hipL, RotateOffsetY((Vector3){ -0.2f * 0.45f, -1.0f * 0.45f, 0.0f }, cosYaw, sinYaw)), legOffsetDirRotatedLower, zombieRight, legSwing * 1.2f, 0.45f);

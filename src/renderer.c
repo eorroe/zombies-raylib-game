@@ -444,6 +444,9 @@ void RendererDrawScope(Game *game) {
 void RendererEnd(Game *game) {
     (void)game;
     EndMode3D();
+    EndTextureMode();
+    
+    DrawTextureRec(game->sceneTarget.texture, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, (float)-game->sceneTarget.texture.height }, (Vector2){ 0, 0 }, WHITE);
 }
 
 void RendererShutdown(Game *game) {

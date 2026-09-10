@@ -86,13 +86,44 @@ static const char *pbrFragShader =
     "    for (int i = 0; i < 8; i++) {\n"
     "        if (i >= lightCount) break;\n"
     "        vec3 L = normalize(lightPos[i] - fragPosition);\n"
-    "        float diff = max(dot(N, L), 0.0);\n"
-    "        float attenuation = 1.0 / (1.0 + 0.08 * length(lightPos[i] - fragPosition));\n"
-    "        vec3 radiance = lightCol[i] * attenuation * 1.2;\n"
-    "        Lo += albedo * diff * radiance;\n"
+    "        vec3 H = normalize(V + L);\n"
+    "        float dist = length(lightPos[i] - fragPosition);\n"
+    "        float attenuation = 1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist);\n"
+    "        vec3 radiance = lightCol[i] * attenuation;\n"
+
+    "        float NDF = DistributionGGX(N, H, roughness);\n"
+    "        float G   = GeometrySmith(N, V, L, roughness);\n"
+    "        vec3 F    = FresnelSchlick(max(dot(H, V), 0.0), F0);\n"
+
+    "        vec3 kS = F;\n"
+    "        vec3 kD = (1.0 - kS) * (1.0 - metallic);\n"
+
+    "        vec3 numerator    = NDF * G * F;\n"
+    "        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);\n"
+    "        vec3 specular     = numerator / max(denominator, 0.001);\n"
+
+    "        float NdotL = max(dot(N, L), 0.0);\n"
+    "        Lo += (kD * albedo / PI + specular) * radiance * NdotL;\n"
     "    }\n"
-    "    vec3 ambient = albedo * 0.55;\n"
-    "    finalColor = vec4(ambient + Lo, 1.0);\n"
+    "    vec3 Ldir = normalize(dirLightDir);\n"
+    "    float NdotLdir = max(dot(N, Ldir), 0.0);\n"
+    "    vec3 dirRadiance = dirLightCol * NdotLdir * 10.0;\n"
+    "    vec3 Hdir = normalize(V + Ldir);\n"
+    "    vec3 Fdir = FresnelSchlick(max(dot(Hdir, V), 0.0), F0);\n"
+    "    vec3 kSdir = Fdir;\n"
+    "    vec3 kDdir = (1.0 - kSdir) * (1.0 - metallic);\n"
+    "    Lo += kDdir * albedo * dirRadiance + kSdir * dirRadiance;\n"
+
+    "    vec3 ambient = vec3(0.05, 0.05, 0.08) * albedo * ao;\n"
+
+    "    vec3 color = ambient + Lo;\n"
+
+    "    float fogFactor = 1.0 - exp(-fogDensity * fogDensity * length(fragPosition) * length(fragPosition));\n"
+    "    color = mix(color, fogColor, clamp(fogFactor, 0.0, 1.0));\n"
+
+    "    color = color / (color + vec3(1.0));\n"
+    "    color = pow(color, vec3(1.0 / 2.2));\n"
+    "    finalColor = vec4(color, 1.0);\n"
     "}\n";
 
 static const char *postVertShader = 

@@ -65,12 +65,23 @@ void RendererBegin(Game *game, Camera3D camera) {
 void RendererDrawScene(Game *game) {
     (void)game;
 
-    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 50, 50 }, (Color){ 210, 205, 195, 255 });
-    DrawGrid(50, 1.0f);
+    DrawPlane((Vector3){ 0, 0, 0 }, (Vector2){ 100, 100 }, (Color){ 210, 205, 195, 255 });
+    DrawGrid(100, 1.0f);
 
-    for (int i = 0; i < 16; i++) {
+    for (int sx = -48; sx <= 48; sx += 12) {
+        DrawPlane((Vector3){ sx + 6, 0.005f, 3.5f }, (Vector2){ 5.4f, 13.0f }, (Color){ 200, 195, 185, 255 });
+        DrawPlane((Vector3){ sx + 6, 0.006f, 3.5f }, (Vector2){ 5.2f, 12.8f }, (Color){ 190, 185, 175, 255 });
+    }
+
+    for (int sz = -38; sz <= 48; sz += 14) {
+        if (fabsf(sz) < 4.0f) continue;
+        DrawPlane((Vector3){ 0, 0.005f, sz + 7 }, (Vector2){ 90, 5.4f }, (Color){ 195, 190, 180, 255 });
+        DrawPlane((Vector3){ 0, 0.006f, sz + 7 }, (Vector2){ 89.6f, 5.2f }, (Color){ 185, 180, 170, 255 });
+    }
+
+    for (int i = 0; i < 24; i++) {
         float angle = i * PI * 0.25f;
-        float radius = 5.0f + (i % 3) * 3.0f;
+        float radius = 6.0f + (i % 3) * 4.0f;
         Vector3 cratePos = {
             cosf(angle) * radius,
             0.3f,
@@ -80,9 +91,9 @@ void RendererDrawScene(Game *game) {
         DrawCubeWires(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 40, 40, 45, 255 });
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 14; i++) {
         float angle = i * PI * 0.5f + 0.3f;
-        float radius = 3.0f + (i % 2) * 3.0f;
+        float radius = 4.0f + (i % 2) * 4.0f;
         Vector3 barrelPos = {
             cosf(angle) * radius,
             0.4f,
@@ -92,30 +103,53 @@ void RendererDrawScene(Game *game) {
         DrawCylinderWires(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 40, 40, 45, 255 });
     }
 
-    for (int i = 0; i < 1; i++) {
-        Vector3 wallPos = { 0, 0.75f, -10.0f };
-        DrawCube(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 190, 185, 180, 255 });
-        DrawCubeWires(wallPos, 38.0f, 1.5f, 0.6f, (Color){ 40, 40, 45, 255 });
-    }
+    for (int bx = -2; bx <= 2; bx++) {
+        for (int bz = 0; bz <= 3; bz++) {
+            float baseX = bx * 12.0f;
+            float baseZ = bz * 14.0f + 6.0f;
+            if (fabsf(baseX) < 1.5f && baseZ < 2.0f) continue;
 
-    for (int i = 0; i < 12; i++) {
-        float x = -12.0f + i * 4.0f;
-        float z = 10.0f;
-        float h = 1.5f + (i % 3) * 1.0f;
-        Vector3 bldPos = { x, h * 0.5f, z };
-        Color bldColor = (Color){ 175, 170, 165, 255 };
-        if (i % 3 == 1) bldColor = (Color){ 185, 175, 165, 255 };
-        else if (i % 3 == 2) bldColor = (Color){ 170, 175, 185, 255 };
-        DrawCube(bldPos, 3.5f, h, 3.5f, bldColor);
-        DrawCubeWires(bldPos, 3.5f, h, 3.5f, (Color){ 40, 40, 45, 255 });
+            float h = 3.0f + ((bx + bz) % 4) * 1.8f;
+            Color bldColor = (Color){ 175, 170, 165, 255 };
+            if ((bx + bz) % 3 == 1) bldColor = (Color){ 185, 175, 165, 255 };
+            else if ((bx + bz) % 3 == 2) bldColor = (Color){ 170, 175, 185, 255 };
 
-        for (int w = 0; w < 5; w++) {
-            float wx = x - 1.0f + w * 1.0f;
-            float wy = h * 0.5f + 0.3f;
-            DrawCube((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 140, 50, 50, 255 });
-            DrawCubeWires((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 40, 40, 45, 255 });
+            DrawCube((Vector3){ baseX, h * 0.5f, baseZ }, 5.5f, h, 5.0f, bldColor);
+            DrawCubeWires((Vector3){ baseX, h * 0.5f, baseZ }, 5.5f, h, 5.0f, (Color){ 40, 40, 45, 255 });
+
+            for (int wy = -2; wy <= 2; wy++) {
+                for (int wx = -2; wx <= 2; wx++) {
+                    if ((wx + wy) % 2 == 0) continue;
+                    float winX = baseX + wx * 0.9f;
+                    float winZ = baseZ + 2.56f;
+                    float winY = wy * 1.1f;
+                    DrawCube((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 90, 110, 150, 220 });
+                    DrawCubeWires((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 40, 40, 45, 255 });
+
+                    float awningZ = baseZ + 2.6f;
+                    float awningY = winY - 0.5f;
+                    if ((wx + wy) % 3 == 0) {
+                        DrawCube((Vector3){ winX, awningY, awningZ }, 0.7f, 0.08f, 0.4f, (Color){ 140, 50, 50, 240 });
+                        DrawCubeWires((Vector3){ winX, awningY, awningZ }, 0.7f, 0.08f, 0.4f, (Color){ 40, 40, 45, 255 });
+                    }
+                }
+            }
+
+            DrawCube((Vector3){ baseX, h + 0.15f, baseZ }, 5.7f, 0.3f, 5.2f, (Color){ 150, 145, 140, 255 });
+            DrawCubeWires((Vector3){ baseX, h + 0.15f, baseZ }, 5.7f, 0.3f, 5.2f, (Color){ 40, 40, 45, 255 });
+
+            for (int w = 0; w < 3; w++) {
+                float sx = baseX - 1.4f + w * 1.4f;
+                float sy = -h * 0.35f;
+                DrawCube((Vector3){ sx, sy, baseZ + 2.56f }, 0.7f, 1.1f, 0.05f, (Color){ 100, 80, 60, 255 });
+                DrawCubeWires((Vector3){ sx, sy, baseZ + 2.56f }, 0.7f, 1.1f, 0.05f, (Color){ 40, 40, 45, 255 });
+            }
         }
     }
+
+    Vector3 wallPos = { 0, 1.2f, -10.0f };
+    DrawCube(wallPos, 60.0f, 2.4f, 0.6f, (Color){ 185, 180, 175, 255 });
+    DrawCubeWires(wallPos, 60.0f, 2.4f, 0.6f, (Color){ 40, 40, 45, 255 });
 
     for (int i = 0; i < 8; i++) {
         float angle = i * PI * 0.5f + PI * 0.25f;
@@ -130,6 +164,14 @@ void RendererDrawScene(Game *game) {
         DrawSphereWires((Vector3){ lampPos.x, lampPos.y + 1.5f, lampPos.z }, 0.5f, 8, 8, (Color){ 40, 40, 45, 255 });
         DrawSphere((Vector3){ lampPos.x, 0.05f, lampPos.z }, 3.0f, (Color){ 240, 200, 100, 60 });
         DrawSphereWires((Vector3){ lampPos.x, 0.05f, lampPos.z }, 3.0f, 8, 8, (Color){ 40, 40, 45, 60 });
+    }
+
+    for (int i = 0; i < 6; i++) {
+        float x = -20.0f + i * 8.0f;
+        DrawCube((Vector3){ x, 0.25f, 4.5f }, 0.6f, 0.5f, 0.6f, (Color){ 90, 85, 80, 255 });
+        DrawCubeWires((Vector3){ x, 0.25f, 4.5f }, 0.6f, 0.5f, 0.6f, (Color){ 40, 40, 45, 255 });
+        DrawCylinder((Vector3){ x, 0.55f, 4.5f }, 0.08f, 0.08f, 0.6f, 8, (Color){ 70, 68, 65, 255 });
+        DrawCylinderWires((Vector3){ x, 0.55f, 4.5f }, 0.08f, 0.08f, 0.6f, 8, (Color){ 40, 40, 45, 255 });
     }
 }
 

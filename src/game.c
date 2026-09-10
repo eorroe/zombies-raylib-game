@@ -21,20 +21,26 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     }
 }
 
+static Vector3 GetZombieSpawnPoint(void) {
+    int side = rand() % 4;
+    float x = 0.0f, z = 0.0f;
+    switch (side) {
+        case 0: x = -40.0f + (float)(rand() % 80); z = -40.0f; break;
+        case 1: x = -40.0f + (float)(rand() % 80); z = 40.0f; break;
+        case 2: x = -40.0f; z = -40.0f + (float)(rand() % 80); break;
+        case 3: x = 40.0f; z = -40.0f + (float)(rand() % 80); break;
+    }
+    return (Vector3){ x, 0, z };
+}
+
 static void SpawnImageZombie(Game *game, int texIdx) {
-    float angle = (float)rand() / RAND_MAX * 2.0f * PI;
-    float radius = 6.0f + rand() % 8;
-    Vector3 pos = {
-        cosf(angle) * radius,
-        0,
-        sinf(angle) * radius
-    };
+    Vector3 pos = GetZombieSpawnPoint();
     SpawnZombie(game, pos, ZOMBIE_TYPE_IMAGE_HEAD, texIdx);
 }
 
 static void SpawnWave(Game *game) {
     game->round++;
-    game->zombiesRemaining = 5 + game->round * 3;
+    game->zombiesRemaining = 8 + game->round * 4;
     game->nonImageDeathsSinceLastImage = 0;
     bool usedImages[16] = { false };
     int imageCount = 0;
@@ -45,13 +51,7 @@ static void SpawnWave(Game *game) {
         usedImages[rand() % game->zombieHeadTextureCount] = true;
     }
     for (int i = 0; i < game->zombiesRemaining; i++) {
-        float angle = (float)i / game->zombiesRemaining * 2.0f * PI;
-        float radius = 6.0f + rand() % 8;
-        Vector3 pos = {
-            cosf(angle) * radius,
-            0,
-            sinf(angle) * radius
-        };
+        Vector3 pos = GetZombieSpawnPoint();
         ZombieType type = ZOMBIE_TYPE_DEFAULT;
         int texIdx = 0;
         if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
@@ -131,8 +131,8 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    Vector3 wallCenter = { 0, 0.75f, -10.0f };
-    Vector3 wallSize = { 38.0f, 1.5f, 0.6f };
+    Vector3 wallCenter = { 0, 1.2f, -10.0f };
+    Vector3 wallSize = { 60.0f, 2.4f, 0.6f };
     if (PointInAABB(p, wallCenter, wallSize)) {
         float dx = p.x - wallCenter.x;
         float dz = p.z - wallCenter.z;
@@ -145,21 +145,24 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    for (int i = 0; i < 12; i++) {
-        float x = -12.0f + i * 4.0f;
-        float z = 10.0f;
-        float h = 1.5f + (i % 3) * 1.0f;
-        Vector3 bldPos = { x, h * 0.5f, z };
-        Vector3 bldSize = { 3.5f, h, 3.5f };
-        if (PointInAABB(p, bldPos, bldSize)) {
-            float dx = p.x - bldPos.x;
-            float dz = p.z - bldPos.z;
-            float halfX = bldSize.x * 0.5f + radius;
-            float halfZ = bldSize.z * 0.5f + radius;
-            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
-                game->player.position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
-            } else {
-                game->player.position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
+    for (int bx = -2; bx <= 2; bx++) {
+        for (int bz = 0; bz <= 3; bz++) {
+            float baseX = bx * 12.0f;
+            float baseZ = bz * 14.0f + 6.0f;
+            if (fabsf(baseX) < 1.5f && baseZ < 2.0f) continue;
+            float h = 3.0f + ((bx + bz) % 4) * 1.8f;
+            Vector3 bldPos = { baseX, h * 0.5f, baseZ };
+            Vector3 bldSize = { 5.5f, h, 5.0f };
+            if (PointInAABB(p, bldPos, bldSize)) {
+                float dx = p.x - bldPos.x;
+                float dz = p.z - bldPos.z;
+                float halfX = bldSize.x * 0.5f + radius;
+                float halfZ = bldSize.z * 0.5f + radius;
+                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                    game->player.position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
+                } else {
+                    game->player.position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
+                }
             }
         }
     }
@@ -212,10 +215,10 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    if (p.x < -25.0f) game->player.position.x = -25.0f;
-    if (p.x > 25.0f) game->player.position.x = 25.0f;
-    if (p.z < -25.0f) game->player.position.z = -25.0f;
-    if (p.z > 25.0f) game->player.position.z = 25.0f;
+    if (p.x < -45.0f) game->player.position.x = -45.0f;
+    if (p.x > 45.0f) game->player.position.x = 45.0f;
+    if (p.z < -45.0f) game->player.position.z = -45.0f;
+    if (p.z > 45.0f) game->player.position.z = 45.0f;
     if (p.y < 0.0f) game->player.position.y = 0.0f;
 }
 
@@ -224,8 +227,8 @@ static void GameApplyZombieCollisions(Game *game) {
     for (int i = 0; i < game->zombieCount; i++) {
         if (!ZombieIsAlive(&game->zombies[i])) continue;
         Vector3 p = game->zombies[i].position;
-        Vector3 wallCenter = { 0, 0.75f, -10.0f };
-        Vector3 wallSize = { 38.0f, 1.5f, 0.6f };
+        Vector3 wallCenter = { 0, 1.2f, -10.0f };
+        Vector3 wallSize = { 60.0f, 2.4f, 0.6f };
         if (PointInAABB(p, wallCenter, wallSize)) {
             float dx = p.x - wallCenter.x;
             float dz = p.z - wallCenter.z;
@@ -237,21 +240,25 @@ static void GameApplyZombieCollisions(Game *game) {
                 game->zombies[i].position.z = wallCenter.z + (dz > 0 ? halfZ : -halfZ);
             }
         }
-        for (int b = 0; b < 12; b++) {
-            float x = -12.0f + b * 4.0f;
-            float z = 10.0f;
-            float h = 1.5f + (b % 3) * 1.0f;
-            Vector3 bldPos = { x, h * 0.5f, z };
-            Vector3 bldSize = { 3.5f, h, 3.5f };
-            if (PointInAABB(p, bldPos, bldSize)) {
-                float dx = p.x - bldPos.x;
-                float dz = p.z - bldPos.z;
-                float halfX = bldSize.x * 0.5f + radius;
-                float halfZ = bldSize.z * 0.5f + radius;
-                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
-                    game->zombies[i].position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
-                } else {
-                    game->zombies[i].position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
+        
+        for (int bx = -2; bx <= 2; bx++) {
+            for (int bz = 0; bz <= 3; bz++) {
+                float baseX = bx * 12.0f;
+                float baseZ = bz * 14.0f + 6.0f;
+                if (fabsf(baseX) < 1.5f && baseZ < 2.0f) continue;
+                float h = 3.0f + ((bx + bz) % 4) * 1.8f;
+                Vector3 bldPos = { baseX, h * 0.5f, baseZ };
+                Vector3 bldSize = { 5.5f, h, 5.0f };
+                if (PointInAABB(p, bldPos, bldSize)) {
+                    float dx = p.x - bldPos.x;
+                    float dz = p.z - bldPos.z;
+                    float halfX = bldSize.x * 0.5f + radius;
+                    float halfZ = bldSize.z * 0.5f + radius;
+                    if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                        game->zombies[i].position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
+                    } else {
+                        game->zombies[i].position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
+                    }
                 }
             }
         }
@@ -304,10 +311,10 @@ static void GameApplyZombieCollisions(Game *game) {
             }
         }
         
-        if (p.x < -25.0f) game->zombies[i].position.x = -25.0f;
-        if (p.x > 25.0f) game->zombies[i].position.x = 25.0f;
-        if (p.z < -25.0f) game->zombies[i].position.z = -25.0f;
-        if (p.z > 25.0f) game->zombies[i].position.z = 25.0f;
+        if (p.x < -45.0f) game->zombies[i].position.x = -45.0f;
+        if (p.x > 45.0f) game->zombies[i].position.x = 45.0f;
+        if (p.z < -45.0f) game->zombies[i].position.z = -45.0f;
+        if (p.z > 45.0f) game->zombies[i].position.z = 45.0f;
         if (p.y < 0.0f) game->zombies[i].position.y = 0.0f;
     }
 }

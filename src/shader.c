@@ -36,6 +36,7 @@ static const char *pbrFragShader =
     "uniform float roughness;\n"
     "uniform vec3 fogColor;\n"
     "uniform float fogDensity;\n"
+    "uniform float subsurface;\n"
     "out vec4 finalColor;\n"
 
     "const float PI = 3.14159265359;\n"
@@ -118,6 +119,9 @@ static const char *pbrFragShader =
     "    vec3 ambient = vec3(0.05, 0.05, 0.08) * albedo * ao;\n"
 
     "    vec3 color = ambient + Lo;\n"
+
+    "    float sss = pow(clamp(1.0 + dot(V, N), 0.0, 1.0), 3.0) * subsurface;\n"
+    "    color += albedo * sss * vec3(0.3, 0.15, 0.1) * 0.5;\n"
 
     "    float fogFactor = 1.0 - exp(-fogDensity * fogDensity * length(fragPosition) * length(fragPosition));\n"
     "    color = mix(color, fogColor, clamp(fogFactor, 0.0, 1.0));\n"
@@ -299,6 +303,7 @@ void ShaderInit(ShaderManager *shaders, int screenWidth, int screenHeight) {
     shaders->pbrLocMetallic = GetShaderLocation(shaders->pbr, "metallic");
     shaders->pbrLocFogColor = GetShaderLocation(shaders->pbr, "fogColor");
     shaders->pbrLocFogDensity = GetShaderLocation(shaders->pbr, "fogDensity");
+    shaders->pbrLocSubsurface = GetShaderLocation(shaders->pbr, "subsurface");
     shaders->postLocTime = GetShaderLocation(shaders->postProcess, "time");
     shaders->postLocResolution = GetShaderLocation(shaders->postProcess, "resolution");
     shaders->scopeLocTime = GetShaderLocation(shaders->scope, "time");
@@ -339,6 +344,10 @@ void ShaderSetFog(ShaderManager *shaders, Vector3 fogColor, float fogDensity) {
 void ShaderSetDirectionalLight(ShaderManager *shaders, Vector3 dir, Vector3 col) {
     SetShaderValue(shaders->pbr, shaders->pbrLocDirLightDir, &dir, SHADER_UNIFORM_VEC3);
     SetShaderValue(shaders->pbr, shaders->pbrLocDirLightCol, &col, SHADER_UNIFORM_VEC3);
+}
+
+void ShaderSetSubsurface(ShaderManager *shaders, float sss) {
+    SetShaderValue(shaders->pbr, shaders->pbrLocSubsurface, &sss, SHADER_UNIFORM_FLOAT);
 }
 
 void ShaderShutdown(ShaderManager *shaders) {

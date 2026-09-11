@@ -308,6 +308,7 @@ void RendererDrawZombies(Game *game, Shader shader) {
     ShaderBeginPBR(&game->shaders);
     ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
     ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 1.2f, 0.9f, 0.7f });
+    ShaderSetSubsurface(&game->shaders, 0.3f);
     Vector3 lightPositions[4];
     Vector3 lightColors[4];
     float t = GetTime();

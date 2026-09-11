@@ -19,6 +19,7 @@ typedef struct {
     float pitch;
     Model bodyModel;
     Model headModel;
+    Model helmetModel;
     Model leftArmModel;
     Model rightArmModel;
     Model leftLegModel;

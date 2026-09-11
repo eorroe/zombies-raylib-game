@@ -41,6 +41,9 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     zombie->speed = ZOMBIE_SPEED_BASE;
     zombie->damageFlashTimer = 0.0f;
     zombie->facingAngle = 0.0f;
+    zombie->armSwingOffset = (rand() % 100) / 500.0f;
+    zombie->legSwingOffset = (rand() % 100) / 500.0f;
+    zombie->armReachOffset = (rand() % 100) / 500.0f;
 
     float torsoW = TORSO_WIDTH * (0.8f + (rand() % 100) / 250.0f);
     float torsoH = TORSO_HEIGHT * (0.85f + (rand() % 100) / 300.0f);
@@ -299,8 +302,8 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     Vector3 hipL = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipLOffset, zombie->facingAngle));
     Vector3 hipR = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipROffset, zombie->facingAngle));
 
-    float armSwing = walk * 0.5f;
-    float legSwing = walk * 0.6f;
+    float armSwing = walk * (0.5f + zombie->armSwingOffset);
+    float legSwing = walk * (0.6f + zombie->legSwingOffset);
     
     if (zombie->dying) {
         float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);
@@ -317,7 +320,7 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     Vector3 playerPos = camera.position;
     float distToPlayer = Vector3Length(Vector3Subtract(playerPos, zombie->position));
     bool reaching = distToPlayer < REACH_DIST;
-    float armAngleX = climbing ? -1.5f + climbReach : (reaching ? -1.2f : -0.6f);
+    float armAngleX = climbing ? -1.5f + climbReach : (reaching ? -1.2f + zombie->armReachOffset : -0.6f + zombie->armReachOffset);
     float armAngleY = climbing ? 0.8f : (reaching ? 0.3f : -0.8f);
     
     Vector3 armDirL = RotateY((Vector3){ armAngleX, armAngleY, 0 }, zombie->facingAngle);

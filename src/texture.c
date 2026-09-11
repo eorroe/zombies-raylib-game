@@ -156,39 +156,47 @@ static Image GenerateConcreteTexture(int width, int height) {
         for (int x = 0; x < width; x++) {
             float n1 = FractalNoise(x, y, 5, 0.5f);
             float n2 = FractalNoise(x + 500, y + 500, 3, 0.6f);
+            float n3 = FractalNoise(x + 1000, y + 1000, 4, 0.4f);
             int idx = (y * width + x) * 4;
-            int shade = (int)(190 + n1 * 40 + n2 * 15);
+            int shade = (int)(185 + n1 * 45 + n2 * 15 + n3 * 10);
             if (shade > 255) shade = 255;
-            if (shade < 140) shade = 140;
+            if (shade < 130) shade = 130;
             data[idx + 0] = (unsigned char)shade;
-            data[idx + 1] = (unsigned char)(shade - (int)(n2 * 5));
-            data[idx + 2] = (unsigned char)(shade + (int)(n2 * 3));
+            data[idx + 1] = (unsigned char)(shade - (int)(n2 * 8));
+            data[idx + 2] = (unsigned char)(shade + (int)(n2 * 5));
             data[idx + 3] = 255;
         }
     }
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 60; i++) {
         int x1 = rand() % width;
         int y1 = rand() % height;
-        int len = 20 + rand() % 80;
+        int len = 20 + rand() % 100;
         int angle = rand() % 360;
         int x2 = x1 + (int)(cosf(angle * DEG2RAD) * len);
         int y2 = y1 + (int)(sinf(angle * DEG2RAD) * len);
-        Color crack = { 120, 120, 125, 160 };
+        Color crack = { 100, 100, 105, 180 };
         ImageDrawLine(&img, x1, y1, x2, y2, crack);
-    }
-    for (int i = 0; i < 300; i++) {
-        int cx = rand() % width;
-        int cy = rand() % height;
-        int r = 3 + rand() % 15;
-        Color stain = { 150, 145, 140, 100 };
-        ImageDrawCircle(&img, cx, cy, r, stain);
     }
     for (int i = 0; i < 500; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
-        int r = 1 + rand() % 3;
-        Color spot = { 220, 220, 225, 120 };
+        int r = 3 + rand() % 20;
+        Color stain = { 140, 135, 130, 120 };
+        ImageDrawCircle(&img, cx, cy, r, stain);
+    }
+    for (int i = 0; i < 800; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 1 + rand() % 4;
+        Color spot = { 220, 220, 225, 150 };
         ImageDrawCircle(&img, cx, cy, r, spot);
+    }
+    for (int i = 0; i < 30; i++) {
+        int x1 = rand() % width;
+        int y1 = rand() % height;
+        int len = 30 + rand() % 120;
+        Color scratch = { 160, 160, 165, 140 };
+        ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 10 - 5), scratch);
     }
     return img;
 }
@@ -199,37 +207,38 @@ static Image GenerateMetalTexture(int width, int height) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             float n = FractalNoise(x, y, 4, 0.5f);
+            float n2 = FractalNoise(x + 200, y + 200, 3, 0.3f);
             int idx = (y * width + x) * 4;
-            int shade = (int)(170 + n * 40);
+            int shade = (int)(165 + n * 45 + n2 * 15);
             if (shade > 255) shade = 255;
-            if (shade < 120) shade = 120;
+            if (shade < 110) shade = 110;
             data[idx + 0] = (unsigned char)shade;
             data[idx + 1] = (unsigned char)(shade - 2);
             data[idx + 2] = (unsigned char)(shade + 2);
             data[idx + 3] = 255;
         }
     }
-    for (int i = 0; i < 150; i++) {
+    for (int i = 0; i < 250; i++) {
         int x1 = rand() % width;
         int y1 = rand() % height;
-        int len = 10 + rand() % 60;
+        int len = 10 + rand() % 80;
         int x2 = x1 + len;
         int y2 = y1 + (rand() % 3 - 1);
-        Color scratch = { 140, 145, 150, 100 };
+        Color scratch = { 130, 135, 140, 120 };
         ImageDrawLine(&img, x1, y1, x2, y2, scratch);
     }
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 60; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
-        int r = 3 + rand() % 10;
-        Color rust = { 160, 100, 70, 140 };
+        int r = 3 + rand() % 12;
+        Color rust = { 170, 110, 70, 160 };
         ImageDrawCircle(&img, cx, cy, r, rust);
     }
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 300; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
-        int r = 2 + rand() % 6;
-        Color wear = { 100, 100, 105, 120 };
+        int r = 2 + rand() % 8;
+        Color wear = { 90, 90, 95, 140 };
         ImageDrawCircle(&img, cx, cy, r, wear);
     }
     return img;
@@ -444,29 +453,37 @@ static Image GenerateFenceTexture(int width, int height) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             float n = FractalNoise(x, y, 3, 0.5f);
+            float n2 = FractalNoise(x + 300, y + 300, 2, 0.4f);
             int idx = (y * width + x) * 4;
-            int shade = (int)(50 + n * 25);
+            int shade = (int)(45 + n * 30 + n2 * 10);
             if (shade > 255) shade = 255;
-            if (shade < 30) shade = 30;
+            if (shade < 25) shade = 25;
             data[idx + 0] = (unsigned char)shade;
             data[idx + 1] = (unsigned char)shade;
             data[idx + 2] = (unsigned char)(shade + 3);
             data[idx + 3] = 255;
         }
     }
-    for (int i = 0; i < 80; i++) {
+    for (int i = 0; i < 120; i++) {
         int x1 = rand() % width;
         int y1 = rand() % height;
-        int len = 10 + rand() % 40;
-        Color scratch = { 40, 40, 45, 120 };
+        int len = 10 + rand() % 60;
+        Color scratch = { 35, 35, 40, 140 };
         ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 5 - 2), scratch);
     }
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 50; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
-        int r = 2 + rand() % 8;
-        Color rust = { 100, 70, 50, 140 };
+        int r = 2 + rand() % 10;
+        Color rust = { 110, 80, 50, 160 };
         ImageDrawCircle(&img, cx, cy, r, rust);
+    }
+    for (int i = 0; i < 200; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 1 + rand() % 3;
+        Color wear = { 70, 70, 75, 130 };
+        ImageDrawCircle(&img, cx, cy, r, wear);
     }
     return img;
 }

@@ -65,6 +65,9 @@ typedef struct {
     float legLowerLen;
     float limbRadius;
     float facingAngle;
+    float armSwingOffset;
+    float legSwingOffset;
+    float armReachOffset;
 } Zombie;
 
 void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIndex, Texture2D skin, Texture2D skinNormal, Texture2D shirt, Texture2D pants, Shader pbr);

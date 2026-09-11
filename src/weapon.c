@@ -87,31 +87,93 @@ void WeaponInit(Weapon *weapon, Shader pbr) {
     g_weaponModels.forearm.materials[0].shader = pbr;
 
     Image metalImg = GenImageColor(256, 256, (Color){ 50, 50, 55, 255 });
-    for (int i = 0; i < 600; i++) {
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x, y, 4, 0.5f);
+            int shade = (int)(35 + n * 30);
+            if (shade > 255) shade = 255;
+            if (shade < 15) shade = 15;
+            unsigned char *data = (unsigned char *)metalImg.data;
+            int idx = (y * 256 + x) * 4;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)shade;
+            data[idx + 2] = (unsigned char)(shade + 2);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 800; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 35 + rand() % 30;
-        ImageDrawPixel(&metalImg, x, y, (Color){ shade, shade, shade + 2, 255 });
+        int len = 5 + rand() % 40;
+        Color scratch = { 25, 25, 30, 100 };
+        ImageDrawLine(&metalImg, x, y, x + len, y + (rand() % 3 - 1), scratch);
+    }
+    for (int i = 0; i < 60; i++) {
+        int cx = rand() % 256;
+        int cy = rand() % 256;
+        int r = 2 + rand() % 8;
+        Color rust = { 120, 80, 50, 150 };
+        ImageDrawCircle(&metalImg, cx, cy, r, rust);
     }
     g_weaponModels.metalTex = LoadTextureFromImage(metalImg);
     UnloadImage(metalImg);
 
     Image darkMetalImg = GenImageColor(256, 256, (Color){ 30, 30, 35, 255 });
-    for (int i = 0; i < 400; i++) {
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x + 100, y + 100, 3, 0.4f);
+            int shade = (int)(20 + n * 25);
+            if (shade > 255) shade = 255;
+            if (shade < 10) shade = 10;
+            unsigned char *data = (unsigned char *)darkMetalImg.data;
+            int idx = (y * 256 + x) * 4;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)shade;
+            data[idx + 2] = (unsigned char)(shade + 2);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 500; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 20 + rand() % 25;
-        ImageDrawPixel(&darkMetalImg, x, y, (Color){ shade, shade, shade + 2, 255 });
+        int len = 3 + rand() % 30;
+        Color scratch = { 15, 15, 20, 100 };
+        ImageDrawLine(&darkMetalImg, x, y, x + len, y + (rand() % 2 - 1), scratch);
+    }
+    for (int i = 0; i < 40; i++) {
+        int cx = rand() % 256;
+        int cy = rand() % 256;
+        int r = 2 + rand() % 6;
+        Color wear = { 50, 50, 55, 120 };
+        ImageDrawCircle(&darkMetalImg, cx, cy, r, wear);
     }
     g_weaponModels.darkMetalTex = LoadTextureFromImage(darkMetalImg);
     UnloadImage(darkMetalImg);
 
     Image gripImg = GenImageColor(256, 256, (Color){ 45, 38, 30, 255 });
-    for (int i = 0; i < 500; i++) {
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x + 200, y + 200, 3, 0.6f);
+            int shade = (int)(35 + n * 30);
+            if (shade > 255) shade = 255;
+            if (shade < 20) shade = 20;
+            unsigned char *data = (unsigned char *)gripImg.data;
+            int idx = (y * 256 + x) * 4;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)(shade - 5);
+            data[idx + 2] = (unsigned char)(shade - 12);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 600; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 35 + rand() % 25;
-        ImageDrawPixel(&gripImg, x, y, (Color){ shade, shade - 5, shade - 10, 255 });
+        int shade = 30 + rand() % 30;
+        unsigned char *data = (unsigned char *)gripImg.data;
+        int idx = (y * 256 + x) * 4;
+        data[idx + 0] = (unsigned char)shade;
+        data[idx + 1] = (unsigned char)(shade - 5);
+        data[idx + 2] = (unsigned char)(shade - 12);
     }
     g_weaponModels.gripTex = LoadTextureFromImage(gripImg);
     UnloadImage(gripImg);
@@ -130,6 +192,16 @@ void WeaponInit(Weapon *weapon, Shader pbr) {
             data[idx + 2] = (unsigned char)(shade - 12);
             data[idx + 3] = 255;
         }
+    }
+    for (int i = 0; i < 300; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int shade = 60 + rand() % 40;
+        unsigned char *data = (unsigned char *)camoImg.data;
+        int idx = (y * 256 + x) * 4;
+        data[idx + 0] = (unsigned char)shade;
+        data[idx + 1] = (unsigned char)(shade + 8);
+        data[idx + 2] = (unsigned char)(shade - 12);
     }
     g_weaponModels.camoTex = LoadTextureFromImage(camoImg);
     UnloadImage(camoImg);

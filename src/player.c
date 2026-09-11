@@ -38,21 +38,25 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->animTime = 0.0f;
     player->moveDir = (Vector3){ 0 };
 
-    Mesh bodyMesh = GenMeshCylinder(0.4f, 1.2f, 8);
+    Mesh bodyMesh = GenMeshCylinder(0.5f, 1.4f, 12);
     player->bodyModel = LoadModelFromMesh(bodyMesh);
     player->bodyModel.materials[0].shader = pbr;
 
-    Mesh headMesh = GenMeshSphere(0.25f, 12, 12);
+    Mesh headMesh = GenMeshSphere(0.28f, 12, 12);
     player->headModel = LoadModelFromMesh(headMesh);
     player->headModel.materials[0].shader = pbr;
 
-    player->leftArmModel = CreateLimb(0.08f, 0.7f, 8);
+    Mesh helmetMesh = GenMeshSphere(0.32f, 12, 8);
+    player->helmetModel = LoadModelFromMesh(helmetMesh);
+    player->helmetModel.materials[0].shader = pbr;
+
+    player->leftArmModel = CreateLimb(0.1f, 0.8f, 8);
     player->leftArmModel.materials[0].shader = pbr;
-    player->rightArmModel = CreateLimb(0.08f, 0.7f, 8);
+    player->rightArmModel = CreateLimb(0.1f, 0.8f, 8);
     player->rightArmModel.materials[0].shader = pbr;
-    player->leftLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->leftLegModel = CreateLimbPivoted(0.12f, 1.0f, 8);
     player->leftLegModel.materials[0].shader = pbr;
-    player->rightLegModel = CreateLimbPivoted(0.1f, 0.9f, 8);
+    player->rightLegModel = CreateLimbPivoted(0.12f, 1.0f, 8);
     player->rightLegModel.materials[0].shader = pbr;
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
@@ -130,10 +134,13 @@ void PlayerRender(Player *player, Shader shader) {
 
     Vector3 bodyPos = player->position;
     bodyPos.y += 1.0f;
-    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 55, 45, 255 });
 
     Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
-    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 200, 180, 160, 255 });
+
+    Vector3 helmetPos = Vector3Add(headPos, (Vector3){ 0, 0.05f, 0 });
+    DrawModelEx(player->helmetModel, helmetPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 35, 38, 30, 255 });
 
     Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
     Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
@@ -176,6 +183,7 @@ void PlayerRender(Player *player, Shader shader) {
 void PlayerShutdown(Player *player) {
     UnloadModel(player->bodyModel);
     UnloadModel(player->headModel);
+    UnloadModel(player->helmetModel);
     UnloadModel(player->leftArmModel);
     UnloadModel(player->rightArmModel);
     UnloadModel(player->leftLegModel);

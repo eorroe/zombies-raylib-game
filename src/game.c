@@ -6,7 +6,12 @@
 #include "raymath.h"
 #include <stdlib.h>
 #include <time.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <direct.h>
+#else
 #include <unistd.h>
+#endif
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     if (game->zombieCount >= MAX_ZOMBIES) return;

@@ -238,6 +238,14 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o
  /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h
+ /usr/include/dirent.h
+ /usr/include/x86_64-linux-gnu/bits/dirent.h
+ /usr/include/x86_64-linux-gnu/bits/posix1_lim.h
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h
+ /usr/include/linux/limits.h
+ /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h
+ /usr/include/x86_64-linux-gnu/bits/pthread_stack_min.h
+ /usr/include/x86_64-linux-gnu/bits/dirent_ext.h
 
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o
  /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/src/image_upload.c

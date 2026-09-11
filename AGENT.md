@@ -150,21 +150,56 @@ Before committing any rendering change:
 - Gravity: `velocityY -= PLAYER_GRAVITY * dt` each frame
 - Ground check: if `position.y <= 0`, set `velocityY = 0` and `isGrounded = true`
 
-## Headless Testing Workflow
+## Screenshot Workflow
+
+### Directory and Naming Convention
+
+All workflow screenshots are saved to the `workflow/` directory using the `iteration_XX.png` naming convention, where `XX` is an incrementing zero-padded count starting from `01`.
+
+Examples:
+- `workflow/iteration_01.png`
+- `workflow/iteration_02.png`
+- `workflow/iteration_10.png`
 
 ### Environment Variables
 
 | Variable | Purpose |
 |----------|---------|
 | `ZOMBIE_AUTO_START=1` | Skips menu and starts gameplay automatically after 30 frames |
-| `ZOMBIE_SHOT=/path/to/screenshot.png` | Saves a screenshot at frame 35 to the specified path |
 | `ZOMBIE_AUTO_QUIT_MS=5000` | Auto-quits after the specified milliseconds (prevents hangs) |
+| `ZOMBIE_SCREENSHOT_ROTATE=1` | Auto-rotates camera 360° and captures screenshots at the interval set by `ZOMBIE_SCREENSHOT_STEP_DEGREES` |
+| `ZOMBIE_SCREENSHOT_STEP_DEGREES=45` | Rotation step in degrees; total screenshots = 360 / step (default 90° = 4 screenshots) |
+| `ZOMBIE_SCREENSHOT_WORLD=1` | Spawns world only (no zombies) and captures rotating screenshots |
+| `ZOMBIE_SCREENSHOT_ZOMBIE=1` | Spawns 1 zombie only (blank background) and captures rotating screenshots |
+| `ZOMBIE_SCREENSHOT_PLAYER=1` | Spawns player only (blank background) and captures rotating screenshots |
 
 ### Command Template
 
 ```bash
 cd /workspace/.../sessions/agent_xxx/build
-ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
+ZOMBIE_AUTO_START=1 ZOMBIE_AUTO_QUIT_MS=5000 \
+  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
+```
+
+### Screenshot Modes
+
+Use one of these environment variables to control what is rendered:
+
+```bash
+# Full world, no zombies
+ZOMBIE_SCREENSHOT_WORLD=1
+
+# Single zombie on blank background
+ZOMBIE_SCREENSHOT_ZOMBIE=1
+
+# Player only on blank background
+ZOMBIE_SCREENSHOT_PLAYER=1
+```
+
+Combine with `ZOMBIE_SCREENSHOT_ROTATE=1` to capture 4 angles at 90° intervals:
+
+```bash
+ZOMBIE_AUTO_START=1 ZOMBIE_SCREENSHOT_ROTATE=1 ZOMBIE_SCREENSHOT_ZOMBIE=1 ZOMBIE_AUTO_QUIT_MS=30000 \
   xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
 ```
 
@@ -172,11 +207,11 @@ ZOMBIE_AUTO_START=1 ZOMBIE_SHOT=/tmp/zombie_test.png ZOMBIE_AUTO_QUIT_MS=5000 \
 
 1. **Build first**: `cd build && make -j"$(nproc)"`
 2. **Run headless** with xvfb using the template above
-3. **Verify screenshot exists**: `ls -la /tmp/zombie_test.png`
+3. **Verify screenshot exists**: `ls -la workflow/iteration_*.png`
 4. **Analyze screenshot** with Python/PIL:
    ```python
    from PIL import Image
-   img = Image.open('/tmp/zombie_test.png')
+   img = Image.open('workflow/iteration_XX.png')
    print(f'Size: {img.size}, Mode: {img.mode}')
    pixels = list(img.getdata())
    non_transparent = sum(1 for p in pixels if len(p) < 4 or p[3] > 128)
@@ -211,7 +246,7 @@ When analyzing screenshots, follow this **broad-to-narrow** iterative approach:
 #### Step 1: Analyze ALL pixels first
 ```python
 from PIL import Image
-img = Image.open('/tmp/screenshot.png')
+img = Image.open('workflow/iteration_XX.png')
 width, height = img.size
 pixels = list(img.getdata())
 print(f'Total pixels: {len(pixels)}')

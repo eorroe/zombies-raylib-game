@@ -88,8 +88,8 @@ static const char *pbrFragShader =
     "        vec3 L = normalize(lightPos[i] - fragPosition);\n"
     "        vec3 H = normalize(V + L);\n"
     "        float dist = length(lightPos[i] - fragPosition);\n"
-    "        float attenuation = 1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist);\n"
-    "        vec3 radiance = lightCol[i] * attenuation;\n"
+     "    float attenuation = 1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist);\n"
+     "        vec3 radiance = lightCol[i] * attenuation;\n"
 
     "        float NDF = DistributionGGX(N, H, roughness);\n"
     "        float G   = GeometrySmith(N, V, L, roughness);\n"
@@ -104,8 +104,8 @@ static const char *pbrFragShader =
 
     "        float NdotL = max(dot(N, L), 0.0);\n"
     "        Lo += (kD * albedo / PI + specular) * radiance * NdotL;\n"
-    "    }\n"
-    "    vec3 Ldir = normalize(dirLightDir);\n"
+     "    }\n"
+     "    vec3 Ldir = normalize(dirLightDir);\n"
     "    float NdotLdir = max(dot(N, Ldir), 0.0);\n"
     "    vec3 dirRadiance = dirLightCol * NdotLdir * 10.0;\n"
     "    vec3 Hdir = normalize(V + Ldir);\n"

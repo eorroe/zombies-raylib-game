@@ -128,8 +128,16 @@ void RendererUpdate(Game *game, float dt) {
 void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
-    BeginTextureMode(game->sceneTarget);
-    ClearBackground((Color){ 245, 240, 232, 255 });
+    
+    int w = 1280;
+    int h = 720;
+    if (game->screenshotMode == SCREENSHOT_MODE_ZOMBIE || game->screenshotMode == SCREENSHOT_MODE_PLAYER) {
+        ClearBackground((Color){ 245, 240, 232, 255 });
+    } else {
+        DrawRectangleGradientV(0, 0, w, h / 2, (Color){ 120, 160, 220, 255 }, (Color){ 220, 180, 120, 255 });
+        DrawRectangleGradientV(0, h / 2, w, h / 2, (Color){ 220, 180, 120, 255 }, (Color){ 180, 120, 80, 255 });
+    }
+    
     BeginMode3D(camera);
     rlDisableBackfaceCulling();
 }

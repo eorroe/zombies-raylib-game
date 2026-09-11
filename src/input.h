@@ -18,6 +18,7 @@ typedef struct {
     bool cameraTogglePressed;
     bool shiftPressed;
     bool ctrlPressed;
+    bool spacePressed;
     bool upPressed;
     bool downPressed;
     bool leftPressed;

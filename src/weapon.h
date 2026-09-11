@@ -28,23 +28,16 @@ typedef struct {
     bool reloading;
     float reloadTimer;
     float recoil;
+    bool scopeActive;
     Model model;
     float muzzleFlashTimer;
     float swayTimer;
     Vector2 aimOffset;
-    Model muzzleBrake;
-    Model handguard;
-    Model triggerGuard;
-    Model magRelease;
-    Model ejectionPort;
-    Model frontSight;
-    Model rearSight;
 } Weapon;
 
 void WeaponInit(Weapon *weapon, Shader pbr);
-void WeaponUpdate(Weapon *weapon, Vector3 playerPos, float yaw, InputState *input, float dt);
+void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt);
 void WeaponRender(Weapon *weapon, Camera3D camera, float yaw);
-void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw);
 void WeaponShoot(Weapon *weapon);
 void WeaponReload(Weapon *weapon);
 bool WeaponCanShoot(Weapon *weapon);

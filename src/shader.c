@@ -36,6 +36,7 @@ static const char *pbrFragShader =
     "uniform float roughness;\n"
     "uniform vec3 fogColor;\n"
     "uniform float fogDensity;\n"
+    "uniform float subsurface;\n"
     "out vec4 finalColor;\n"
 
     "const float PI = 3.14159265359;\n"
@@ -88,8 +89,8 @@ static const char *pbrFragShader =
     "        vec3 L = normalize(lightPos[i] - fragPosition);\n"
     "        vec3 H = normalize(V + L);\n"
     "        float dist = length(lightPos[i] - fragPosition);\n"
-     "    float attenuation = 1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist);\n"
-     "        vec3 radiance = lightCol[i] * attenuation;\n"
+    "    float attenuation = 1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist);\n"
+    "        vec3 radiance = lightCol[i] * attenuation;\n"
 
     "        float NDF = DistributionGGX(N, H, roughness);\n"
     "        float G   = GeometrySmith(N, V, L, roughness);\n"
@@ -104,8 +105,9 @@ static const char *pbrFragShader =
 
     "        float NdotL = max(dot(N, L), 0.0);\n"
     "        Lo += (kD * albedo / PI + specular) * radiance * NdotL;\n"
-     "    }\n"
-     "    vec3 Ldir = normalize(dirLightDir);\n"
+    "    }\n"
+
+    "    vec3 Ldir = normalize(dirLightDir);\n"
     "    float NdotLdir = max(dot(N, Ldir), 0.0);\n"
     "    vec3 dirRadiance = dirLightCol * NdotLdir * 10.0;\n"
     "    vec3 Hdir = normalize(V + Ldir);\n"
@@ -117,6 +119,9 @@ static const char *pbrFragShader =
     "    vec3 ambient = vec3(0.05, 0.05, 0.08) * albedo * ao;\n"
 
     "    vec3 color = ambient + Lo;\n"
+
+    "    float sss = pow(clamp(1.0 + dot(V, N), 0.0, 1.0), 3.0) * subsurface;\n"
+    "    color += albedo * sss * vec3(0.3, 0.15, 0.1) * 0.5;\n"
 
     "    float fogFactor = 1.0 - exp(-fogDensity * fogDensity * length(fragPosition) * length(fragPosition));\n"
     "    color = mix(color, fogColor, clamp(fogFactor, 0.0, 1.0));\n"
@@ -148,84 +153,60 @@ static const char *postFragShader =
 
     "const float PI = 3.14159265359;\n"
 
-    "float hash(vec2 p) {\n"
-    "    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);\n"
-    "}\n"
-
-    "float paperGrain(vec2 uv) {\n"
-    "    vec2 p = uv * resolution;\n"
-    "    float n = hash(floor(p)) * 0.5 + hash(floor(p) + 0.5) * 0.5;\n"
-    "    return (n - 0.5) * 0.07;\n"
-    "}\n"
-
-    "float sobelEdge(vec2 uv) {\n"
-    "    float oX = 1.0 / resolution.x;\n"
-    "    float oY = 1.0 / resolution.y;\n"
-
-    "    vec3 tl = texture(texture0, uv + vec2(-oX,  oY)).rgb;\n"
-    "    vec3 t  = texture(texture0, uv + vec2( 0.0,  oY)).rgb;\n"
-    "    vec3 tr = texture(texture0, uv + vec2( oX,  oY)).rgb;\n"
-    "    vec3 l  = texture(texture0, uv + vec2(-oX,  0.0)).rgb;\n"
-    "    vec3 r  = texture(texture0, uv + vec2( oX,  0.0)).rgb;\n"
-    "    vec3 bl = texture(texture0, uv + vec2(-oX, -oY)).rgb;\n"
-    "    vec3 b  = texture(texture0, uv + vec2( 0.0, -oY)).rgb;\n"
-    "    vec3 br = texture(texture0, uv + vec2( oX, -oY)).rgb;\n"
-
-    "    float tlL = dot(tl, vec3(0.299, 0.587, 0.114));\n"
-    "    float tL  = dot(t,  vec3(0.299, 0.587, 0.114));\n"
-    "    float trL = dot(tr, vec3(0.299, 0.587, 0.114));\n"
-    "    float lL  = dot(l,  vec3(0.299, 0.587, 0.114));\n"
-    "    float rL  = dot(r,  vec3(0.299, 0.587, 0.114));\n"
-    "    float blL = dot(bl, vec3(0.299, 0.587, 0.114));\n"
-    "    float bL  = dot(b,  vec3(0.299, 0.587, 0.114));\n"
-    "    float brL = dot(br, vec3(0.299, 0.587, 0.114));\n"
-
-    "    float gx = -tlL + trL - 2.0 * lL + 2.0 * rL - blL + brL;\n"
-    "    float gy = -tlL - 2.0 * tL - trL + blL + 2.0 * bL + brL;\n"
-
-    "    return sqrt(gx * gx + gy * gy);\n"
-    "}\n"
-
     "void main() {\n"
     "    vec2 uv = fragTexCoord;\n"
+
     "    vec3 col = texture(texture0, uv).rgb;\n"
-    "    \n"
-    "    float edge = sobelEdge(uv);\n"
-    "    edge = smoothstep(0.12, 0.50, edge);\n"
-    "    float inkMask = floor(edge * 4.0 + 0.5) / 4.0;\n"
-    "    \n"
-    "    vec3 paper = mix(vec3(0.98, 0.97, 0.94), vec3(0.95, 0.94, 0.90), uv.y);\n"
-    "    paper += paperGrain(uv) * 0.03;\n"
-    "    paper = clamp(paper, 0.0, 1.0);\n"
-    "    \n"
-    "    vec3 inkBlue = vec3(0.08, 0.18, 0.52);\n"
-    "    vec3 inkCyan = vec3(0.06, 0.36, 0.60);\n"
-    "    float inkMix = sin(uv.y * resolution.y * 0.4 + time * 0.3) * 0.5 + 0.5;\n"
-    "    vec3 inkColor = mix(inkBlue, inkCyan, inkMix * 0.4);\n"
-    "    \n"
-    "    float lum = dot(col, vec3(0.299, 0.587, 0.114));\n"
-    "    float paperMix = smoothstep(0.20, 0.80, lum) * 0.30;\n"
-    "    vec3 result = mix(col, paper, paperMix);\n"
-    "    \n"
-    "    float darkLift = smoothstep(0.0, 0.18, lum);\n"
-    "    result = mix(paper * 0.92, result, darkLift);\n"
-    "    \n"
-    "    result = mix(result, inkColor, inkMask * 0.75);\n"
-    "    \n"
-    "    float h1 = step(0.5, fract((uv.x + uv.y) * 64.0));\n"
-    "    float h2 = step(0.5, fract((uv.x - uv.y) * 64.0));\n"
-    "    float h3 = step(0.5, fract(uv.x * 64.0));\n"
-    "    float hatch = 0.0;\n"
-    "    if (lum > 0.50 && lum < 0.70) hatch = max(h1 * 0.85, max(h2 * 0.65, h3 * 0.45));\n"
-    "    result = mix(result, inkColor * 0.85, hatch * 0.12);\n"
-    "    \n"
-    "    float lineSpacing = resolution.y / 18.0;\n"
-    "    float lineY = fract(uv.y * resolution.y / lineSpacing);\n"
-    "    float ruledLine = 1.0 - smoothstep(0.0, 0.02, lineY);\n"
-    "    result = mix(result, inkColor * 0.6, ruledLine * 0.08);\n"
-    "    \n"
-    "    result = clamp(result, 0.0, 1.0);\n"
-    "    finalColor = vec4(result, 1.0);\n"
+    "    float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));\n"
+
+    "    vec2 texel = vec2(1.0) / resolution;\n"
+
+    "    float tl = dot(texture(texture0, uv + texel * vec2(-1.0,  1.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float t  = dot(texture(texture0, uv + texel * vec2( 0.0,  1.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float tr = dot(texture(texture0, uv + texel * vec2( 1.0,  1.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float l  = dot(texture(texture0, uv + texel * vec2(-1.0,  0.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float r  = dot(texture(texture0, uv + texel * vec2( 1.0,  0.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float bl = dot(texture(texture0, uv + texel * vec2(-1.0, -1.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float b  = dot(texture(texture0, uv + texel * vec2( 0.0, -1.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+    "    float br = dot(texture(texture0, uv + texel * vec2( 1.0, -1.0)).rgb, vec3(0.2126, 0.7152, 0.0722));\n"
+
+    "    float gx = -tl - 2.0*l - bl + tr + 2.0*r + br;\n"
+    "    float gy = -tl - 2.0*t - tr + bl + 2.0*b + br;\n"
+    "    float edge = sqrt(gx*gx + gy*gy);\n"
+    "    float edgeLine = smoothstep(0.05, 0.12, edge);\n"
+
+    "    vec3 inkDark   = vec3(0.08, 0.18, 0.52);\n"
+    "    vec3 inkMedium = vec3(0.15, 0.35, 0.65);\n"
+    "    vec3 inkLight  = vec3(0.40, 0.55, 0.75);\n"
+    "    vec3 inkPale   = vec3(0.70, 0.80, 0.90);\n"
+    "    vec3 paper     = vec3(0.96, 0.94, 0.91);\n"
+
+    "    float inkAmount = 1.0 - lum;\n"
+    "    vec3 inkCol = mix(inkPale, inkDark, inkAmount);\n"
+    "    inkCol = mix(inkMedium, inkCol, smoothstep(0.0, 0.4, inkAmount));\n"
+    "    inkCol = mix(inkLight,  inkCol, smoothstep(0.0, 0.25, inkAmount));\n"
+
+    "    col = mix(col, inkCol, edgeLine * 0.8);\n"
+
+    "    float lineSpacing = 30.0;\n"
+    "    float lineY = (uv.y - 0.5) * resolution.y / lineSpacing;\n"
+    "    float lineFrac = fract(lineY);\n"
+    "    float hLine = 1.0 - smoothstep(0.0, 1.2 / resolution.y, lineFrac) * smoothstep(0.0, 1.2 / resolution.y, 1.0 - lineFrac);\n"
+    "    hLine *= smoothstep(0.0, 0.003, lineFrac) * smoothstep(0.0, 0.003, 1.0 - lineFrac);\n"
+    "    col = mix(col, col * vec3(0.70, 0.78, 0.90), hLine * 0.22);\n"
+
+    "    float marginLineWidth = 1.4 / resolution.x;\n"
+    "    float marginL = 1.0 - smoothstep(0.0, marginLineWidth, abs(uv.x - 0.10));\n"
+    "    float marginR = 1.0 - smoothstep(0.0, marginLineWidth, abs(uv.x - 0.90));\n"
+    "    float margin = max(marginL, marginR);\n"
+    "    col = mix(col, vec3(0.85, 0.20, 0.15), margin * 0.80);\n"
+
+    "    float grain = fract(sin(dot(uv + vec2(time * 0.003, fract(time * 0.617)), vec2(12.9898, 78.233))) * 43758.5453);\n"
+    "    col += (grain - 0.5) * 0.035;\n"
+
+    "    col = pow(clamp(col, 0.0, 1.0), vec3(1.0 / 2.2));\n"
+
+    "    finalColor = vec4(clamp(col, 0.0, 1.0), 1.0);\n"
     "}\n";
 
 static const char *scopeVertShader = 
@@ -251,13 +232,26 @@ static const char *scopeFragShader =
     "void main() {\n"
     "    vec2 uv = fragTexCoord - 0.5;\n"
     "    float dist = length(uv);\n"
-    "    float ring = smoothstep(0.48, 0.5, dist) - smoothstep(0.5, 0.52, dist);\n"
-    "    float crosshair = 0.0;\n"
-    "    if (abs(uv.x) < 0.002 || abs(uv.y) < 0.002) crosshair = 1.0;\n"
-    "    if (dist > 0.5) discard;\n"
-    "    vec3 col = texture(texture0, fragTexCoord).rgb;\n"
-    "    col = mix(col, vec3(0.15, 0.15, 0.18), ring * 0.9);\n"
-    "    col = mix(col, vec3(0.15, 0.15, 0.18), crosshair * 0.9);\n"
+
+    "    if (dist > 0.52) discard;\n"
+
+    "    vec2 d = uv;\n"
+    "    float blurAmount = smoothstep(0.28, 0.52, dist) * 0.008;\n"
+    "    vec3 col = vec3(0.0);\n"
+    "    col += texture(texture0, fragTexCoord + vec2( blurAmount, 0.0)).rgb * 0.25;\n"
+    "    col += texture(texture0, fragTexCoord + vec2(-blurAmount, 0.0)).rgb * 0.25;\n"
+    "    col += texture(texture0, fragTexCoord + vec2(0.0,  blurAmount)).rgb * 0.25;\n"
+    "    col += texture(texture0, fragTexCoord + vec2(0.0, -blurAmount)).rgb * 0.25;\n"
+
+    "    float outerDim = smoothstep(0.28, 0.52, dist);\n"
+    "    col *= 1.0 - outerDim * 0.65;\n"
+
+    "    float ringInner = smoothstep(0.41, 0.43, dist);\n"
+    "    float ringOuter = smoothstep(0.49, 0.47, dist);\n"
+    "    float ring = ringInner * (1.0 - ringOuter);\n"
+    "    col = mix(col, col * vec3(1.0), ring * 0.3);\n"
+
+    "    col = clamp(col, 0.0, 1.0);\n"
     "    finalColor = vec4(col, 1.0);\n"
     "}\n";
 
@@ -290,6 +284,7 @@ void ShaderInit(ShaderManager *shaders, int screenWidth, int screenHeight) {
     shaders->pbrLocMetallic = GetShaderLocation(shaders->pbr, "metallic");
     shaders->pbrLocFogColor = GetShaderLocation(shaders->pbr, "fogColor");
     shaders->pbrLocFogDensity = GetShaderLocation(shaders->pbr, "fogDensity");
+    shaders->pbrLocSubsurface = GetShaderLocation(shaders->pbr, "subsurface");
     shaders->postLocTime = GetShaderLocation(shaders->postProcess, "time");
     shaders->postLocResolution = GetShaderLocation(shaders->postProcess, "resolution");
     shaders->scopeLocTime = GetShaderLocation(shaders->scope, "time");
@@ -330,6 +325,10 @@ void ShaderSetFog(ShaderManager *shaders, Vector3 fogColor, float fogDensity) {
 void ShaderSetDirectionalLight(ShaderManager *shaders, Vector3 dir, Vector3 col) {
     SetShaderValue(shaders->pbr, shaders->pbrLocDirLightDir, &dir, SHADER_UNIFORM_VEC3);
     SetShaderValue(shaders->pbr, shaders->pbrLocDirLightCol, &col, SHADER_UNIFORM_VEC3);
+}
+
+void ShaderSetSubsurface(ShaderManager *shaders, float sss) {
+    SetShaderValue(shaders->pbr, shaders->pbrLocSubsurface, &sss, SHADER_UNIFORM_FLOAT);
 }
 
 void ShaderShutdown(ShaderManager *shaders) {

@@ -5,47 +5,8 @@
 #include "audio.h"
 #include "raymath.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
-
-#if defined(_WIN32) || defined(_WIN64)
-#include <io.h>
-#include <fcntl.h>
-#else
-#include <dirent.h>
-#endif
-
-static int FindNextIteration(const char *dir) {
-#if defined(_WIN32) || defined(_WIN64)
-    char pattern[512];
-    snprintf(pattern, sizeof(pattern), "%s/iteration_*.png", dir);
-    struct _finddata_t info;
-    intptr_t handle = _findfirst(pattern, &info);
-    if (handle == -1) return 1;
-    int maxNum = 0;
-    do {
-        int n;
-        if (sscanf(info.name, "iteration_%d.png", &n) == 1 && n > maxNum) {
-            maxNum = n;
-        }
-    } while (_findnext(handle, &info) == 0);
-    _findclose(handle);
-    return maxNum + 1;
-#else
-    DIR *d = opendir(dir);
-    if (!d) return 1;
-    int maxNum = 0;
-    struct dirent *ent;
-    while ((ent = readdir(d)) != NULL) {
-        int n;
-        if (sscanf(ent->d_name, "iteration_%d.png", &n) == 1 && n > maxNum) {
-            maxNum = n;
-        }
-    }
-    closedir(d);
-    return maxNum + 1;
-#endif
-}
+#include <unistd.h>
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     if (game->zombieCount >= MAX_ZOMBIES) return;
@@ -54,32 +15,28 @@ static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
         texIdx = texIdx % game->zombieHeadTextureCount;
         DebugLogf(&game->debug, DEBUG_INFO, "Spawning image-head zombie with texIdx=%d", texIdx);
     }
-    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieSkinNormal, game->textures.zombieShirt, game->textures.zombiePants, game->textures.zombieBone, game->shaders.pbr);
+    ZombieInit(&game->zombies[idx], pos, type, texIdx, game->textures.zombieSkin, game->textures.zombieSkinNormal, game->textures.zombieShirt, game->textures.zombiePants, game->shaders.pbr);
     game->zombies[idx].speed = ZOMBIE_SPEED_BASE;
     if (type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
         game->zombies[idx].speed = ZOMBIE_SPEED_BASE * 2.0f;
     }
 }
 
-static Vector3 GetZombieSpawnPoint(void) {
-    float angle = (float)rand() / RAND_MAX * PI;
-    float radius = 5.0f + rand() % 15;
-    Vector3 pos = {
-        (float)(rand() % 20 - 10),
-        0,
-        (float)(5 + rand() % 20)
-    };
-    return pos;
-}
-
 static void SpawnImageZombie(Game *game, int texIdx) {
-    Vector3 pos = GetZombieSpawnPoint();
+    float angle = (float)rand() / RAND_MAX * 2.0f * PI;
+    float radius = 5.0f + rand() % 12;
+    Vector3 pos = {
+        cosf(angle) * radius,
+        0,
+        sinf(angle) * radius
+    };
     SpawnZombie(game, pos, ZOMBIE_TYPE_IMAGE_HEAD, texIdx);
 }
 
 static void SpawnWave(Game *game) {
     game->round++;
-    game->zombiesRemaining = 8 + game->round * 4;
+    game->zombiesRemaining = 30 + game->round * 10;
+    if (game->zombiesRemaining > MAX_ZOMBIES) game->zombiesRemaining = MAX_ZOMBIES;
     game->nonImageDeathsSinceLastImage = 0;
     bool usedImages[16] = { false };
     int imageCount = 0;
@@ -89,8 +46,49 @@ static void SpawnWave(Game *game) {
         imageCount = 1;
         usedImages[rand() % game->zombieHeadTextureCount] = true;
     }
-    for (int i = 0; i < game->zombiesRemaining; i++) {
-        Vector3 pos = GetZombieSpawnPoint();
+    
+    int fenceZombies = 8 + game->round * 3;
+    int groupCount = 4 + game->round;
+    float groupSpacing = 15.0f / (float)groupCount;
+    
+    for (int g = 0; g < groupCount && game->zombieCount < game->zombiesRemaining; g++) {
+        int groupSize = 4 + rand() % 6;
+        float groupCenterX = -4.0f + (rand() % 8);
+        float groupCenterZ = 6.0f + g * groupSpacing;
+        
+        for (int j = 0; j < groupSize && game->zombieCount < game->zombiesRemaining; j++) {
+            float offsetX = (rand() % 100 - 50) / 40.0f;
+            float offsetZ = (rand() % 100 - 50) / 40.0f;
+            Vector3 pos = {
+                groupCenterX + offsetX,
+                0,
+                groupCenterZ + offsetZ
+            };
+            ZombieType type = ZOMBIE_TYPE_DEFAULT;
+            int texIdx = 0;
+            if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
+                type = ZOMBIE_TYPE_IMAGE_HEAD;
+                texIdx = game->zombieCount % game->zombieHeadTextureCount;
+            } else if (game->zombieMode == ZOMBIE_MODE_MIXED && game->zombieHeadTextureCount > 0 && game->zombieCount == 0 && imageCount > 0) {
+                type = ZOMBIE_TYPE_IMAGE_HEAD;
+                for (int k = 0; k < game->zombieHeadTextureCount; k++) {
+                    if (usedImages[k]) { texIdx = k; break; }
+                }
+            }
+            SpawnZombie(game, pos, type, texIdx);
+        }
+    }
+    
+    for (int i = 0; i < fenceZombies && game->zombieCount < game->zombiesRemaining; i++) {
+        float x = -4.0f + (rand() % 8);
+        Vector3 pos = { x, 0, 4.5f + (rand() % 100) / 50.0f };
+        SpawnZombie(game, pos, ZOMBIE_TYPE_DEFAULT, 0);
+    }
+    
+    for (int i = game->zombieCount; i < game->zombiesRemaining; i++) {
+        float x = -6.0f + rand() % 12;
+        float z = 5.0f + rand() % 15;
+        Vector3 pos = { x, 0, z };
         ZombieType type = ZOMBIE_TYPE_DEFAULT;
         int texIdx = 0;
         if (game->zombieMode == ZOMBIE_MODE_ALL_IMAGES && game->zombieHeadTextureCount > 0) {
@@ -110,6 +108,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->round = 0;
     game->nonImageDeathsSinceLastImage = 0;
     game->gameTime = 0.0f;
+    game->scopeActive = false;
     game->firstShotFired = false;
     game->firstShotGraceTimer = 0.3f;
     game->zombieCount = 0;
@@ -119,13 +118,13 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->muzzleFlashTimer = 0.0f;
     game->muzzleFlashPos = (Vector3){ 0 };
     
-    RendererInit(game, screenWidth, screenHeight);
-    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr, &game->textures);
+    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
     WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
     
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
+    RendererInit(game, screenWidth, screenHeight);
     game->mode = game->menu.mode;
     game->zombieMode = game->menu.zombieMode;
     
@@ -139,23 +138,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
         DebugLog(&game->debug, "No zombie head textures uploaded", DEBUG_WARN);
     }
     
-    if (game->screenshotMode == SCREENSHOT_MODE_WORLD) {
-        game->zombieCount = 0;
-        game->zombiesRemaining = 0;
-    } else if (game->screenshotMode == SCREENSHOT_MODE_ZOMBIE) {
-        game->zombieCount = 0;
-        game->zombiesRemaining = 0;
-        SpawnZombie(game, (Vector3){ 0, 0, 2.0f }, ZOMBIE_TYPE_DEFAULT, 0);
-        CameraSetMode(&game->camera, GAME_CAMERA_MODE_THIRD_PERSON);
-        game->camera.baseMode = GAME_CAMERA_MODE_THIRD_PERSON;
-    } else if (game->screenshotMode == SCREENSHOT_MODE_PLAYER) {
-        game->zombieCount = 0;
-        game->zombiesRemaining = 0;
-        CameraSetMode(&game->camera, GAME_CAMERA_MODE_THIRD_PERSON);
-        game->camera.baseMode = GAME_CAMERA_MODE_THIRD_PERSON;
-    } else {
-        SpawnWave(game);
-    }
+    SpawnWave(game);
 }
 
 static bool PointInAABB(Vector3 p, Vector3 center, Vector3 size) {
@@ -180,8 +163,8 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    Vector3 wallCenter = { 0, 1.2f, -10.0f };
-    Vector3 wallSize = { 60.0f, 2.4f, 0.6f };
+    Vector3 wallCenter = { 0, 0.75f, -10.0f };
+    Vector3 wallSize = { 38.0f, 1.5f, 0.6f };
     if (PointInAABB(p, wallCenter, wallSize)) {
         float dx = p.x - wallCenter.x;
         float dz = p.z - wallCenter.z;
@@ -194,24 +177,21 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    for (int bx = -2; bx <= 2; bx++) {
-        for (int bz = 0; bz <= 3; bz++) {
-            float baseX = bx * 12.0f;
-            float baseZ = bz * 14.0f + 6.0f;
-            if (fabsf(baseX) < 1.5f && baseZ < 2.0f) continue;
-            float h = 3.0f + ((bx + bz) % 4) * 1.8f;
-            Vector3 bldPos = { baseX, h * 0.5f, baseZ };
-            Vector3 bldSize = { 5.5f, h, 5.0f };
-            if (PointInAABB(p, bldPos, bldSize)) {
-                float dx = p.x - bldPos.x;
-                float dz = p.z - bldPos.z;
-                float halfX = bldSize.x * 0.5f + radius;
-                float halfZ = bldSize.z * 0.5f + radius;
-                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
-                    game->player.position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
-                } else {
-                    game->player.position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
-                }
+    for (int i = 0; i < 12; i++) {
+        float x = -12.0f + i * 4.0f;
+        float z = 10.0f;
+        float h = 1.5f + (i % 3) * 1.0f;
+        Vector3 bldPos = { x, h * 0.5f, z };
+        Vector3 bldSize = { 3.5f, h, 3.5f };
+        if (PointInAABB(p, bldPos, bldSize)) {
+            float dx = p.x - bldPos.x;
+            float dz = p.z - bldPos.z;
+            float halfX = bldSize.x * 0.5f + radius;
+            float halfZ = bldSize.z * 0.5f + radius;
+            if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                game->player.position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
+            } else {
+                game->player.position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
             }
         }
     }
@@ -327,10 +307,10 @@ static void GameApplyCollisions(Game *game) {
         }
     }
     
-    if (p.x < -45.0f) game->player.position.x = -45.0f;
-    if (p.x > 45.0f) game->player.position.x = 45.0f;
-    if (p.z < -45.0f) game->player.position.z = -45.0f;
-    if (p.z > 45.0f) game->player.position.z = 45.0f;
+    if (p.x < -25.0f) game->player.position.x = -25.0f;
+    if (p.x > 25.0f) game->player.position.x = 25.0f;
+    if (p.z < -25.0f) game->player.position.z = -25.0f;
+    if (p.z > 25.0f) game->player.position.z = 25.0f;
     if (p.y < 0.0f) game->player.position.y = 0.0f;
 }
 
@@ -339,8 +319,8 @@ static void GameApplyZombieCollisions(Game *game) {
     for (int i = 0; i < game->zombieCount; i++) {
         if (!ZombieIsAlive(&game->zombies[i])) continue;
         Vector3 p = game->zombies[i].position;
-        Vector3 wallCenter = { 0, 1.2f, -10.0f };
-        Vector3 wallSize = { 60.0f, 2.4f, 0.6f };
+        Vector3 wallCenter = { 0, 0.75f, -10.0f };
+        Vector3 wallSize = { 38.0f, 1.5f, 0.6f };
         if (PointInAABB(p, wallCenter, wallSize)) {
             float dx = p.x - wallCenter.x;
             float dz = p.z - wallCenter.z;
@@ -352,25 +332,21 @@ static void GameApplyZombieCollisions(Game *game) {
                 game->zombies[i].position.z = wallCenter.z + (dz > 0 ? halfZ : -halfZ);
             }
         }
-        
-        for (int bx = -2; bx <= 2; bx++) {
-            for (int bz = 0; bz <= 3; bz++) {
-                float baseX = bx * 12.0f;
-                float baseZ = bz * 14.0f + 6.0f;
-                if (fabsf(baseX) < 1.5f && baseZ < 2.0f) continue;
-                float h = 3.0f + ((bx + bz) % 4) * 1.8f;
-                Vector3 bldPos = { baseX, h * 0.5f, baseZ };
-                Vector3 bldSize = { 5.5f, h, 5.0f };
-                if (PointInAABB(p, bldPos, bldSize)) {
-                    float dx = p.x - bldPos.x;
-                    float dz = p.z - bldPos.z;
-                    float halfX = bldSize.x * 0.5f + radius;
-                    float halfZ = bldSize.z * 0.5f + radius;
-                    if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
-                        game->zombies[i].position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
-                    } else {
-                        game->zombies[i].position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
-                    }
+        for (int b = 0; b < 12; b++) {
+            float x = -12.0f + b * 4.0f;
+            float z = 10.0f;
+            float h = 1.5f + (b % 3) * 1.0f;
+            Vector3 bldPos = { x, h * 0.5f, z };
+            Vector3 bldSize = { 3.5f, h, 3.5f };
+            if (PointInAABB(p, bldPos, bldSize)) {
+                float dx = p.x - bldPos.x;
+                float dz = p.z - bldPos.z;
+                float halfX = bldSize.x * 0.5f + radius;
+                float halfZ = bldSize.z * 0.5f + radius;
+                if (fabsf(dx) / halfX > fabsf(dz) / halfZ) {
+                    game->zombies[i].position.x = bldPos.x + (dx > 0 ? halfX : -halfX);
+                } else {
+                    game->zombies[i].position.z = bldPos.z + (dz > 0 ? halfZ : -halfZ);
                 }
             }
         }
@@ -469,11 +445,27 @@ static void GameApplyZombieCollisions(Game *game) {
             }
         }
         
-        if (p.x < -45.0f) game->zombies[i].position.x = -45.0f;
-        if (p.x > 45.0f) game->zombies[i].position.x = 45.0f;
-        if (p.z < -45.0f) game->zombies[i].position.z = -45.0f;
-        if (p.z > 45.0f) game->zombies[i].position.z = 45.0f;
+        if (p.x < -25.0f) game->zombies[i].position.x = -25.0f;
+        if (p.x > 25.0f) game->zombies[i].position.x = 25.0f;
+        if (p.z < -25.0f) game->zombies[i].position.z = -25.0f;
+        if (p.z > 25.0f) game->zombies[i].position.z = 25.0f;
         if (p.y < 0.0f) game->zombies[i].position.y = 0.0f;
+    }
+    
+    float zombieRadius = 0.5f;
+    for (int i = 0; i < game->zombieCount; i++) {
+        if (!ZombieIsAlive(&game->zombies[i])) continue;
+        for (int j = i + 1; j < game->zombieCount; j++) {
+            if (!ZombieIsAlive(&game->zombies[j])) continue;
+            Vector3 diff = Vector3Subtract(game->zombies[i].position, game->zombies[j].position);
+            float dist = Vector3Length(diff);
+            float minDist = zombieRadius * 2.0f;
+            if (dist < minDist && dist > 0.001f) {
+                Vector3 push = Vector3Scale(diff, (minDist - dist) / dist * 0.5f);
+                game->zombies[i].position = Vector3Add(game->zombies[i].position, push);
+                game->zombies[j].position = Vector3Subtract(game->zombies[j].position, push);
+            }
+        }
     }
 }
 
@@ -488,7 +480,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     if (game->firstShotGraceTimer > 0.0f) game->firstShotGraceTimer -= dt;
     PlayerUpdate(&game->player, input, dt);
     CameraUpdate(&game->camera, &game->player, dt);
-    WeaponUpdate(&game->weapon, game->player.position, game->player.yaw, input, dt);
+    WeaponUpdate(&game->weapon, game->player.position, input, dt);
     RendererUpdate(game, dt);
     
     GameApplyCollisions(game);
@@ -516,29 +508,24 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (game->screenshotMode == SCREENSHOT_MODE_NONE) {
-        if (input->cameraTogglePressed) {
-            CameraToggleMode(&game->camera);
-        }
+    if (input->mouseLeftPressed) {
+        CameraSetAiming(&game->camera, true);
+    }
+    
+    if (input->mouseLeftReleased) {
+        CameraSetAiming(&game->camera, false);
+    }
+    
+    if (input->mouseLeftReleased && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
+        WeaponShoot(&game->weapon);
+        AudioPlayGunshot(&game->audio);
+        game->firstShotFired = true;
         
-        if (input->mouseRightDown) {
-            CameraSetMode(&game->camera, GAME_CAMERA_MODE_FIRST_PERSON);
-        } else {
-            CameraSetMode(&game->camera, game->camera.baseMode);
-        }
-        CameraSetCrouch(&game->camera, input->ctrlPressed);
-        
-        if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
-            WeaponShoot(&game->weapon);
-            AudioPlayGunshot(&game->audio);
-            game->firstShotFired = true;
-            
-            RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
-            if (hit.hit) {
-                ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
-                if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
-                    game->score += 100;
-                }
+        RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
+        if (hit.hit) {
+            ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
+            if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
+                game->score += 100;
                 game->totalDeadZombies += 1;
                 if (game->zombies[hit.zombieIndex].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
                     bool anyImageAlive = false;
@@ -615,7 +602,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                             (rand()%100-50)/25.0f
                         };
                         ParticleSpawn(&game->particles[game->particleCount++], deathPos,
-                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 60, 80, 140, 255 });
+                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 200 + rand()%55, 0, 0, 255 });
                     }
                 }
                 if (game->bloodDecalCount < 128) {
@@ -627,7 +614,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                         splashPos.y = 0.05f;
                         ParticleSpawn(&game->particles[game->particleCount++], splashPos,
                             (Vector3){ (rand()%100-50)/80.0f, 0.05f, (rand()%100-50)/80.0f },
-                            3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 50, 70, 130, 220 });
+                            3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 180, 0, 0, 220 });
                     }
                 }
             }
@@ -635,7 +622,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                 if (game->particleCount < 256) {
                     ParticleSpawn(&game->particles[game->particleCount++], hit.point,
                         (Vector3){ (rand()%100-50)/50.0f, (rand()%100-50)/50.0f, (rand()%100-50)/50.0f },
-                        1.0f, PARTICLE_BLOOD, 0.05f, (Color){ 50, 70, 130, 255 });
+                        1.0f, PARTICLE_BLOOD, 0.05f, RED);
                 }
             }
         }
@@ -646,44 +633,33 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     
     
     if (IsKeyPressed(KEY_R)) WeaponReload(&game->weapon);
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) game->scopeActive = !game->scopeActive;
+    if (game->scopeActive) CameraApplyScope(&game->camera, true);
+    else CameraApplyScope(&game->camera, false);
     
     ParticleSystemUpdate(game->particles, game->particleCount, dt);
     
     if (game->muzzleFlashTimer > 0) game->muzzleFlashTimer -= dt;
     
-    if (game->screenshotMode == SCREENSHOT_MODE_NONE) {
-        bool allDead = true;
-        for (int i = 0; i < game->zombieCount; i++) {
-            if (ZombieIsAlive(&game->zombies[i])) { allDead = false; break; }
-        }
-        if (allDead) {
-            SpawnWave(game);
-        }
+    bool allDead = true;
+    for (int i = 0; i < game->zombieCount; i++) {
+        if (ZombieIsAlive(&game->zombies[i])) { allDead = false; break; }
+    }
+    if (allDead) {
+        SpawnWave(game);
     }
 }
 
 void GameRender(Game *game) {
     Camera3D cam = CameraGetCamera(&game->camera);
     RendererBegin(game, cam);
-    
-    if (game->screenshotMode != SCREENSHOT_MODE_ZOMBIE && game->screenshotMode != SCREENSHOT_MODE_PLAYER) {
-        RendererDrawScene(game);
+    RendererDrawScene(game);
+    RendererDrawBloodDecals(game);
+    RendererDrawZombies(game, game->shaders.pbr);
+    if (CameraGetFirstPersonBlend(&game->camera) < 0.5f) {
+        RendererDrawPlayer(&game->player, game->shaders.pbr);
     }
-    
-    if (game->screenshotMode != SCREENSHOT_MODE_PLAYER) {
-        RendererDrawBloodDecals(game);
-        RendererDrawZombies(game, game->shaders.pbr);
-    }
-    
-    if (game->screenshotMode != SCREENSHOT_MODE_ZOMBIE) {
-        if (CameraGetMode(&game->camera) == GAME_CAMERA_MODE_THIRD_PERSON) {
-            RendererDrawPlayer(&game->player, game->shaders.pbr);
-            WeaponRender(&game->weapon, cam, game->player.yaw);
-        } else {
-            WeaponRenderFirstPerson(&game->weapon, cam, game->player.yaw);
-        }
-    }
-    
+    WeaponRender(&game->weapon, cam, game->player.yaw);
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
     RendererDrawZombieHeads(game);
@@ -716,52 +692,48 @@ int main(void) {
     
     Game game = { 0 };
     UIInit(&game.menu, screenWidth, screenHeight);
-    game.menu.active = true;
-    game.state = GAME_STATE_MENU;
+    game.menu.active = false;
+    game.state = GAME_STATE_PLAYING;
     
     InputState input;
     int frameCount = 0;
-    char screenshotPath[256] = { 0 };
-    const char *shotEnv = getenv("ZOMBIE_SHOT");
-    if (shotEnv) {
-        snprintf(screenshotPath, sizeof(screenshotPath), "%s", shotEnv);
-    } else {
-        int nextIter = FindNextIteration("../workflow");
-        snprintf(screenshotPath, sizeof(screenshotPath), "../workflow/iteration_%02d.png", nextIter);
-    }
+    const char *screenshotPath = getenv("ZOMBIE_SHOT");
     int autoQuitMs = -1;
     const char *autoQuitStr = getenv("ZOMBIE_AUTO_QUIT_MS");
     if (autoQuitStr) autoQuitMs = atoi(autoQuitStr);
     double startTime = GetTime();
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
-    int screenshotFrame = 35;
+    int screenshotFrame = 5;
     
-    bool autoRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
-    int autoRotateStage = 0;
-    int autoRotateBase = FindNextIteration("../workflow");
-    float autoRotateAccum = 0.0f;
-    float lastYaw = 0.0f;
-    const float autoRotateSpeed = 9.5f;
-    float autoRotateAngleThreshold = PI * 0.5f;
-    int autoRotateMaxScreenshots = 4;
-    const char *stepEnv = getenv("ZOMBIE_SCREENSHOT_STEP_DEGREES");
-    if (stepEnv) {
-        float stepDeg = atof(stepEnv);
-        if (stepDeg > 0.1f && stepDeg <= 180.0f) {
-            autoRotateAngleThreshold = stepDeg * PI / 180.0f;
-            autoRotateMaxScreenshots = (int)(360.0f / stepDeg);
-            if (autoRotateMaxScreenshots < 1) autoRotateMaxScreenshots = 1;
+    bool screenshotRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
+    int screenshotStepDegrees = 1;
+    const char *stepStr = getenv("ZOMBIE_SCREENSHOT_STEP_DEGREES");
+    if (stepStr) screenshotStepDegrees = atoi(stepStr);
+    if (screenshotStepDegrees < 1) screenshotStepDegrees = 1;
+    if (screenshotStepDegrees > 360) screenshotStepDegrees = 360;
+    int totalScreenshots = 360 / screenshotStepDegrees;
+    int screenshotIndex = 0;
+    float currentRotation = 0.0f;
+    bool screenshotWorld = getenv("ZOMBIE_SCREENSHOT_WORLD") != NULL;
+    bool screenshotZombie = getenv("ZOMBIE_SCREENSHOT_ZOMBIE") != NULL;
+    bool screenshotPlayer = getenv("ZOMBIE_SCREENSHOT_PLAYER") != NULL;
+    
+    GameInit(&game, screenWidth, screenHeight);
+    
+    if (screenshotRotate) {
+        game.menu.active = false;
+        game.state = GAME_STATE_PLAYING;
+        if (screenshotZombie) {
+            for (int i = 0; i < game.zombieCount; i++) game.zombies[i].active = false;
+            game.zombieCount = 1;
+            Vector3 pos = { 0, 0, 3.0f };
+            ZombieInit(&game.zombies[0], pos, ZOMBIE_TYPE_DEFAULT, 0, game.textures.zombieSkin, game.textures.zombieSkinNormal, game.textures.zombieShirt, game.textures.zombiePants, game.shaders.pbr);
+            game.zombies[0].active = true;
+        } else if (screenshotPlayer) {
+            for (int i = 0; i < game.zombieCount; i++) game.zombies[i].active = false;
+            game.zombieCount = 0;
         }
-    }
-    
-    game.screenshotMode = SCREENSHOT_MODE_NONE;
-    if (getenv("ZOMBIE_SCREENSHOT_WORLD") != NULL) {
-        game.screenshotMode = SCREENSHOT_MODE_WORLD;
-    } else if (getenv("ZOMBIE_SCREENSHOT_ZOMBIE") != NULL) {
-        game.screenshotMode = SCREENSHOT_MODE_ZOMBIE;
-    } else if (getenv("ZOMBIE_SCREENSHOT_PLAYER") != NULL) {
-        game.screenshotMode = SCREENSHOT_MODE_PLAYER;
     }
     
     while (!WindowShouldClose()) {
@@ -785,42 +757,15 @@ int main(void) {
         
         if (autoStart && frameCount == autoStartFrame && game.state == GAME_STATE_MENU) {
             game.state = GAME_STATE_PLAYING;
-            game.menu.active = false;
             GameInit(&game, screenWidth, screenHeight);
-        }
-        
-        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < autoRotateMaxScreenshots) {
-            fprintf(stderr, "AUTO_ROTATE: stage=%d yaw=%.3f accum=%.3f\n", autoRotateStage, game.player.yaw, autoRotateAccum);
-            input.mouseDelta.x = autoRotateSpeed;
-            input.mouseDelta.y = 0.0f;
         }
         
         if (game.state == GAME_STATE_PLAYING && !game.menu.active) {
             GameUpdate(&game, GetFrameTime(), &input);
         }
         
-        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < autoRotateMaxScreenshots) {
-            float currentYaw = game.player.yaw;
-            float deltaYaw = currentYaw - lastYaw;
-            autoRotateAccum += deltaYaw;
-            lastYaw = currentYaw;
-            
-            while (autoRotateAccum <= -autoRotateAngleThreshold) {
-                autoRotateAccum += autoRotateAngleThreshold;
-                char path[256];
-                snprintf(path, sizeof(path), "../workflow/iteration_%02d.png", autoRotateBase + autoRotateStage);
-                fprintf(stderr, "AUTO_ROTATE: Taking screenshot %d -> %s\n", autoRotateStage, path);
-                TakeScreenshot(path);
-                autoRotateStage++;
-            }
-            
-            if (autoRotateStage >= autoRotateMaxScreenshots) {
-                break;
-            }
-        }
-        
         BeginDrawing();
-        ClearBackground((Color){ 245, 240, 232, 255 });
+        ClearBackground(BLACK);
         
         if (game.state == GAME_STATE_MENU || game.menu.active) {
             UIRender(&game.menu);
@@ -828,8 +773,8 @@ int main(void) {
         } else if (game.state == GAME_STATE_PLAYING) {
             GameRender(&game);
         } else if (game.state == GAME_STATE_GAMEOVER) {
-            DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, (Color){ 120, 40, 40, 255 });
-            DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, (Color){ 20, 30, 60, 255 });
+            DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, RED);
+            DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, WHITE);
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
                 GameShutdown(&game);
                 UIInit(&game.menu, screenWidth, screenHeight);
@@ -843,6 +788,37 @@ int main(void) {
         if (screenshotPath && frameCount == screenshotFrame) {
             TakeScreenshot(screenshotPath);
         }
+        
+        if (screenshotRotate && game.state == GAME_STATE_PLAYING && frameCount >= autoStartFrame) {
+            float stepRad = screenshotStepDegrees * DEG2RAD;
+            currentRotation += stepRad;
+            if (currentRotation >= 2.0f * PI) currentRotation -= 2.0f * PI;
+            float dist = 4.0f;
+            float height = 2.0f;
+            game.camera.camera.position.x = game.player.position.x + sinf(currentRotation) * dist;
+            game.camera.camera.position.z = game.player.position.z + cosf(currentRotation) * dist;
+            game.camera.camera.position.y = game.player.position.y + height;
+            game.camera.camera.target = game.player.position;
+            game.camera.camera.target.y += 1.0f;
+            
+            if (screenshotIndex < totalScreenshots) {
+                char cwd[256];
+                char path[512];
+                const char *subdir = "";
+                if (screenshotZombie) subdir = "zombie";
+                else if (screenshotPlayer) subdir = "player";
+                else if (screenshotWorld) subdir = "world";
+                
+                if (getcwd(cwd, sizeof(cwd)) != NULL) {
+                    snprintf(path, sizeof(path), "%s/workflow/%s/iteration_%02d.png", cwd, subdir, screenshotIndex + 1);
+                } else {
+                    snprintf(path, sizeof(path), "workflow/%s/iteration_%02d.png", subdir, screenshotIndex + 1);
+                }
+                TakeScreenshot(path);
+                screenshotIndex++;
+            }
+        }
+        
         frameCount++;
         
         if (autoQuitMs > 0 && (GetTime() - startTime) * 1000.0 > autoQuitMs) break;

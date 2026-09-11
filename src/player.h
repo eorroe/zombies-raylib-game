@@ -24,6 +24,10 @@ typedef struct {
     Model rightArmModel;
     Model leftLegModel;
     Model rightLegModel;
+    Model leftHandModel;
+    Model rightHandModel;
+    Model leftFootModel;
+    Model rightFootModel;
     Texture2D uniformTex;
     Texture2D skinTex;
     bool isMoving;

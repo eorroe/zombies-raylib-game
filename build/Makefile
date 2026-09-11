@@ -321,6 +321,30 @@ src/player.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/player.c.s
 .PHONY : src/player.c.s
 
+src/player_mesh.o: src/player_mesh.c.o
+.PHONY : src/player_mesh.o
+
+# target to build an object file
+src/player_mesh.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/player_mesh.c.o
+.PHONY : src/player_mesh.c.o
+
+src/player_mesh.i: src/player_mesh.c.i
+.PHONY : src/player_mesh.i
+
+# target to preprocess a source file
+src/player_mesh.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/player_mesh.c.i
+.PHONY : src/player_mesh.c.i
+
+src/player_mesh.s: src/player_mesh.c.s
+.PHONY : src/player_mesh.s
+
+# target to generate assembly for a file
+src/player_mesh.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/player_mesh.c.s
+.PHONY : src/player_mesh.c.s
+
 src/renderer.o: src/renderer.c.o
 .PHONY : src/renderer.o
 
@@ -522,6 +546,9 @@ help:
 	@echo "... src/player.o"
 	@echo "... src/player.i"
 	@echo "... src/player.s"
+	@echo "... src/player_mesh.o"
+	@echo "... src/player_mesh.i"
+	@echo "... src/player_mesh.s"
 	@echo "... src/renderer.o"
 	@echo "... src/renderer.i"
 	@echo "... src/renderer.s"

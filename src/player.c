@@ -2,20 +2,37 @@
 #include "raymath.h"
 #include "texture.h"
 #include "input.h"
+#include "player_mesh.h"
 #include <stdlib.h>
 #include <math.h>
 
 static Model CreateLimbPivoted(float radius, float length, int slices) {
-    Mesh m = GenMeshCylinder(radius, length, slices);
+    Mesh m = PlayerMesh_CreateLimb(radius, length, slices);
     for (int i = 0; i < m.vertexCount; i++) {
         m.vertices[i * 3 + 1] -= length * 0.5f;
     }
+    PlayerMesh_Upload(&m);
     Model model = LoadModelFromMesh(m);
     return model;
 }
 
 static Model CreateLimb(float radius, float length, int slices) {
-    Mesh m = GenMeshCylinder(radius, length, slices);
+    Mesh m = PlayerMesh_CreateLimb(radius, length, slices);
+    PlayerMesh_Upload(&m);
+    Model model = LoadModelFromMesh(m);
+    return model;
+}
+
+static Model CreateHand(float radius) {
+    Mesh m = PlayerMesh_CreateHand(radius);
+    PlayerMesh_Upload(&m);
+    Model model = LoadModelFromMesh(m);
+    return model;
+}
+
+static Model CreateFoot(float radius) {
+    Mesh m = PlayerMesh_CreateFoot(radius);
+    PlayerMesh_Upload(&m);
     Model model = LoadModelFromMesh(m);
     return model;
 }
@@ -38,26 +55,35 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->animTime = 0.0f;
     player->moveDir = (Vector3){ 0 };
 
-    Mesh bodyMesh = GenMeshCylinder(0.5f, 1.4f, 12);
+    Mesh bodyMesh = PlayerMesh_CreateTorso(0.5f, 1.4f, 0.3f);
     player->bodyModel = LoadModelFromMesh(bodyMesh);
     player->bodyModel.materials[0].shader = pbr;
 
-    Mesh headMesh = GenMeshSphere(0.28f, 12, 12);
+    Mesh headMesh = PlayerMesh_CreateHead(0.28f);
     player->headModel = LoadModelFromMesh(headMesh);
     player->headModel.materials[0].shader = pbr;
 
-    Mesh helmetMesh = GenMeshSphere(0.32f, 12, 8);
+    Mesh helmetMesh = PlayerMesh_CreateHelmet(0.32f);
     player->helmetModel = LoadModelFromMesh(helmetMesh);
     player->helmetModel.materials[0].shader = pbr;
 
-    player->leftArmModel = CreateLimb(0.1f, 0.8f, 8);
+    player->leftArmModel = CreateLimb(0.1f, 0.8f, 16);
     player->leftArmModel.materials[0].shader = pbr;
-    player->rightArmModel = CreateLimb(0.1f, 0.8f, 8);
+    player->rightArmModel = CreateLimb(0.1f, 0.8f, 16);
     player->rightArmModel.materials[0].shader = pbr;
-    player->leftLegModel = CreateLimbPivoted(0.12f, 1.0f, 8);
+    player->leftLegModel = CreateLimbPivoted(0.12f, 1.0f, 16);
     player->leftLegModel.materials[0].shader = pbr;
-    player->rightLegModel = CreateLimbPivoted(0.12f, 1.0f, 8);
+    player->rightLegModel = CreateLimbPivoted(0.12f, 1.0f, 16);
     player->rightLegModel.materials[0].shader = pbr;
+
+    player->leftHandModel = CreateHand(0.06f);
+    player->leftHandModel.materials[0].shader = pbr;
+    player->rightHandModel = CreateHand(0.06f);
+    player->rightHandModel.materials[0].shader = pbr;
+    player->leftFootModel = CreateFoot(0.08f);
+    player->leftFootModel.materials[0].shader = pbr;
+    player->rightFootModel = CreateFoot(0.08f);
+    player->rightFootModel.materials[0].shader = pbr;
 
     Image uniformImg = GenImageColor(256, 256, (Color){ 60, 100, 160, 255 });
     for (int i = 0; i < 800; i++) {
@@ -178,6 +204,16 @@ void PlayerRender(Player *player, Shader shader) {
     float rightLegAngle = legSwing * RAD2DEG;
     DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
     DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
+
+    Vector3 leftHandPos = Vector3Add(leftShoulder, Vector3Scale(right, -0.35f));
+    Vector3 rightHandPos = Vector3Add(rightShoulder, Vector3Scale(right, -0.35f));
+    DrawModelEx(player->leftHandModel, leftHandPos, (Vector3){ 0, 0, 1 }, yawDeg + armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightHandModel, rightHandPos, (Vector3){ 0, 0, 1 }, yawDeg - armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+
+    Vector3 leftFootPos = Vector3Add(leftHip, Vector3Scale(leftAxis, -PLAYER_LEG_LENGTH));
+    Vector3 rightFootPos = Vector3Add(rightHip, Vector3Scale(rightAxis, -PLAYER_LEG_LENGTH));
+    DrawModelEx(player->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
 void PlayerShutdown(Player *player) {
@@ -188,6 +224,10 @@ void PlayerShutdown(Player *player) {
     UnloadModel(player->rightArmModel);
     UnloadModel(player->leftLegModel);
     UnloadModel(player->rightLegModel);
+    UnloadModel(player->leftHandModel);
+    UnloadModel(player->rightHandModel);
+    UnloadModel(player->leftFootModel);
+    UnloadModel(player->rightFootModel);
     UnloadTexture(player->uniformTex);
     UnloadTexture(player->skinTex);
 }

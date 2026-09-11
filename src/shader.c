@@ -186,7 +186,7 @@ static const char *postFragShader =
     "    inkCol = mix(inkMedium, inkCol, smoothstep(0.0, 0.4, inkAmount));\n"
     "    inkCol = mix(inkLight,  inkCol, smoothstep(0.0, 0.25, inkAmount));\n"
 
-    "    col = mix(paper, inkCol, edgeLine);\n"
+    "    col = mix(col, inkCol, edgeLine * 0.8);\n"
 
     "    float lineSpacing = 30.0;\n"
     "    float lineY = (uv.y - 0.5) * resolution.y / lineSpacing;\n"

@@ -233,7 +233,15 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
-  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h
+  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+  /usr/include/dirent.h \
+  /usr/include/x86_64-linux-gnu/bits/dirent.h \
+  /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+  /usr/include/linux/limits.h \
+  /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
+  /usr/include/x86_64-linux-gnu/bits/pthread_stack_min.h \
+  /usr/include/x86_64-linux-gnu/bits/dirent_ext.h
 
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: ../src/image_upload.c \
   /usr/include/stdc-predef.h \
@@ -810,8 +818,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 ../src/zombie_mesh.c:
 
-../src/weapon.c:
-
 ../src/ui.c:
 
 ../src/shader.c:
@@ -819,6 +825,14 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 ../src/player.c:
 
 ../src/image_upload.c:
+
+../src/weapon.c:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/dirent.h:
 
 /usr/include/x86_64-linux-gnu/bits/time.h:
 
@@ -846,6 +860,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
+/usr/include/dirent.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
@@ -863,6 +879,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/stdio.h:
 
 ../src/weapon.h:
+
+/usr/include/x86_64-linux-gnu/bits/dirent_ext.h:
 
 ../src/input.h:
 
@@ -934,6 +952,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 /usr/include/features.h:
 
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+
 /usr/include/features-time64.h:
 
 /usr/include/time.h:
@@ -949,6 +969,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
+
+/usr/include/linux/limits.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
@@ -985,6 +1007,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 

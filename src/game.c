@@ -7,6 +7,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <dirent.h>
+
+static int FindNextIteration(const char *dir) {
+    DIR *d = opendir(dir);
+    if (!d) return 1;
+    int maxNum = 0;
+    struct dirent *ent;
+    while ((ent = readdir(d)) != NULL) {
+        int n;
+        if (sscanf(ent->d_name, "iteration_%d.png", &n) == 1 && n > maxNum) {
+            maxNum = n;
+        }
+    }
+    closedir(d);
+    return maxNum + 1;
+}
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     if (game->zombieCount >= MAX_ZOMBIES) return;
@@ -682,7 +698,14 @@ int main(void) {
     
     InputState input;
     int frameCount = 0;
-    const char *screenshotPath = getenv("ZOMBIE_SHOT");
+    char screenshotPath[256] = { 0 };
+    const char *shotEnv = getenv("ZOMBIE_SHOT");
+    if (shotEnv) {
+        snprintf(screenshotPath, sizeof(screenshotPath), "%s", shotEnv);
+    } else {
+        int nextIter = FindNextIteration("../workflow");
+        snprintf(screenshotPath, sizeof(screenshotPath), "../workflow/iteration_%02d.png", nextIter);
+    }
     int autoQuitMs = -1;
     const char *autoQuitStr = getenv("ZOMBIE_AUTO_QUIT_MS");
     if (autoQuitStr) autoQuitMs = atoi(autoQuitStr);
@@ -693,6 +716,7 @@ int main(void) {
     
     bool autoRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
     int autoRotateStage = 0;
+    int autoRotateBase = FindNextIteration("../workflow");
     float autoRotateAccum = 0.0f;
     float lastYaw = 0.0f;
     const float autoRotateSpeed = 9.5f;
@@ -742,7 +766,7 @@ int main(void) {
             while (autoRotateAccum <= -autoRotateAngleThreshold) {
                 autoRotateAccum += autoRotateAngleThreshold;
                 char path[256];
-                snprintf(path, sizeof(path), "/tmp/weapon_yaw_%d.png", autoRotateStage);
+                snprintf(path, sizeof(path), "../workflow/iteration_%02d.png", autoRotateBase + autoRotateStage);
                 fprintf(stderr, "AUTO_ROTATE: Taking screenshot %d -> %s\n", autoRotateStage, path);
                 TakeScreenshot(path);
                 autoRotateStage++;

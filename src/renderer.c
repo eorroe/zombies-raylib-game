@@ -129,11 +129,10 @@ void RendererBegin(Game *game, Camera3D camera) {
     (void)game;
     (void)camera;
     
-    int w = 1280;
-    int h = 720;
-    DrawRectangleGradientV(0, 0, w, h / 2, (Color){ 120, 160, 220, 255 }, (Color){ 220, 180, 120, 255 });
-    DrawRectangleGradientV(0, h / 2, w, h / 2, (Color){ 220, 180, 120, 255 }, (Color){ 180, 120, 80, 255 });
-    
+    BeginTextureMode(game->sceneTarget);
+    ClearBackground((Color){245,240,232,255});
+    DrawRectangleGradientV(0, 0, 1280, 360, (Color){200,220,240,255}, (Color){235,240,245,255});
+    DrawRectangleGradientV(0, 360, 1280, 360, (Color){235,240,245,255}, (Color){220,230,240,255});
     BeginMode3D(camera);
     rlDisableBackfaceCulling();
 }
@@ -147,13 +146,13 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 1.2f * flicker, 0.7f * flicker, 0.4f * flicker };
+        lightColors[i] = (Vector3){ 0.5f * flicker, 0.7f * flicker, 1.0f * flicker };
     }
     int lightCount = 4;
     
     ShaderBeginPBR(&game->shaders);
     ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
-    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 1.2f, 0.9f, 0.7f });
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.7f, 0.85f, 1.0f });
     
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
@@ -177,32 +176,32 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 4; i++) {
         float x = -10.0f + i * 3.5f;
         Vector3 containerPos = { x, 0.6f, -10.0f };
-        DrawModel(game->containerModel, containerPos, 1.0f, (Color){ 180, 80, 50, 255 });
+        DrawModel(game->containerModel, containerPos, 1.0f, (Color){80, 100, 120, 255});
     }
     
     SetPBRMaterial(game, game->textures.fence, game->textures.metalNormal, 0.8f, 0.4f);
     for (int i = 0; i < 20; i++) {
         float x = -8.0f + i * 0.8f;
-        DrawModel(game->fenceModel, (Vector3){ x, 0.6f, 4.0f }, 1.0f, WHITE);
-        DrawModel(game->fenceModel, (Vector3){ x, 0.6f, 4.5f }, 1.0f, WHITE);
+        DrawModel(game->fenceModel, (Vector3){ x, 0.6f, 4.0f }, 1.0f, (Color){50, 70, 100, 255});
+        DrawModel(game->fenceModel, (Vector3){ x, 0.6f, 4.5f }, 1.0f, (Color){50, 70, 100, 255});
     }
     for (int i = 0; i < 20; i++) {
         float x = -8.0f + i * 0.8f;
         float barY = 0.3f + (i % 3) * 0.35f;
-        DrawCube((Vector3){ x, barY, 4.0f }, 0.04f, 0.04f, 2.0f, (Color){ 50, 50, 55, 255 });
-        DrawCube((Vector3){ x, barY, 4.5f }, 0.04f, 0.04f, 2.0f, (Color){ 50, 50, 55, 255 });
+        DrawCube((Vector3){ x, barY, 4.0f }, 0.04f, 0.04f, 2.0f, (Color){40, 60, 90, 255});
+        DrawCube((Vector3){ x, barY, 4.5f }, 0.04f, 0.04f, 2.0f, (Color){40, 60, 90, 255});
     }
     
     SetPBRMaterial(game, game->textures.concrete, game->textures.concreteNormal, 0.1f, 0.7f);
     DrawModel(game->platformModel, (Vector3){ 8.0f, 0.3f, 3.0f }, 1.0f, WHITE);
-    DrawModel(game->platformModel, (Vector3){ 12.0f, 0.3f, 3.0f }, 1.0f, (Color){ 110, 105, 100, 255 });
-    DrawCube((Vector3){ 10.0f, 0.55f, 4.2f }, 4.5f, 0.3f, 0.3f, (Color){ 80, 75, 70, 255 });
+    DrawModel(game->platformModel, (Vector3){ 12.0f, 0.3f, 3.0f }, 1.0f, (Color){130, 140, 150, 255});
+    DrawCube((Vector3){ 10.0f, 0.55f, 4.2f }, 4.5f, 0.3f, 0.3f, (Color){130, 140, 150, 255});
     
     for (int i = 0; i < 40; i++) {
         float x = -20.0f + (i % 20) * 2.0f + (i / 20) * 0.5f;
         float z = -5.0f + (i % 7) * 1.5f;
         float y = 0.08f + (i % 3) * 0.04f;
-        DrawModel(game->rubbleModel, (Vector3){ x, y, z }, 1.0f, (Color){ 90, 85, 80, 255 });
+        DrawModel(game->rubbleModel, (Vector3){ x, y, z }, 1.0f, (Color){100, 110, 120, 255});
     }
     
     SetPBRMaterial(game, game->textures.concrete, game->textures.concreteNormal, 0.1f, 0.7f);
@@ -210,7 +209,7 @@ void RendererDrawScene(Game *game) {
         float x = -14.0f + i * 3.0f;
         float z = 14.0f + (i % 2) * 2.0f;
         float h = 1.2f + (i % 4) * 0.8f;
-        DrawCube((Vector3){ x, h * 0.5f, z }, 0.5f, h * 0.5f, 1.5f, (Color){ 70, 65, 60, 255 });
+        DrawCube((Vector3){ x, h * 0.5f, z }, 0.5f, h * 0.5f, 1.5f, (Color){140, 150, 160, 255});
     }
     
     SetPBRMaterial(game, game->textures.brick, (Texture2D){0}, 0.0f, 0.85f);
@@ -224,14 +223,14 @@ void RendererDrawScene(Game *game) {
         for (int w = 0; w < 5; w++) {
             float wx = x - 1.0f + w * 1.0f;
             float wy = h * 0.5f + 0.3f;
-            DrawCube((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){ 12, 10, 8, 255 });
+            DrawCube((Vector3){ wx, wy, z + 1.76f }, 0.5f, 0.5f, 0.05f, (Color){20, 30, 60, 255});
         }
         
         if (i % 4 == 0) {
             float cx = x + 0.3f;
             float cz = z - 0.5f;
-            DrawCube((Vector3){ cx, h * 0.5f, cz }, 0.08f, h * 0.6f, 0.08f, (Color){ 35, 30, 25, 255 });
-            DrawCube((Vector3){ cx + 0.3f, h * 0.3f, cz + 0.2f }, 0.08f, h * 0.3f, 0.08f, (Color){ 35, 30, 25, 255 });
+            DrawCube((Vector3){ cx, h * 0.5f, cz }, 0.08f, h * 0.6f, 0.08f, (Color){30, 40, 60, 255});
+            DrawCube((Vector3){ cx + 0.3f, h * 0.3f, cz + 0.2f }, 0.08f, h * 0.3f, 0.08f, (Color){30, 40, 60, 255});
         }
     }
     
@@ -241,8 +240,8 @@ void RendererDrawScene(Game *game) {
         float xEnd = 18.0f;
         for (float x = xStart; x < xEnd; x += 1.5f) {
             float postH = 1.0f + (i % 2) * 0.3f;
-            DrawCube((Vector3){ x, postH * 0.5f, z }, 0.08f, postH, 0.08f, (Color){ 40, 38, 35, 255 });
-            DrawCube((Vector3){ x, postH * 0.5f, z + 0.15f }, 0.06f, postH * 0.02f, 0.06f, (Color){ 25, 25, 25, 255 });
+            DrawCube((Vector3){ x, postH * 0.5f, z }, 0.08f, postH, 0.08f, (Color){40, 50, 70, 255});
+            DrawCube((Vector3){ x, postH * 0.5f, z + 0.15f }, 0.06f, postH * 0.02f, 0.06f, (Color){40, 50, 70, 255});
         }
     }
     
@@ -297,7 +296,7 @@ void RendererDrawBloodDecals(Game *game) {
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
         pos.y = 0.03f;
-        DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){ 180, 0, 0, 200 });
+        DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){20, 30, 60, 180});
     }
 }
 
@@ -307,7 +306,7 @@ void RendererDrawZombies(Game *game, Shader shader) {
     Camera3D cam = CameraGetCamera(&game->camera);
     ShaderBeginPBR(&game->shaders);
     ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
-    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 1.2f, 0.9f, 0.7f });
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.7f, 0.85f, 1.0f });
     ShaderSetSubsurface(&game->shaders, 0.3f);
     Vector3 lightPositions[4];
     Vector3 lightColors[4];
@@ -315,7 +314,7 @@ void RendererDrawZombies(Game *game, Shader shader) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 1.2f * flicker, 0.7f * flicker, 0.4f * flicker };
+        lightColors[i] = (Vector3){ 0.5f * flicker, 0.7f * flicker, 1.0f * flicker };
     }
     int lightCount = 4;
     for (int i = 0; i < 4; i++) {
@@ -365,16 +364,16 @@ void RendererDrawZombieHeads(Game *game) {
                 float barX = screenPos.x - size / 2;
                 float barY = screenPos.y - size / 2 - barHeight - 4.0f;
                 float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
-                DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
-                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, RED);
+                DrawRectangle(barX, barY, barWidth, barHeight, (Color){20, 30, 60, 255});
+                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, (Color){40, 80, 160, 255});
             }
         } else {
             Vector2 screenPos = GetWorldToScreen(headPos, cam);
             float barWidth = 40.0f;
             float barHeight = 4.0f;
             float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
-            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth, barHeight, (Color){ 120, 0, 0, 255 });
-            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth * healthPct, barHeight, RED);
+            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth, barHeight, (Color){20, 30, 60, 255});
+            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth * healthPct, barHeight, (Color){40, 80, 160, 255});
         }
     }
 }
@@ -389,7 +388,7 @@ void RendererDrawParticles(Particle *particles, int count) {
     
     for (int i = 0; i < count; i++) {
         if (particles[i].type == PARTICLE_BLOOD) {
-            DrawSphere(particles[i].position, particles[i].size * 4.0f, particles[i].color);
+            DrawSphere(particles[i].position, particles[i].size * 4.0f, (Color){20, 30, 60, 200});
         }
     }
 }
@@ -398,7 +397,7 @@ void RendererDrawHUD(Game *game) {
     int w = game->sceneTarget.texture.width;
     int h = game->sceneTarget.texture.height;
     
-    DrawRectangle(0, h - 70, w, 70, ColorAlpha(BLACK, 0.6f));
+    DrawRectangle(0, h - 70, w, 70, (Color){230, 235, 240, 200});
     
     int ammoX = w - 20;
     int ammoY = h - 45;
@@ -409,22 +408,22 @@ void RendererDrawHUD(Game *game) {
     int healthX = 20;
     int healthY = h - 45;
     float healthPct = game->player.health / game->player.maxHealth;
-    DrawRectangle(healthX, healthY, 200, 18, (Color){ 60, 60, 60, 200 });
-    DrawRectangle(healthX, healthY, (int)(200 * healthPct), 18, (Color){ 180, 40, 40, 255 });
-    DrawRectangleLines(healthX, healthY, 200, 18, WHITE);
+    DrawRectangle(healthX, healthY, 200, 18, (Color){230, 235, 240, 200});
+    DrawRectangle(healthX, healthY, (int)(200 * healthPct), 18, (Color){40, 80, 160, 255});
+    DrawRectangleLines(healthX, healthY, 200, 18, (Color){20, 30, 60, 255});
     DrawText(TextFormat("%.0f", game->player.health), healthX + 205, healthY, 20, WHITE);
     
     if (CameraGetADSBlend(&game->camera) > 0.5f || CameraGetFirstPersonBlend(&game->camera) > 0.5f) {
         int cx = w / 2;
         int cy = h / 2;
-        DrawLine(cx - 12, cy, cx - 4, cy, (Color){ 200, 200, 200, 180 });
-        DrawLine(cx + 4, cy, cx + 12, cy, (Color){ 200, 200, 200, 180 });
-        DrawLine(cx, cy - 12, cx, cy - 4, (Color){ 200, 200, 200, 180 });
-        DrawLine(cx, cy + 4, cx, cy + 12, (Color){ 200, 200, 200, 180 });
+        DrawLine(cx - 12, cy, cx - 4, cy, (Color){40, 80, 160, 180});
+        DrawLine(cx + 4, cy, cx + 12, cy, (Color){40, 80, 160, 180});
+        DrawLine(cx, cy - 12, cx, cy - 4, (Color){40, 80, 160, 180});
+        DrawLine(cx, cy + 4, cx, cy + 12, (Color){40, 80, 160, 180});
     }
     
     if (game->weapon.reloading) {
-        DrawText("RELOADING", w / 2 - MeasureText("RELOADING", 20) / 2, h - 65, 20, YELLOW);
+        DrawText("RELOADING", w / 2 - MeasureText("RELOADING", 20) / 2, h - 65, 20, (Color){120, 40, 40, 255});
     }
 }
 
@@ -435,6 +434,15 @@ void RendererDrawScope(Game *game) {
 void RendererEnd(Game *game) {
     (void)game;
     EndMode3D();
+    EndTextureMode();
+    DrawTextureRec(game->sceneTarget.texture, (Rectangle){0,0,(float)game->sceneTarget.texture.width,(float)-game->sceneTarget.texture.height}, (Vector2){0,0}, WHITE);
+    BeginTextureMode(game->postProcessTarget);
+    ClearBackground(BLANK);
+    BeginShaderMode(game->shaders.postProcess);
+    DrawTextureRec(game->sceneTarget.texture, (Rectangle){0,0,(float)game->sceneTarget.texture.width,(float)-game->sceneTarget.texture.height}, (Vector2){0,0}, WHITE);
+    EndShaderMode();
+    EndTextureMode();
+    DrawTextureRec(game->postProcessTarget.texture, (Rectangle){0,0,(float)game->postProcessTarget.texture.width,(float)-game->postProcessTarget.texture.height}, (Vector2){0,0}, WHITE);
 }
 
 void RendererShutdown(Game *game) {

@@ -222,10 +222,10 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         if (cycle < 0.5f) flash = 1.0f;
     }
     
-    Color skinColor = (Color){ 180, 170, 155, 255 };
-    Color shirtColor = (Color){ 60, 65, 55, 255 };
-    Color pantsColor = (Color){ 40, 45, 50, 255 };
-    Color flashRed = (Color){ 255, 60, 60, 255 };
+    Color skinColor = (Color){ 70, 110, 160, 255 };
+    Color shirtColor = (Color){ 40, 70, 130, 255 };
+    Color pantsColor = (Color){ 30, 50, 100, 255 };
+    Color flashRed = (Color){ 120, 40, 40, 255 };
     
     Color bodyColor = (Color){
         (unsigned char)(shirtColor.r + (flashRed.r - shirtColor.r) * flash),

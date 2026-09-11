@@ -59,22 +59,22 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr) {
     player->rightLegModel = CreateLimbPivoted(0.12f, 1.0f, 8);
     player->rightLegModel.materials[0].shader = pbr;
 
-    Image uniformImg = GenImageColor(256, 256, (Color){ 130, 135, 160, 255 });
+    Image uniformImg = GenImageColor(256, 256, (Color){ 60, 100, 160, 255 });
     for (int i = 0; i < 800; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 110 + rand() % 70;
-        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 10, shade + 25, 255 });
+        int shade = 50 + rand() % 70;
+        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 20, shade + 60, 255 });
     }
     Texture2D uniformTex = LoadTextureFromImage(uniformImg);
     UnloadImage(uniformImg);
 
-    Image skinImg = GenImageColor(256, 256, (Color){ 180, 220, 140, 255 });
+    Image skinImg = GenImageColor(256, 256, (Color){ 80, 120, 170, 255 });
     for (int i = 0; i < 1500; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 140 + rand() % 100;
-        ImageDrawPixel(&skinImg, x, y, (Color){ shade, shade + 50, shade - 5, 255 });
+        int shade = 60 + rand() % 90;
+        ImageDrawPixel(&skinImg, x, y, (Color){ shade, shade + 30, shade + 70, 255 });
     }
     Texture2D skinTex = LoadTextureFromImage(skinImg);
     UnloadImage(skinImg);
@@ -134,13 +134,13 @@ void PlayerRender(Player *player, Shader shader) {
 
     Vector3 bodyPos = player->position;
     bodyPos.y += 1.0f;
-    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 55, 45, 255 });
+    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
-    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 200, 180, 160, 255 });
+    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 80, 120, 170, 255 });
 
     Vector3 helmetPos = Vector3Add(headPos, (Vector3){ 0, 0.05f, 0 });
-    DrawModelEx(player->helmetModel, helmetPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 35, 38, 30, 255 });
+    DrawModelEx(player->helmetModel, helmetPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 20, 30, 60, 255 });
 
     Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
     Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, -0.5f * sinYaw });

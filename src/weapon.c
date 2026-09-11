@@ -215,35 +215,17 @@ static void DrawDetailedGun(Vector3 pos, float yawDeg, Color tint) {
         DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 85, 170, 255 });
     }
 
-    Vector3 muzzlePos = Vector3Add(barrelPos, (Vector3){ 0, 0, 0.45f });
-    DrawModelEx(g_weaponModels.muzzleBrake, muzzlePos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 35, 45, 120, 255 });
-
     Vector3 scopePos = Vector3Add(bodyPos, (Vector3){ 0, 0.09f, 0.05f });
     DrawModelEx(g_weaponModels.sight, scopePos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 70, 160, 255 });
 
-    Vector3 handguardPos = Vector3Add(pos, (Vector3){ 0, 0, 0.08f });
-    DrawModelEx(g_weaponModels.handguard, handguardPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 75, 165, 255 });
-
-    Vector3 frontSightPos = Vector3Add(handguardPos, (Vector3){ 0, 0.04f, 0.08f });
-    DrawModelEx(g_weaponModels.frontSight, frontSightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 50, 130, 255 });
-
     Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.07f, -0.015f });
     DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 80, 60, 40, 255 });
-
-    Vector3 triggerGuardPos = Vector3Add(gripPos, (Vector3){ 0, -0.025f, 0.01f });
-    DrawModelEx(g_weaponModels.triggerGuard, triggerGuardPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 65, 140, 255 });
 
     Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.02f, 0.01f });
     DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 45, 45, 120, 255 });
 
     Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.06f, 0.04f });
     DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 60, 145, 255 });
-
-    Vector3 magReleasePos = Vector3Add(magPos, (Vector3){ 0.02f, 0.0f, 0.0f });
-    DrawModelEx(g_weaponModels.magRelease, magReleasePos, (Vector3){ 1, 0, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 80, 170, 255 });
-
-    Vector3 ejectionPortPos = Vector3Add(bodyPos, (Vector3){ 0.04f, 0.01f, 0.1f });
-    DrawModelEx(g_weaponModels.ejectionPort, ejectionPortPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 50, 130, 255 });
 
     Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.2f });
     DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 65, 150, 255 });
@@ -255,7 +237,6 @@ static void DrawDetailedGun(Vector3 pos, float yawDeg, Color tint) {
     DrawModelEx(g_weaponModels.forearm, forearmPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 80, 50, 255 });
 }
 
->>>>>>> theirs
 void WeaponRender(Weapon *weapon, Camera3D camera, float yaw) {
     (void)camera;
     if (weapon->reloading) return;

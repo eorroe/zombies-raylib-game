@@ -32,6 +32,13 @@ typedef struct {
     float muzzleFlashTimer;
     float swayTimer;
     Vector2 aimOffset;
+    Model muzzleBrake;
+    Model handguard;
+    Model triggerGuard;
+    Model magRelease;
+    Model ejectionPort;
+    Model frontSight;
+    Model rearSight;
 } Weapon;
 
 void WeaponInit(Weapon *weapon, Shader pbr);

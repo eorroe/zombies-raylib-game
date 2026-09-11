@@ -497,6 +497,17 @@ CMakeFiles/ZombieShooter.dir/src/renderer.c.o
  /usr/include/x86_64-linux-gnu/bits/fp-fast.h
  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h
+ /usr/include/stdio.h
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h
+ /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h
+ /usr/include/x86_64-linux-gnu/bits/types/__FILE.h
+ /usr/include/x86_64-linux-gnu/bits/types/FILE.h
+ /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h
+ /usr/include/x86_64-linux-gnu/bits/stdio.h
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h
 
 CMakeFiles/ZombieShooter.dir/src/shader.c.o
  /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_c654aa33-d172-44c0-ab26-a68a350ae4ae/src/shader.c

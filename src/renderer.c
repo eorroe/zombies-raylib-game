@@ -165,7 +165,7 @@ void RendererDrawScene(Game *game) {
             0.3f,
             sinf(angle) * radius
         };
-        DrawCubeWires(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 20, 30, 60, 255 });
+        DrawCube(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 240, 242, 248, 255 });
     }
 
     for (int i = 0; i < 14; i++) {
@@ -176,7 +176,7 @@ void RendererDrawScene(Game *game) {
             0.4f,
             sinf(angle) * radius
         };
-        DrawCylinderWires(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 20, 30, 60, 255 });
+        DrawCylinder(barrelPos, 0.3f, 0.3f, 1.2f, 12, (Color){ 240, 242, 248, 255 });
     }
 
     for (int bx = -2; bx <= 2; bx++) {
@@ -187,7 +187,7 @@ void RendererDrawScene(Game *game) {
 
             float h = 3.0f + ((bx + bz) % 4) * 1.8f;
 
-            DrawCubeWires((Vector3){ baseX, h * 0.5f, baseZ }, 5.5f, h, 5.0f, (Color){ 20, 30, 60, 255 });
+            DrawCube((Vector3){ baseX, h * 0.5f, baseZ }, 5.5f, h, 5.0f, (Color){ 240, 242, 248, 255 });
 
             for (int wy = -2; wy <= 2; wy++) {
                 for (int wx = -2; wx <= 2; wx++) {
@@ -195,12 +195,12 @@ void RendererDrawScene(Game *game) {
                     float winX = baseX + wx * 0.9f;
                     float winZ = baseZ - 2.56f;
                     float winY = wy * 1.1f;
-                    DrawCubeWires((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 20, 30, 60, 255 });
+                    DrawCube((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 240, 242, 248, 255 });
 
                     float awningZ = baseZ - 2.6f;
                     float awningY = winY - 0.5f;
                     if ((wx + wy) % 3 == 0) {
-                        DrawCubeWires((Vector3){ winX, awningY, awningZ }, 0.7f, 0.08f, 0.4f, (Color){ 20, 30, 60, 255 });
+                        DrawCube((Vector3){ winX, awningY, awningZ }, 0.7f, 0.08f, 0.4f, (Color){ 240, 242, 248, 255 });
                     }
                 }
             }
@@ -210,27 +210,27 @@ void RendererDrawScene(Game *game) {
                     float fireX = baseX - 2.0f;
                     float fireZ = baseZ + 2.56f;
                     float fireY = wy * 1.5f;
-                    DrawCubeWires((Vector3){ fireX, fireY, fireZ }, 0.08f, 0.8f, 0.4f, (Color){ 20, 30, 60, 255 });
-                    DrawCubeWires((Vector3){ fireX - 0.2f, fireY + 0.2f, fireZ }, 0.25f, 0.08f, 0.35f, (Color){ 20, 30, 60, 255 });
+                    DrawCube((Vector3){ fireX, fireY, fireZ }, 0.08f, 0.8f, 0.4f, (Color){ 240, 242, 248, 255 });
+                    DrawCube((Vector3){ fireX - 0.2f, fireY + 0.2f, fireZ }, 0.25f, 0.08f, 0.35f, (Color){ 240, 242, 248, 255 });
                 }
             }
 
-            DrawCubeWires((Vector3){ baseX, h + 0.15f, baseZ }, 5.7f, 0.3f, 5.2f, (Color){ 20, 30, 60, 255 });
+            DrawCube((Vector3){ baseX, h + 0.15f, baseZ }, 5.7f, 0.3f, 5.2f, (Color){ 240, 242, 248, 255 });
 
             if ((bx + bz) % 2 == 0) {
-                DrawCubeWires((Vector3){ baseX, h + 0.4f, baseZ }, 1.0f, 0.5f, 0.8f, (Color){ 20, 30, 60, 255 });
+                DrawCube((Vector3){ baseX, h + 0.4f, baseZ }, 1.0f, 0.5f, 0.8f, (Color){ 240, 242, 248, 255 });
             }
 
             for (int w = 0; w < 3; w++) {
                 float sx = baseX - 1.4f + w * 1.4f;
                 float sy = -h * 0.35f;
-                DrawCubeWires((Vector3){ sx, sy, baseZ + 2.56f }, 0.7f, 1.1f, 0.05f, (Color){ 20, 30, 60, 255 });
+                DrawCube((Vector3){ sx, sy, baseZ + 2.56f }, 0.7f, 1.1f, 0.05f, (Color){ 240, 242, 248, 255 });
             }
         }
     }
 
     Vector3 wallPos = { 0, 1.2f, -10.0f };
-    DrawCubeWires(wallPos, 60.0f, 2.4f, 0.6f, (Color){ 20, 30, 60, 255 });
+    DrawCube(wallPos, 60.0f, 2.4f, 0.6f, (Color){ 240, 242, 248, 255 });
 
     for (int i = 0; i < 8; i++) {
         float angle = i * PI * 0.5f + PI * 0.25f;
@@ -240,20 +240,20 @@ void RendererDrawScene(Game *game) {
             2.0f,
             sinf(angle) * radius
         };
-        DrawCylinderWires(lampPos, 0.2f, 0.2f, 3.0f, 8, (Color){ 20, 30, 60, 255 });
-        DrawSphereWires((Vector3){ lampPos.x, lampPos.y + 1.5f, lampPos.z }, 0.5f, 8, 8, (Color){ 20, 30, 60, 255 });
+        DrawCylinder(lampPos, 0.2f, 0.2f, 3.0f, 8, (Color){ 240, 242, 248, 255 });
+        DrawSphere((Vector3){ lampPos.x, lampPos.y + 1.5f, lampPos.z }, 0.5f, (Color){ 240, 242, 248, 255 });
     }
 
     for (int i = 0; i < 6; i++) {
         float x = -20.0f + i * 8.0f;
-        DrawCubeWires((Vector3){ x, 0.25f, 4.5f }, 0.6f, 0.5f, 0.6f, (Color){ 20, 30, 60, 255 });
-        DrawCylinderWires((Vector3){ x, 0.55f, 4.5f }, 0.08f, 0.08f, 0.6f, 8, (Color){ 20, 30, 60, 255 });
+        DrawCube((Vector3){ x, 0.25f, 4.5f }, 0.6f, 0.5f, 0.6f, (Color){ 240, 242, 248, 255 });
+        DrawCylinder((Vector3){ x, 0.55f, 4.5f }, 0.08f, 0.08f, 0.6f, 8, (Color){ 240, 242, 248, 255 });
     }
 
     for (int i = 0; i < 4; i++) {
         float x = -16.0f + i * 10.0f;
-        DrawCubeWires((Vector3){ x, 1.2f, 4.5f }, 0.08f, 1.4f, 0.08f, (Color){ 20, 30, 60, 255 });
-        DrawCubeWires((Vector3){ x + 0.2f, 1.6f, 4.5f }, 0.6f, 0.4f, 0.05f, (Color){ 20, 30, 60, 255 });
+        DrawCube((Vector3){ x, 1.2f, 4.5f }, 0.08f, 1.4f, 0.08f, (Color){ 240, 242, 248, 255 });
+        DrawCube((Vector3){ x + 0.2f, 1.6f, 4.5f }, 0.6f, 0.4f, 0.05f, (Color){ 240, 242, 248, 255 });
     }
 }
 
@@ -354,7 +354,6 @@ void RendererDrawParticles(Particle *particles, int count) {
     for (int i = 0; i < count; i++) {
         if (particles[i].type == PARTICLE_BLOOD) {
             DrawSphere(particles[i].position, particles[i].size * 4.0f, particles[i].color);
-            DrawSphereWires(particles[i].position, particles[i].size * 4.0f, 8, 8, (Color){ 20, 30, 60, 180 });
         }
     }
     
@@ -366,18 +365,17 @@ void RendererDrawParticles(Particle *particles, int count) {
         Vector3 dustPos = { x, y, z };
         float alpha = 0.8f + sinf(t + i) * 0.2f;
         DrawSphere(dustPos, 0.3f, (Color){ 100, 130, 170, (unsigned char)(alpha * 255) });
-        DrawSphereWires(dustPos, 0.3f, 8, 8, (Color){ 20, 30, 60, (unsigned char)(alpha * 180) });
     }
 }
 
 void RendererDrawHUD(Game *game) {
     DrawRectangle(0, 0, game->sceneTarget.texture.width, 60, (Color){ 230, 235, 240, 200 });
-    DrawRectangleLines(0, 0, game->sceneTarget.texture.width, 60, (Color){ 20, 30, 60, 255 });
+    DrawRectangleLines(0, 0, game->sceneTarget.texture.width, 60, (Color){ 240, 242, 248, 255 });
     int x = 20;
     int gap = 10;
     int y = 20;
     int fontSize = 30;
-    Color color = (Color){ 20, 30, 60, 255 };
+    Color color = (Color){ 240, 242, 248, 255 };
 
     const char *scoreText = TextFormat("Score: %d", game->score);
     DrawText(scoreText, x, y, fontSize, color);

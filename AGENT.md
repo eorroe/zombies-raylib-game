@@ -87,6 +87,32 @@ When setting shader uniforms in `RendererDrawZombies()` or similar:
 - Light attenuation should use proper distance falloff: `1.0 / (1.0 + 0.05 * dist + 0.01 * dist * dist)`
 - Fire light flicker is ±15-25% — without tonemapping this will cause visible white flash
 
+### 5.1 Mandatory Screenshot Workflow for Every Visual Update
+
+**For EVERY visual change—without exception—you MUST complete the full screenshot workflow before considering the change finished.**
+
+This is not optional. A visual change is NOT complete until the screenshot workflow has been executed and the result has been judged against the reference.
+
+**Required steps for every visual update:**
+1. Make the code change
+2. Build the project
+3. Run headless with `xvfb-run -a -s "-screen 0 1280x720x24"` using the `workflow/` screenshot environment variables
+4. Capture a screenshot to `workflow/iteration_XX.png`
+5. **Apply the Judge Protocol** (systematic pixel analysis) to compare against the reference image
+6. Only declare success if the Judge Protocol confirms the visual change matches intent
+7. If the result does not match, iterate: adjust the code, rebuild, recapture, re-judge
+
+**What qualifies as a visual update:**
+- Shader changes (post-process, PBR, material)
+- Color palette changes
+- Model/material/tint changes
+- Render pipeline changes (render textures, blits, post-processing order)
+- Lighting changes
+- HUD/overlay changes
+- Any change that affects what appears on screen
+
+**Do NOT skip the screenshot workflow for "small" or "obvious" visual changes.**
+
 ### 6. Pre-Commit Rendering Checklist
 
 Before committing any rendering change:
@@ -96,7 +122,7 @@ Before committing any rendering change:
 - [ ] Ambient is ≤ 0.08 * albedo * ao
 - [ ] Model replacements match or exceed original scale
 - [ ] Build succeeds with zero errors
-- [ ] Screenshot taken and visually verified (no blown whites, scene visible)
+- [ ] Screenshot taken and visually verified using the Judge Protocol (Section 5.1/5.2)
 
 ### 7. Doodle Style Rendering Rules
 
@@ -270,6 +296,14 @@ The post-process shader MUST include:
 
 ## Screenshot Workflow
 
+**This workflow is MANDATORY for every visual update.** See Section 5.1 for the full policy.
+
+After every visual change, you MUST:
+1. Build and capture a screenshot using the workflow below
+2. Apply the **Judge Protocol** (systematic pixel analysis algorithm in Section 5.2)
+3. Compare the result against the reference image
+4. Do NOT declare the change complete until the Judge Protocol confirms it matches intent
+
 ### Directory and Naming Convention
 
 All workflow screenshots are saved to the `workflow/` directory using the `iteration_XX.png` naming convention, where `XX` is an incrementing zero-padded count starting from `01`.
@@ -357,7 +391,11 @@ The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `s
 | HUD missing | HUD drawn inside texture mode, not on backbuffer |
 | Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` |
 
-### Systematic Pixel Analysis Algorithm
+### Judge Protocol (Systematic Pixel Analysis Algorithm)
+
+The **Judge Protocol** is the mandatory verification method for all visual updates.
+
+After capturing a screenshot for a visual change, you MUST apply this algorithm to judge whether the change matches the intended result. Do not rely on visual inspection alone—use the quantitative steps below.
 
 When analyzing screenshots, follow this **broad-to-narrow** iterative approach:
 

@@ -146,6 +146,7 @@ static const char *postFragShader =
     "uniform vec2 resolution;\n"
     "out vec4 finalColor;\n"
 
+<<<<<<< Updated upstream
     "const float PI = 3.14159265359;\n"
 
     "float hash(vec2 p) {\n"
@@ -216,6 +217,66 @@ static const char *postFragShader =
     "    \n"
     "    result = clamp(result, 0.0, 1.0);\n"
     "    finalColor = vec4(result, 1.0);\n"
+=======
+    "void main() {\n"
+    "    vec2 uv = fragTexCoord;\n"
+    "    vec2 pixel = 1.0 / resolution;\n"
+
+    "    vec3 scene = texture(texture0, uv).rgb;\n"
+    "    float lum = dot(scene, vec3(0.299, 0.587, 0.114));\n"
+
+    "    float tl = dot(texture(texture0, uv + pixel * vec2(-1,-1)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float t  = dot(texture(texture0, uv + pixel * vec2( 0,-1)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float tr = dot(texture(texture0, uv + pixel * vec2( 1,-1)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float l  = dot(texture(texture0, uv + pixel * vec2(-1, 0)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float r  = dot(texture(texture0, uv + pixel * vec2( 1, 0)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float bl = dot(texture(texture0, uv + pixel * vec2(-1, 1)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float b  = dot(texture(texture0, uv + pixel * vec2( 0, 1)).rgb, vec3(0.299, 0.587, 0.114));\n"
+    "    float br = dot(texture(texture0, uv + pixel * vec2( 1, 1)).rgb, vec3(0.299, 0.587, 0.114));\n"
+
+    "    float gx = -tl - 2.0*l - bl + tr + 2.0*r + br;\n"
+    "    float gy = -tl - 2.0*t - tr + bl + 2.0*b + br;\n"
+    "    float edge = sqrt(gx*gx + gy*gy);\n"
+
+    "    float h1 = step(0.5, fract((uv.x + uv.y) * 48.0));\n"
+    "    float h2 = step(0.5, fract((uv.x - uv.y) * 48.0));\n"
+    "    float h3 = step(0.5, fract(uv.x * 75.0));\n"
+
+    "    float hatch = 0.0;\n"
+    "    if (lum < 0.10) hatch = h1 * h2;\n"
+    "    else if (lum < 0.30) hatch = h1;\n"
+    "    else if (lum < 0.55) hatch = max(h1 * 0.8, h3 * 0.4);\n"
+
+    "    vec3 inkDark = vec3(0.02, 0.05, 0.18);\n"
+    "    vec3 inkMid = vec3(0.05, 0.15, 0.40);\n"
+    "    vec3 inkLight = vec3(0.10, 0.30, 0.65);\n"
+
+    "    float inkStr = 1.0 - smoothstep(0.0, 0.65, lum);\n"
+    "    vec3 ink = mix(inkLight, inkDark, inkStr);\n"
+
+    "    float hatchDarken = hatch * smoothstep(0.05, 0.20, lum) * 0.65;\n"
+    "    ink = mix(ink, inkDark, hatchDarken);\n"
+
+    "    float edgeLine = smoothstep(0.10, 0.30, edge);\n"
+    "    ink = mix(ink, inkDark, edgeLine * 0.80);\n"
+
+    "    vec3 paper = vec3(0.97, 0.97, 0.95);\n"
+
+    "    float ruledY = fract(uv.y * 28.0);\n"
+    "    float ruledLine = smoothstep(0.022, 0.0, abs(ruledY - 0.5) - 0.47);\n"
+    "    paper = mix(paper, vec3(0.70, 0.75, 0.90), ruledLine * 0.40);\n"
+
+    "    float margin = smoothstep(0.003, 0.0, abs(uv.x - 0.10));\n"
+    "    paper = mix(paper, vec3(0.80, 0.35, 0.35), margin * 0.55);\n"
+
+    "    float inkMask = smoothstep(0.01, 0.10, lum + edge * 0.12);\n"
+    "    vec3 finalColor = mix(paper, ink, inkMask);\n"
+
+    "    float grain = fract(sin(dot(uv + vec2(time*0.001, fract(time*0.618)), vec2(12.9898, 78.233))) * 43758.5453);\n"
+    "    finalColor += (grain - 0.5) * 0.025;\n"
+
+    "    gl_FragColor = vec4(clamp(finalColor, 0.0, 1.0), 1.0);\n"
+>>>>>>> Stashed changes
     "}\n";
 
 static const char *scopeVertShader = 

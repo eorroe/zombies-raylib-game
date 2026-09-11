@@ -91,6 +91,7 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr, ProceduralTextures
     player->leftUpperArm = LoadHighPolyModel(leftUpperArmMesh);
     player->leftUpperArm.materials[0].shader = pbr;
 
+<<<<<<< Updated upstream
     Mesh leftLowerArmMesh = ZombieMesh_CreateLimb(0.06f, 0.5f);
     player->leftLowerArm = LoadHighPolyModel(leftLowerArmMesh);
     player->leftLowerArm.materials[0].shader = pbr;
@@ -147,6 +148,24 @@ void PlayerInit(Player *player, Vector3 startPos, Shader pbr, ProceduralTextures
         int y = rand() % 256;
         int r = 3 + rand() % 8;
         ImageDrawCircle(&skinImg, x, y, r, (Color){ 160, 100, 80, 180 });
+=======
+    Image uniformImg = GenImageColor(256, 256, (Color){ 50, 90, 150, 255 });
+    for (int i = 0; i < 800; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int shade = 40 + rand() % 30;
+        ImageDrawPixel(&uniformImg, x, y, (Color){ shade, shade + 10, shade + 25, 255 });
+    }
+    Texture2D uniformTex = LoadTextureFromImage(uniformImg);
+    UnloadImage(uniformImg);
+
+    Image skinImg = GenImageColor(256, 256, (Color){ 70, 110, 170, 255 });
+    for (int i = 0; i < 1500; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int shade = 60 + rand() % 40;
+        ImageDrawPixel(&skinImg, x, y, (Color){ shade, shade + 50, shade - 5, 255 });
+>>>>>>> Stashed changes
     }
     Texture2D skinTex = LoadTextureFromImage(skinImg);
     UnloadImage(skinImg);

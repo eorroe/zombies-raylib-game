@@ -129,14 +129,21 @@ void RendererUpdate(Game *game, float dt) {
 }
 
 void RendererBegin(Game *game, Camera3D camera) {
-    (void)game;
-    (void)camera;
+    BeginTextureMode(game->sceneTarget);
+    ClearBackground(BLACK);
     
+<<<<<<< Updated upstream
     int w = 1280;
     int h = 720;
     
     BeginTextureMode(game->sceneTarget);
     ClearBackground((Color){ 245, 240, 232, 255 });
+=======
+    int w = game->sceneTarget.texture.width;
+    int h = game->sceneTarget.texture.height;
+    DrawRectangleGradientV(0, 0, w, h / 2, (Color){ 120, 160, 220, 255 }, (Color){ 220, 180, 120, 255 });
+    DrawRectangleGradientV(0, h / 2, w, h / 2, (Color){ 220, 180, 120, 255 }, (Color){ 180, 120, 80, 255 });
+>>>>>>> Stashed changes
     
     BeginMode3D(camera);
     rlDisableBackfaceCulling();
@@ -156,6 +163,7 @@ void RendererDrawScene(Game *game) {
 
     for (int cx = -42; cx <= 42; cx += 12) {
     }
+<<<<<<< Updated upstream
 
     for (int i = 0; i < 24; i++) {
         float angle = i * PI * 0.25f;
@@ -166,6 +174,12 @@ void RendererDrawScene(Game *game) {
             sinf(angle) * radius
         };
         DrawCubeWires(cratePos, 1.0f, 1.0f, 1.0f, (Color){ 20, 30, 60, 255 });
+=======
+    for (int i = 0; i < 4; i++) {
+        float x = -10.0f + i * 3.5f;
+        Vector3 containerPos = { x, 0.6f, -10.0f };
+        DrawModel(game->containerModel, containerPos, 1.0f, (Color){ 50, 90, 150, 255 });
+>>>>>>> Stashed changes
     }
 
     for (int i = 0; i < 14; i++) {
@@ -251,9 +265,51 @@ void RendererDrawScene(Game *game) {
     }
 
     for (int i = 0; i < 4; i++) {
+<<<<<<< Updated upstream
         float x = -16.0f + i * 10.0f;
         DrawCubeWires((Vector3){ x, 1.2f, 4.5f }, 0.08f, 1.4f, 0.08f, (Color){ 20, 30, 60, 255 });
         DrawCubeWires((Vector3){ x + 0.2f, 1.6f, 4.5f }, 0.6f, 0.4f, 0.05f, (Color){ 20, 30, 60, 255 });
+=======
+        float t = GetTime();
+        for (int p = 0; p < 25; p++) {
+            float ft = t * 3.0f + p * 1.7f + i * 5.0f;
+            float fx = fireLightPositions[i].x + sinf(ft * 2.3f) * 0.4f;
+            float fy = fireLightPositions[i].y + fmodf(ft * 0.8f, 1.5f) + 0.3f;
+            float fz = fireLightPositions[i].z + cosf(ft * 1.9f) * 0.4f;
+            float alpha = 0.6f - fmodf(ft * 0.8f, 1.5f) * 0.4f;
+            if (alpha < 0.0f) alpha = 0.0f;
+            float size = 0.06f + fmodf(ft, 1.0f) * 0.1f;
+            DrawSphere((Vector3){ fx, fy, fz }, size, (Color){ 100, 150, 220, (unsigned char)(alpha * 255) });
+        }
+    }
+    EndBlendMode();
+    
+    {
+        Vector3 wallPos = { 0, 0.75f, -10.0f };
+        DrawModel(game->wallModel, wallPos, 1.0f, WHITE);
+    }
+    
+    for (int i = 0; i < 180; i++) {
+        float t = GetTime() * 0.5f + i * 3.31f;
+        int fireIdx = i % 4;
+        Vector3 basePos = fireLightPositions[fireIdx];
+        float x = basePos.x + sinf(t * 1.7f + fireIdx * 2.0f) * 1.2f;
+        float y = basePos.y + fmodf(t * 0.4f, 2.5f) + 0.2f;
+        float z = basePos.z + cosf(t * 1.3f + fireIdx * 2.0f) * 1.2f;
+        Vector3 dustPos = { x, y, z };
+        float alpha = 0.25f + sinf(t + i) * 0.15f;
+        DrawSphere(dustPos, 0.12f, (Color){ 150, 180, 220, (unsigned char)(alpha * 255) });
+    }
+    
+    for (int i = 0; i < 250; i++) {
+        float t = GetTime() * 0.25f + i * 2.17f;
+        float x = sinf(t * 1.1f) * 26.0f;
+        float y = 0.4f + fmodf(t * 0.5f, 5.0f);
+        float z = cosf(t * 0.8f) * 26.0f;
+        Vector3 dustPos = { x, y, z };
+        float alpha = 0.4f + sinf(t + i) * 0.25f;
+        DrawSphere(dustPos, 0.18f, (Color){ 180, 200, 230, (unsigned char)(alpha * 255) });
+>>>>>>> Stashed changes
     }
 }
 
@@ -262,7 +318,11 @@ void RendererDrawBloodDecals(Game *game) {
     for (int i = 0; i < game->bloodDecalCount; i++) {
         Vector3 pos = game->bloodDecals[i];
         pos.y = 0.03f;
+<<<<<<< Updated upstream
         DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){ 40, 60, 120, 200 });
+=======
+        DrawPlane(pos, (Vector2){ 5.0f, 5.0f }, (Color){ 60, 90, 160, 200 });
+>>>>>>> Stashed changes
     }
 }
 
@@ -329,8 +389,13 @@ void RendererDrawZombieHeads(Game *game) {
                 float barX = screenPos.x - size / 2;
                 float barY = screenPos.y - size / 2 - barHeight - 4.0f;
                 float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
+<<<<<<< Updated upstream
                 DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 40, 60, 120, 255 });
                 DrawRectangle(barX, barY, barWidth * healthPct, barHeight, (Color){ 80, 120, 180, 255 });
+=======
+                DrawRectangle(barX, barY, barWidth, barHeight, (Color){ 40, 70, 130, 255 });
+                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, (Color){ 100, 150, 220, 255 });
+>>>>>>> Stashed changes
             }
         } else {
             Vector2 screenPos = GetWorldToScreen(headPos, cam);
@@ -425,6 +490,7 @@ void RendererEnd(Game *game) {
     EndMode3D();
     EndTextureMode();
     
+<<<<<<< Updated upstream
     DrawTextureRec(game->sceneTarget.texture, (Rectangle){ 0, 0, (float)game->sceneTarget.texture.width, (float)-game->sceneTarget.texture.height }, (Vector2){ 0, 0 }, WHITE);
     
     BeginTextureMode(game->postProcessTarget);
@@ -435,6 +501,17 @@ void RendererEnd(Game *game) {
     EndTextureMode();
     
     DrawTextureRec(game->postProcessTarget.texture, (Rectangle){ 0, 0, (float)game->postProcessTarget.texture.width, (float)-game->postProcessTarget.texture.height }, (Vector2){ 0, 0 }, WHITE);
+=======
+    ShaderUpdate(&game->shaders, GetTime(), 1280, 720);
+    ShaderBeginPostProcess(&game->shaders);
+    int w = game->sceneTarget.texture.width;
+    int h = game->sceneTarget.texture.height;
+    DrawTexturePro(game->sceneTarget.texture,
+        (Rectangle){ 0, 0, (float)w, (float)-h },
+        (Rectangle){ 0, 0, (float)w, (float)h },
+        (Vector2){ 0, 0 }, 0.0f, WHITE);
+    ShaderEnd(&game->shaders);
+>>>>>>> Stashed changes
 }
 
 void RendererShutdown(Game *game) {

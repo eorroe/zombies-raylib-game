@@ -214,9 +214,16 @@ static Vector3 RotateOffsetY(Vector3 offset, float cosYaw, float sinYaw) {
     };
 }
 
+<<<<<<< Updated upstream
 static void DrawLimb(Model model, Vector3 origin, Vector3 offsetDir, Vector3 rotationAxis, float angle, float length) {
     Vector3 mid = Vector3Add(origin, Vector3Scale(offsetDir, length * 0.5f));
     DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
+=======
+static Vector3 RotateY(Vector3 v, float angle) {
+    float c = cosf(angle);
+    float s = sinf(angle);
+    return (Vector3){ v.x * c + v.z * s, v.y, -v.x * s + v.z * c };
+>>>>>>> Stashed changes
 }
 
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader) {

@@ -305,18 +305,18 @@ static Image GenerateBloodTexture(int width, int height) {
 }
 
 static Image GenerateUniformTexture(int width, int height) {
-    Image img = GenImageColor(width, height, (Color){ 25, 25, 255, 255 });
+    Image img = GenImageColor(width, height, (Color){ 128, 128, 128, 255 });
     unsigned char *data = (unsigned char *)img.data;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             float n = FractalNoise(x, y, 4, 0.5f);
             int idx = (y * width + x) * 4;
-            int shade = (int)(25 + n * 55);
+            int shade = (int)(120 + n * 40);
             if (shade > 255) shade = 255;
-            if (shade < 10) shade = 10;
+            if (shade < 80) shade = 80;
             data[idx + 0] = (unsigned char)shade;
             data[idx + 1] = (unsigned char)shade;
-            data[idx + 2] = (unsigned char)(shade + 20);
+            data[idx + 2] = (unsigned char)shade;
             data[idx + 3] = 255;
         }
     }
@@ -478,35 +478,42 @@ static Image GenerateContainerTexture(int width, int height) {
         for (int x = 0; x < width; x++) {
             float n = FractalNoise(x + 300, y + 300, 4, 0.5f);
             int idx = (y * width + x) * 4;
-            int shade = (int)(155 + n * 35);
+            int shade = (int)(140 + n * 50);
             if (shade > 255) shade = 255;
-            if (shade < 90) shade = 90;
-            data[idx + 0] = (unsigned char)(shade + 10);
-            data[idx + 1] = (unsigned char)(shade - 30);
-            data[idx + 2] = (unsigned char)(shade - 40);
+            if (shade < 70) shade = 70;
+            data[idx + 0] = (unsigned char)(shade + 15);
+            data[idx + 1] = (unsigned char)(shade - 25);
+            data[idx + 2] = (unsigned char)(shade - 45);
             data[idx + 3] = 255;
         }
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 40; i++) {
         int x1 = rand() % width;
         int y1 = rand() % height;
-        int len = 30 + rand() % 100;
-        Color peel = { 120, 50, 30, 160 };
+        int len = 30 + rand() % 120;
+        Color peel = { 100, 40, 20, 180 };
         ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 10 - 5), peel);
+    }
+    for (int i = 0; i < 80; i++) {
+        int cx = rand() % width;
+        int cy = rand() % height;
+        int r = 2 + rand() % 15;
+        Color rust = { 160, 100, 30, 200 };
+        ImageDrawCircle(&img, cx, cy, r, rust);
     }
     for (int i = 0; i < 40; i++) {
         int cx = rand() % width;
         int cy = rand() % height;
-        int r = 2 + rand() % 10;
-        Color rust = { 140, 90, 40, 180 };
-        ImageDrawCircle(&img, cx, cy, r, rust);
+        int r = 5 + rand() % 25;
+        Color dent = { 90, 35, 20, 140 };
+        ImageDrawCircle(&img, cx, cy, r, dent);
     }
     for (int i = 0; i < 20; i++) {
-        int cx = rand() % width;
-        int cy = rand() % height;
-        int r = 5 + rand() % 20;
-        Color dent = { 100, 45, 30, 120 };
-        ImageDrawCircle(&img, cx, cy, r, dent);
+        int x1 = rand() % width;
+        int y1 = rand() % height;
+        int len = 20 + rand() % 80;
+        Color scratch = { 120, 55, 35, 160 };
+        ImageDrawLine(&img, x1, y1, x1 + len, y1 + (rand() % 8 - 4), scratch);
     }
     return img;
 }

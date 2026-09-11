@@ -450,6 +450,22 @@ static void GameApplyZombieCollisions(Game *game) {
         if (p.z > 25.0f) game->zombies[i].position.z = 25.0f;
         if (p.y < 0.0f) game->zombies[i].position.y = 0.0f;
     }
+    
+    float zombieRadius = 0.5f;
+    for (int i = 0; i < game->zombieCount; i++) {
+        if (!ZombieIsAlive(&game->zombies[i])) continue;
+        for (int j = i + 1; j < game->zombieCount; j++) {
+            if (!ZombieIsAlive(&game->zombies[j])) continue;
+            Vector3 diff = Vector3Subtract(game->zombies[i].position, game->zombies[j].position);
+            float dist = Vector3Length(diff);
+            float minDist = zombieRadius * 2.0f;
+            if (dist < minDist && dist > 0.001f) {
+                Vector3 push = Vector3Scale(diff, (minDist - dist) / dist * 0.5f);
+                game->zombies[i].position = Vector3Add(game->zombies[i].position, push);
+                game->zombies[j].position = Vector3Subtract(game->zombies[j].position, push);
+            }
+        }
+    }
 }
 
 void GameUpdate(Game *game, float dt, InputState *input) {

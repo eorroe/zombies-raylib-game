@@ -40,6 +40,7 @@ void ZombieInit(Zombie *zombie, Vector3 position, ZombieType type, int textureIn
     zombie->pantsTex = pants;
     zombie->speed = ZOMBIE_SPEED_BASE;
     zombie->damageFlashTimer = 0.0f;
+    zombie->facingAngle = 0.0f;
 
     float torsoW = TORSO_WIDTH * (0.8f + (rand() % 100) / 250.0f);
     float torsoH = TORSO_HEIGHT * (0.85f + (rand() % 100) / 300.0f);
@@ -175,6 +176,13 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
             dir = Vector3Normalize(dir);
             zombie->velocity = Vector3Scale(dir, zombie->speed);
             zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
+            float targetAngle = atan2f(dir.x, dir.z);
+            float diff = targetAngle - zombie->facingAngle;
+            while (diff > PI) diff -= 2.0f * PI;
+            while (diff < -PI) diff += 2.0f * PI;
+            zombie->facingAngle += diff * 5.0f * dt;
+            while (zombie->facingAngle > PI) zombie->facingAngle -= 2.0f * PI;
+            while (zombie->facingAngle < -PI) zombie->facingAngle += 2.0f * PI;
         }
         
         if (fabsf(zombie->position.z - FENCE_Z) < 0.8f && zombie->position.z < FENCE_Z + 0.5f) {
@@ -193,6 +201,12 @@ static void DrawLimb(Model model, Vector3 origin, Vector3 axis, float angle, flo
     DrawModelEx(model, mid, (Vector3){ 0, 0, 1 }, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
 }
 
+static Vector3 RotateY(Vector3 v, float angle) {
+    float c = cosf(angle);
+    float s = sinf(angle);
+    return (Vector3){ v.x * c + v.z * s, v.y, -v.x * s + v.z * c };
+}
+
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader) {
     if (!zombie->active) return;
     float bob = sinf(zombie->animTime) * 0.05f;
@@ -205,10 +219,10 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         if (cycle < 0.5f) flash = 1.0f;
     }
     
-    Color skinColor = (Color){ 255, 0, 0, 255 };
-    Color shirtColor = (Color){ 0, 255, 0, 255 };
-    Color pantsColor = (Color){ 0, 0, 255, 255 };
-    Color flashRed = (Color){ 255, 0, 0, 255 };
+    Color skinColor = (Color){ 180, 170, 155, 255 };
+    Color shirtColor = (Color){ 60, 65, 55, 255 };
+    Color pantsColor = (Color){ 40, 45, 50, 255 };
+    Color flashRed = (Color){ 255, 60, 60, 255 };
     
     Color bodyColor = (Color){
         (unsigned char)(shirtColor.r + (flashRed.r - shirtColor.r) * flash),
@@ -228,21 +242,21 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     float headCenterY = hipY + zombie->torsoHeight + zombie->headRadius * 0.9f;
 
     Vector3 torsoPos = (Vector3){ zombie->position.x, torsoCenterY, zombie->position.z };
-    float bodyRot = 0.0f;
     float bodyY = torsoPos.y;
     
     bool climbing = fabsf(zombie->position.z - FENCE_Z) < 1.0f && zombie->position.z > FENCE_Z - 0.3f && !zombie->dying;
     float climbReach = climbing ? sinf(zombie->animTime * 2.0f) * 0.3f : 0.0f;
     
+    float yawDeg = zombie->facingAngle * RAD2DEG;
+    
     if (zombie->dying) {
         float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);
         if (deathProgress > 1.0f) deathProgress = 1.0f;
-        bodyRot = deathProgress * 110.0f;
         bodyY = torsoPos.y - deathProgress * torsoPos.y * 0.8f;
     }
     
     SetModelTexture(&zombie->bodyModel, zombie->shirtTex);
-    DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 1, 0, 0 }, bodyRot, (Vector3){ 1, 1, 1 }, bodyColor);
+    DrawModelEx(zombie->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, bodyColor);
 
     if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
         Vector3 headPos = (Vector3){ zombie->position.x, headCenterY, zombie->position.z };
@@ -261,9 +275,10 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         } else {
             SetModelTexture(&zombie->headModel, zombie->skinTex);
         }
-        DrawModelEx(zombie->headModel, (Vector3){ headPos.x, headY, headPos.z }, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, headColor);
+        DrawModelEx(zombie->headModel, (Vector3){ headPos.x, headY, headPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, headColor);
         if (!zombie->dying || zombie->type != ZOMBIE_TYPE_IMAGE_HEAD) {
-            Vector3 jawPos = (Vector3){ headPos.x, headY - zombie->headRadius * 0.3f, headPos.z + zombie->headRadius * 0.4f };
+            Vector3 jawOffset = (Vector3){ 0, -zombie->headRadius * 0.3f, zombie->headRadius * 0.4f };
+            Vector3 jawPos = Vector3Add(headPos, RotateY(jawOffset, zombie->facingAngle));
             float jawY = jawPos.y;
             if (zombie->dying) {
                 float deathProgress = 1.0f - (zombie->deathTimer / 3.0f);
@@ -274,10 +289,15 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         }
     }
 
-    Vector3 shoulderL = (Vector3){ zombie->position.x - zombie->torsoWidth * 0.6f, torsoCenterY + zombie->torsoHeight * 0.35f, zombie->position.z };
-    Vector3 shoulderR = (Vector3){ zombie->position.x + zombie->torsoWidth * 0.6f, torsoCenterY + zombie->torsoHeight * 0.35f, zombie->position.z };
-    Vector3 hipL = (Vector3){ zombie->position.x - zombie->torsoWidth * 0.35f, hipY, zombie->position.z };
-    Vector3 hipR = (Vector3){ zombie->position.x + zombie->torsoWidth * 0.35f, hipY, zombie->position.z };
+    Vector3 shoulderLOffset = (Vector3){ -zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 };
+    Vector3 shoulderROffset = (Vector3){ zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 };
+    Vector3 hipLOffset = (Vector3){ -zombie->torsoWidth * 0.35f, 0, 0 };
+    Vector3 hipROffset = (Vector3){ zombie->torsoWidth * 0.35f, 0, 0 };
+    
+    Vector3 shoulderL = Vector3Add(torsoPos, RotateY(shoulderLOffset, zombie->facingAngle));
+    Vector3 shoulderR = Vector3Add(torsoPos, RotateY(shoulderROffset, zombie->facingAngle));
+    Vector3 hipL = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipLOffset, zombie->facingAngle));
+    Vector3 hipR = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipROffset, zombie->facingAngle));
 
     float armSwing = walk * 0.5f;
     float legSwing = walk * 0.6f;
@@ -299,26 +319,31 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     bool reaching = distToPlayer < REACH_DIST;
     float armAngleX = climbing ? -1.5f + climbReach : (reaching ? -1.2f : -0.6f);
     float armAngleY = climbing ? 0.8f : (reaching ? 0.3f : -0.8f);
+    
+    Vector3 armDirL = RotateY((Vector3){ armAngleX, armAngleY, 0 }, zombie->facingAngle);
+    Vector3 armDirR = RotateY((Vector3){ -armAngleX, armAngleY, 0 }, zombie->facingAngle);
+    Vector3 legDirL = RotateY((Vector3){ -0.2f, -1.0f, 0 }, zombie->facingAngle);
+    Vector3 legDirR = RotateY((Vector3){ 0.2f, -1.0f, 0 }, zombie->facingAngle);
 
-    DrawLimb(zombie->leftUpperArm, shoulderL, (Vector3){ armAngleX, armAngleY, 0 }, armSwing, zombie->armUpperLen);
-    DrawLimb(zombie->leftLowerArm, Vector3Add(shoulderL, (Vector3){ armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen, 0 }), (Vector3){ armAngleX * 0.7f, armAngleY * 0.8f, 0 }, armSwing * 1.3f, zombie->armLowerLen);
+    DrawLimb(zombie->leftUpperArm, shoulderL, armDirL, armSwing, zombie->armUpperLen);
+    DrawLimb(zombie->leftLowerArm, Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen)), Vector3Scale(armDirL, 0.8f), armSwing * 1.3f, zombie->armLowerLen);
 
-    DrawLimb(zombie->rightUpperArm, shoulderR, (Vector3){ -armAngleX, armAngleY, 0 }, -armSwing, zombie->armUpperLen);
-    DrawLimb(zombie->rightLowerArm, Vector3Add(shoulderR, (Vector3){ -armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen, 0 }), (Vector3){ -armAngleX * 0.7f, armAngleY * 0.8f, 0 }, -armSwing * 1.3f, zombie->armLowerLen);
+    DrawLimb(zombie->rightUpperArm, shoulderR, armDirR, -armSwing, zombie->armUpperLen);
+    DrawLimb(zombie->rightLowerArm, Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen)), Vector3Scale(armDirR, 0.8f), -armSwing * 1.3f, zombie->armLowerLen);
 
-    DrawLimb(zombie->leftUpperLeg, hipL, (Vector3){ -0.2f, -1.0f, 0 }, climbing ? -0.5f : -legSwing, zombie->legUpperLen);
-    DrawLimb(zombie->leftLowerLeg, Vector3Add(hipL, (Vector3){ -0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen, 0 }), (Vector3){ -0.15f, -1.0f, 0 }, climbing ? -0.3f : -legSwing * 1.2f, zombie->legLowerLen);
+    DrawLimb(zombie->leftUpperLeg, hipL, legDirL, climbing ? -0.5f : -legSwing, zombie->legUpperLen);
+    DrawLimb(zombie->leftLowerLeg, Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen)), Vector3Scale(legDirL, 0.85f), climbing ? -0.3f : -legSwing * 1.2f, zombie->legLowerLen);
 
-    DrawLimb(zombie->rightUpperLeg, hipR, (Vector3){ 0.2f, -1.0f, 0 }, climbing ? 0.5f : legSwing, zombie->legUpperLen);
-    DrawLimb(zombie->rightLowerLeg, Vector3Add(hipR, (Vector3){ 0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen, 0 }), (Vector3){ 0.15f, -1.0f, 0 }, climbing ? 0.3f : legSwing * 1.2f, zombie->legLowerLen);
+    DrawLimb(zombie->rightUpperLeg, hipR, legDirR, climbing ? 0.5f : legSwing, zombie->legUpperLen);
+    DrawLimb(zombie->rightLowerLeg, Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen)), Vector3Scale(legDirR, 0.85f), climbing ? 0.3f : legSwing * 1.2f, zombie->legLowerLen);
 
-    Vector3 leftHandPos = Vector3Add(shoulderL, (Vector3){ armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen + zombie->armLowerLen * 0.5f, climbReach * 0.5f });
-    Vector3 rightHandPos = Vector3Add(shoulderR, (Vector3){ -armAngleX * zombie->armUpperLen, armAngleY * zombie->armUpperLen + zombie->armLowerLen * 0.5f, climbReach * 0.5f });
+    Vector3 leftHandPos = Vector3Add(shoulderL, Vector3Add(Vector3Scale(armDirL, zombie->armUpperLen), (Vector3){ 0, 0, climbReach * 0.5f }));
+    Vector3 rightHandPos = Vector3Add(shoulderR, Vector3Add(Vector3Scale(armDirR, zombie->armUpperLen), (Vector3){ 0, 0, climbReach * 0.5f }));
     DrawModelEx(zombie->leftHandModel, leftHandPos, (Vector3){ 1, 0, 0 }, armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, headColor);
     DrawModelEx(zombie->rightHandModel, rightHandPos, (Vector3){ 1, 0, 0 }, -armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, headColor);
 
-    Vector3 leftFootPos = Vector3Add(hipL, (Vector3){ -0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen - zombie->legLowerLen * 0.5f, 0 });
-    Vector3 rightFootPos = Vector3Add(hipR, (Vector3){ 0.2f * zombie->legUpperLen, -1.0f * zombie->legUpperLen - zombie->legLowerLen * 0.5f, 0 });
+    Vector3 leftFootPos = Vector3Add(hipL, Vector3Add(Vector3Scale(legDirL, zombie->legUpperLen), Vector3Scale(legDirL, zombie->legLowerLen * 0.5f)));
+    Vector3 rightFootPos = Vector3Add(hipR, Vector3Add(Vector3Scale(legDirR, zombie->legUpperLen), Vector3Scale(legDirR, zombie->legLowerLen * 0.5f)));
     DrawModelEx(zombie->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, pantsColor);
     DrawModelEx(zombie->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, pantsColor);
 }

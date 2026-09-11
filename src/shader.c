@@ -202,13 +202,16 @@ static const char *postFragShader =
 
     "    col = mix(col, col * vec3(0.95, 0.9, 1.1), smoothstep(0.4, 1.0, lum) * 0.2);\n"
 
-    "    float hazeFactor = smoothstep(0.3, 0.9, edgeDist * 1.4);\n"
-    "    vec3 hazeColor = vec3(0.65, 0.52, 0.38);\n"
-    "    col = mix(col, hazeColor, hazeFactor * 0.15);\n"
+    "    float hazeFactor = smoothstep(0.2, 0.8, edgeDist * 1.4);\n"
+    "    vec3 hazeColor = vec3(0.75, 0.58, 0.42);\n"
+    "    col = mix(col, hazeColor, hazeFactor * 0.25);\n"
 
-    "    float depthFog = smoothstep(0.15, 0.85, edgeDist * 1.5);\n"
-    "    vec3 fogColor = vec3(0.6, 0.5, 0.4);\n"
-    "    col = mix(col, fogColor, depthFog * 0.2);\n"
+    "    float depthFog = smoothstep(0.1, 0.7, edgeDist * 1.5);\n"
+    "    vec3 fogColor = vec3(0.7, 0.55, 0.4);\n"
+    "    col = mix(col, fogColor, depthFog * 0.35);\n"
+
+    "    float horizonGlow = smoothstep(0.4, 0.0, abs(uv.y + 0.1)) * smoothstep(0.0, 0.4, abs(uv.y + 0.1));\n"
+    "    col += vec3(0.9, 0.6, 0.3) * horizonGlow * 0.15;\n"
 
     "    float vignette = smoothstep(0.5, 1.3, edgeDist * 2.2);\n"
     "    col *= 1.0 - vignette * 0.3;\n"
@@ -261,21 +264,7 @@ static const char *scopeFragShader =
     "    float ringInner = smoothstep(0.41, 0.43, dist);\n"
     "    float ringOuter = smoothstep(0.49, 0.47, dist);\n"
     "    float ring = ringInner * (1.0 - ringOuter);\n"
-    "    col = mix(col, vec3(0.85, 0.9, 0.95), ring * 0.85);\n"
-
-    "    float crossThickness = 0.0018;\n"
-    "    float crossFade = smoothstep(0.0, 0.015, dist);\n"
-    "    float ch = 0.0;\n"
-    "    ch += smoothstep(crossThickness, 0.0, abs(d.x)) * crossFade;\n"
-    "    ch += smoothstep(crossThickness, 0.0, abs(d.y)) * crossFade;\n"
-    "    col = mix(col, vec3(0.95, 0.3, 0.15), ch * 0.9);\n"
-
-    "    vec2 flareUV = uv * 2.5;\n"
-    "    float flare = 1.0 / (1.0 + dot(flareUV, flareUV) * 8.0);\n"
-    "    flare *= smoothstep(0.5, 0.0, dist);\n"
-    "    vec3 glareColor = vec3(0.6, 0.75, 1.0) * flare * 0.12;\n"
-    "    glareColor += vec3(1.0, 0.85, 0.6) * pow(flare, 3.0) * 0.06;\n"
-    "    col += glareColor;\n"
+    "    col = mix(col, col * vec3(1.0), ring * 0.3);\n"
 
     "    col = clamp(col, 0.0, 1.0);\n"
     "    finalColor = vec4(col, 1.0);\n"

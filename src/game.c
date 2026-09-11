@@ -19,10 +19,10 @@ static int FindNextIteration(const char *dir) {
 #if defined(_WIN32) || defined(_WIN64)
     char pattern[512];
     snprintf(pattern, sizeof(pattern), "%s/iteration_*.png", dir);
-    intptr_t handle = _findfirst(pattern, NULL);
+    struct _finddata_t info;
+    intptr_t handle = _findfirst(pattern, &info);
     if (handle == -1) return 1;
     int maxNum = 0;
-    struct _finddata_t info;
     do {
         int n;
         if (sscanf(info.name, "iteration_%d.png", &n) == 1 && n > maxNum) {

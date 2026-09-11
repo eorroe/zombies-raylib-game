@@ -213,7 +213,14 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
-  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h
+  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+  /usr/include/unistd.h \
+  /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+  /usr/include/x86_64-linux-gnu/bits/environments.h \
+  /usr/include/x86_64-linux-gnu/bits/confname.h \
+  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+  /usr/include/x86_64-linux-gnu/bits/unistd_ext.h
 
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: ../src/image_upload.c \
   /usr/include/stdc-predef.h \
@@ -771,6 +778,12 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 ../src/image_upload.c:
 
+/usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
+
+/usr/include/x86_64-linux-gnu/bits/confname.h:
+
+/usr/include/unistd.h:
+
 /usr/include/x86_64-linux-gnu/bits/time.h:
 
 ../src/particle.h:
@@ -799,9 +812,13 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 ../src/particle.c:
 
+/usr/include/x86_64-linux-gnu/bits/posix_opt.h:
+
 ../src/texture.h:
 
 ../src/zombie.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
 
@@ -816,6 +833,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
+
+/usr/include/x86_64-linux-gnu/bits/environments.h:
 
 /usr/include/x86_64-linux-gnu/sys/select.h:
 
@@ -846,6 +865,8 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 

@@ -6,6 +6,7 @@
 #include "raymath.h"
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     if (game->zombieCount >= MAX_ZOMBIES) return;
@@ -693,7 +694,6 @@ int main(void) {
     UIInit(&game.menu, screenWidth, screenHeight);
     game.menu.active = false;
     game.state = GAME_STATE_PLAYING;
-    GameInit(&game, screenWidth, screenHeight);
     
     InputState input;
     int frameCount = 0;
@@ -705,6 +705,36 @@ int main(void) {
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
     int screenshotFrame = 5;
+    
+    bool screenshotRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
+    int screenshotStepDegrees = 1;
+    const char *stepStr = getenv("ZOMBIE_SCREENSHOT_STEP_DEGREES");
+    if (stepStr) screenshotStepDegrees = atoi(stepStr);
+    if (screenshotStepDegrees < 1) screenshotStepDegrees = 1;
+    if (screenshotStepDegrees > 360) screenshotStepDegrees = 360;
+    int totalScreenshots = 360 / screenshotStepDegrees;
+    int screenshotIndex = 0;
+    float currentRotation = 0.0f;
+    bool screenshotWorld = getenv("ZOMBIE_SCREENSHOT_WORLD") != NULL;
+    bool screenshotZombie = getenv("ZOMBIE_SCREENSHOT_ZOMBIE") != NULL;
+    bool screenshotPlayer = getenv("ZOMBIE_SCREENSHOT_PLAYER") != NULL;
+    
+    GameInit(&game, screenWidth, screenHeight);
+    
+    if (screenshotRotate) {
+        game.menu.active = false;
+        game.state = GAME_STATE_PLAYING;
+        if (screenshotZombie) {
+            for (int i = 0; i < game.zombieCount; i++) game.zombies[i].active = false;
+            game.zombieCount = 1;
+            Vector3 pos = { 0, 0, 3.0f };
+            ZombieInit(&game.zombies[0], pos, ZOMBIE_TYPE_DEFAULT, 0, game.textures.zombieSkin, game.textures.zombieSkinNormal, game.textures.zombieShirt, game.textures.zombiePants, game.shaders.pbr);
+            game.zombies[0].active = true;
+        } else if (screenshotPlayer) {
+            for (int i = 0; i < game.zombieCount; i++) game.zombies[i].active = false;
+            game.zombieCount = 0;
+        }
+    }
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);
@@ -758,6 +788,37 @@ int main(void) {
         if (screenshotPath && frameCount == screenshotFrame) {
             TakeScreenshot(screenshotPath);
         }
+        
+        if (screenshotRotate && game.state == GAME_STATE_PLAYING && frameCount >= autoStartFrame) {
+            float stepRad = screenshotStepDegrees * DEG2RAD;
+            currentRotation += stepRad;
+            if (currentRotation >= 2.0f * PI) currentRotation -= 2.0f * PI;
+            float dist = 4.0f;
+            float height = 2.0f;
+            game.camera.camera.position.x = game.player.position.x + sinf(currentRotation) * dist;
+            game.camera.camera.position.z = game.player.position.z + cosf(currentRotation) * dist;
+            game.camera.camera.position.y = game.player.position.y + height;
+            game.camera.camera.target = game.player.position;
+            game.camera.camera.target.y += 1.0f;
+            
+            if (screenshotIndex < totalScreenshots) {
+                char cwd[256];
+                char path[512];
+                const char *subdir = "";
+                if (screenshotZombie) subdir = "zombie";
+                else if (screenshotPlayer) subdir = "player";
+                else if (screenshotWorld) subdir = "world";
+                
+                if (getcwd(cwd, sizeof(cwd)) != NULL) {
+                    snprintf(path, sizeof(path), "%s/workflow/%s/iteration_%02d.png", cwd, subdir, screenshotIndex + 1);
+                } else {
+                    snprintf(path, sizeof(path), "workflow/%s/iteration_%02d.png", subdir, screenshotIndex + 1);
+                }
+                TakeScreenshot(path);
+                screenshotIndex++;
+            }
+        }
+        
         frameCount++;
         
         if (autoQuitMs > 0 && (GetTime() - startTime) * 1000.0 > autoQuitMs) break;

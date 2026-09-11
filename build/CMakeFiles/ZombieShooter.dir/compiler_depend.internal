@@ -218,6 +218,13 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o
  /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h
+ /usr/include/unistd.h
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h
+ /usr/include/x86_64-linux-gnu/bits/environments.h
+ /usr/include/x86_64-linux-gnu/bits/confname.h
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h
 
 CMakeFiles/ZombieShooter.dir/src/image_upload.c.o
  /workspace/0a976afa-9d91-494d-85d2-5832b5541cb3/sessions/agent_437ce457-9f98-452f-bb95-1acaf88bb180/src/image_upload.c

@@ -1,5 +1,24 @@
 # Agent Instructions
 
+## Mandatory Visual Update Protocol
+
+**Before making ANY update—code, rendering, or otherwise—you MUST:**
+
+1. **STOP** and read the **Screenshot Workflow** section in full
+2. **STOP** and read the **Judge Protocol** section in full
+3. Execute the screenshot workflow after your change
+4. Apply the Judge Protocol to verify the result
+5. Do NOT declare the update complete until the Judge Protocol confirms success
+
+This applies to **every** update, including:
+- Visual/rendering changes
+- Shader changes
+- Color changes
+- Code changes that might affect output
+- "Small" or "trivial" changes
+
+**If you have not executed the screenshot workflow and applied the Judge Protocol, the update is NOT complete.**
+
 ## Rendering Rules
 
 ### 1. Branch Policy

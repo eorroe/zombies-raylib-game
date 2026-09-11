@@ -4,6 +4,7 @@
 #include "particle.h"
 #include "zombie.h"
 #include "raymath.h"
+#include <stdio.h>
 
 static void SetModelTexture(Model *model, Texture2D diffuse, Texture2D normal) {
     if (model->meshCount > 0 && model->materialCount > 0) {

@@ -7,9 +7,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <io.h>
+#include <fcntl.h>
+#else
 #include <dirent.h>
+#endif
 
 static int FindNextIteration(const char *dir) {
+#if defined(_WIN32) || defined(_WIN64)
+    char pattern[512];
+    snprintf(pattern, sizeof(pattern), "%s/iteration_*.png", dir);
+    intptr_t handle = _findfirst(pattern, NULL);
+    if (handle == -1) return 1;
+    int maxNum = 0;
+    struct _finddata_t info;
+    do {
+        int n;
+        if (sscanf(info.name, "iteration_%d.png", &n) == 1 && n > maxNum) {
+            maxNum = n;
+        }
+    } while (_findnext(handle, &info) == 0);
+    _findclose(handle);
+    return maxNum + 1;
+#else
     DIR *d = opendir(dir);
     if (!d) return 1;
     int maxNum = 0;
@@ -22,6 +44,7 @@ static int FindNextIteration(const char *dir) {
     }
     closedir(d);
     return maxNum + 1;
+#endif
 }
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
@@ -97,7 +120,7 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     game->muzzleFlashPos = (Vector3){ 0 };
     
     RendererInit(game, screenWidth, screenHeight);
-    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
+    PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr, &game->textures);
     WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
     
@@ -713,13 +736,6 @@ int main(void) {
     bool autoStart = getenv("ZOMBIE_AUTO_START") != NULL;
     int autoStartFrame = 30;
     int screenshotFrame = 35;
-    
-    bool autoRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
-    int autoRotateStage = 0;
-    float autoRotateAccum = 0.0f;
-    float lastYaw = 0.0f;
-    const float autoRotateSpeed = 9.5f;
-    const float autoRotateAngleThreshold = PI * 0.5f;
     
     bool autoRotate = getenv("ZOMBIE_SCREENSHOT_ROTATE") != NULL;
     int autoRotateStage = 0;

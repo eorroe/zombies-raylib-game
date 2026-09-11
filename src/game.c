@@ -615,11 +615,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                             (rand()%100-50)/25.0f
                         };
                         ParticleSpawn(&game->particles[game->particleCount++], deathPos,
-<<<<<<< Updated upstream
                             bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 60, 80, 140, 255 });
-=======
-                            bloodVel, 2.5f, PARTICLE_BLOOD, 0.12f + rand()%100/800.0f, (Color){ 100 + rand()%55, 130, 200, 255 });
->>>>>>> Stashed changes
                     }
                 }
                 if (game->bloodDecalCount < 128) {
@@ -631,11 +627,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                         splashPos.y = 0.05f;
                         ParticleSpawn(&game->particles[game->particleCount++], splashPos,
                             (Vector3){ (rand()%100-50)/80.0f, 0.05f, (rand()%100-50)/80.0f },
-<<<<<<< Updated upstream
                             3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 50, 70, 130, 220 });
-=======
-                            3.0f, PARTICLE_BLOOD, 0.25f + rand()%100/500.0f, (Color){ 80, 100, 180, 220 });
->>>>>>> Stashed changes
                     }
                 }
             }
@@ -643,11 +635,7 @@ void GameUpdate(Game *game, float dt, InputState *input) {
                 if (game->particleCount < 256) {
                     ParticleSpawn(&game->particles[game->particleCount++], hit.point,
                         (Vector3){ (rand()%100-50)/50.0f, (rand()%100-50)/50.0f, (rand()%100-50)/50.0f },
-<<<<<<< Updated upstream
                         1.0f, PARTICLE_BLOOD, 0.05f, (Color){ 50, 70, 130, 255 });
-=======
-                        1.0f, PARTICLE_BLOOD, 0.05f, (Color){ 60, 90, 160, 255 });
->>>>>>> Stashed changes
                 }
             }
         }
@@ -840,13 +828,8 @@ int main(void) {
         } else if (game.state == GAME_STATE_PLAYING) {
             GameRender(&game);
         } else if (game.state == GAME_STATE_GAMEOVER) {
-<<<<<<< Updated upstream
             DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, (Color){ 120, 40, 40, 255 });
             DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, (Color){ 20, 30, 60, 255 });
-=======
-            DrawText("GAME OVER", screenWidth / 2 - MeasureText("GAME OVER", 40) / 2, screenHeight / 2 - 20, 40, (Color){ 40, 70, 130, 255 });
-            DrawText(TextFormat("Final Score: %d", game.score), screenWidth / 2 - MeasureText(TextFormat("Final Score: %d", game.score), 20) / 2, screenHeight / 2 + 30, 20, (Color){ 100, 150, 220, 255 });
->>>>>>> Stashed changes
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
                 GameShutdown(&game);
                 UIInit(&game.menu, screenWidth, screenHeight);

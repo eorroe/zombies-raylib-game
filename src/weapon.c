@@ -324,7 +324,6 @@ void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw) {
     float yawDeg = yaw * RAD2DEG;
 
     Vector3 forearmPos = Vector3Add(pos, (Vector3){ -0.15f, -0.12f, 0.05f });
-<<<<<<< Updated upstream
     DrawModelEx(g_weaponModels.forearm, forearmPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 80, 130, 255 });
     
     Vector3 handPos = Vector3Add(pos, (Vector3){ -0.12f, -0.15f, 0.12f });
@@ -335,23 +334,10 @@ void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw) {
 
     Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.3f });
     DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 45, 55, 140, 255 });
-=======
-    DrawModelEx(g_weaponModels.forearm, forearmPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 90, 150, 255 });
-    
-    Vector3 handPos = Vector3Add(pos, (Vector3){ -0.12f, -0.15f, 0.12f });
-    DrawModelEx(g_weaponModels.hand, handPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 110, 170, 255 });
-
-    Vector3 bodyPos = pos;
-    DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 90, 150, 255 });
-
-    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.3f });
-    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
->>>>>>> Stashed changes
 
     for (int i = 0; i < 4; i++) {
         float t = (float)i / 3.0f;
         Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.3f });
-<<<<<<< Updated upstream
         DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 85, 170, 255 });
     }
 
@@ -373,28 +359,6 @@ void WeaponRenderFirstPerson(Weapon *weapon, Camera3D camera, float yaw) {
     if (weapon->muzzleFlashTimer > 0) {
         Vector3 barrelTip = Vector3Add(pos, (Vector3){ 0, 0, 0.7f });
         DrawSphere(barrelTip, 0.1f, (Color){ 120, 160, 220, 255 });
-=======
-        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
-    }
-
-    Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.06f, -0.02f });
-    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
-
-    Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.04f, 0.02f });
-    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
-
-    Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.3f });
-    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 90, 150, 255 });
-
-    Vector3 sightPos = Vector3Add(pos, (Vector3){ 0, 0.06f, 0.02f });
-    DrawModelEx(g_weaponModels.sight, sightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
-
-    Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.015f, 0.01f });
-    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
-
-    if (weapon->muzzleFlashTimer > 0) {
-        DrawSphere(barrelPos, 0.1f, (Color){ 100, 150, 220, 255 });
->>>>>>> Stashed changes
     }
 }
 

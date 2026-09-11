@@ -1,26 +1,47 @@
 # Agent Instructions
 
-## Mandatory Visual Update Protocol
+## Mandatory Build Protocol
 
 **Before making ANY update—code, rendering, or otherwise—you MUST:**
 
-1. **STOP** and read the **Screenshot Workflow** section in full
-2. **STOP** and read the **Judge Protocol** section in full
-3. **BUILD** the project and verify it compiles with zero errors
-4. **RUN** the built executable in headless mode (`xvfb-run -a -s "-screen 0 1280x720x24"`) and verify it actually executes without crashing
-5. Execute the screenshot workflow after your change
-6. Apply the Judge Protocol to verify the result
-7. Do NOT declare the update complete until the Judge Protocol confirms success
-8. Do NOT commit, push, or report to the user until steps 3–7 are verified
+1. **BUILD** the project and verify it compiles with zero errors
+2. **RUN** the built executable in headless mode: `xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter`
+3. **Verify** the executable actually launches and runs without crashing
+4. **Check** exit code and stderr for crash prevention protocol violations
+5. Do NOT commit, push, or report to the user until the build succeeds and the executable runs without errors
 
 This applies to **every** update, including:
+- Code changes
 - Visual/rendering changes
 - Shader changes
 - Color changes
-- Code changes that might affect output
+- Header/config changes
+- Documentation changes
 - "Small" or "trivial" changes
 
-**If you have not executed the screenshot workflow and applied the Judge Protocol, the update is NOT complete.**
+**If you have not built and run the executable successfully, the update is NOT complete.**
+
+## Mandatory Visual Update Protocol
+
+**In addition to the Mandatory Build Protocol above, for EVERY visual update you MUST:**
+
+1. **STOP** and read the **Screenshot Workflow** section in full
+2. **STOP** and read the **Judge Protocol** section in full
+3. Execute the screenshot workflow after your change
+4. Apply the Judge Protocol to verify the result
+5. Do NOT declare the update complete until the Judge Protocol confirms success
+6. Do NOT commit, push, or report to the user until the Judge Protocol confirms success
+
+This applies to **every** visual update, including:
+- Shader changes (post-process, PBR, material)
+- Color palette changes
+- Model/material/tint changes
+- Render pipeline changes
+- Lighting changes
+- HUD/overlay changes
+- Any change that affects what appears on screen
+
+**If you have not executed the screenshot workflow and applied the Judge Protocol, the visual update is NOT complete.**
 
 ## Rendering Rules
 

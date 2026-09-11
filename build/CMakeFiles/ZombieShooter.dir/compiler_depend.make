@@ -50,7 +50,6 @@ CMakeFiles/ZombieShooter.dir/src/audio.c.o: ../src/audio.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -58,9 +57,7 @@ CMakeFiles/ZombieShooter.dir/src/audio.c.o: ../src/audio.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/camera.c.o: ../src/camera.c \
   /usr/include/stdc-predef.h \
@@ -126,8 +123,6 @@ CMakeFiles/ZombieShooter.dir/src/debug.c.o: ../src/debug.c \
   /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio2.h \
   ../raylib_src/src/raymath.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/math-vector.h \
@@ -140,9 +135,7 @@ CMakeFiles/ZombieShooter.dir/src/debug.c.o: ../src/debug.c \
   /usr/include/string.h \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
-  /usr/include/strings.h \
-  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
-  /usr/include/x86_64-linux-gnu/bits/string_fortified.h
+  /usr/include/strings.h
 
 CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/stdc-predef.h \
@@ -207,7 +200,6 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -215,9 +207,7 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h \
   /usr/include/stdio.h \
   /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
@@ -226,8 +216,6 @@ CMakeFiles/ZombieShooter.dir/src/game.c.o: ../src/game.c \
   /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio2.h \
   /usr/include/time.h \
   /usr/include/x86_64-linux-gnu/bits/time.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
@@ -277,8 +265,6 @@ CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: ../src/image_upload.c \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
   /usr/include/strings.h \
-  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
-  /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
   /usr/include/stdlib.h \
   /usr/include/x86_64-linux-gnu/bits/waitflags.h \
   /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
@@ -299,7 +285,6 @@ CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: ../src/image_upload.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -307,9 +292,7 @@ CMakeFiles/ZombieShooter.dir/src/image_upload.c.o: ../src/image_upload.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/input.c.o: ../src/input.c \
   /usr/include/stdc-predef.h \
@@ -369,7 +352,6 @@ CMakeFiles/ZombieShooter.dir/src/particle.c.o: ../src/particle.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -377,9 +359,7 @@ CMakeFiles/ZombieShooter.dir/src/particle.c.o: ../src/particle.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   /usr/include/stdc-predef.h \
@@ -434,7 +414,6 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -442,9 +421,7 @@ CMakeFiles/ZombieShooter.dir/src/player.c.o: ../src/player.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/renderer.c.o: ../src/renderer.c \
   /usr/include/stdc-predef.h \
@@ -496,9 +473,7 @@ CMakeFiles/ZombieShooter.dir/src/renderer.c.o: ../src/renderer.c \
   /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio2.h
+  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h
 
 CMakeFiles/ZombieShooter.dir/src/shader.c.o: ../src/shader.c \
   /usr/include/stdc-predef.h \
@@ -557,7 +532,6 @@ CMakeFiles/ZombieShooter.dir/src/texture.c.o: ../src/texture.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -565,9 +539,7 @@ CMakeFiles/ZombieShooter.dir/src/texture.c.o: ../src/texture.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/ui.c.o: ../src/ui.c \
   /usr/include/stdc-predef.h \
@@ -615,8 +587,6 @@ CMakeFiles/ZombieShooter.dir/src/ui.c.o: ../src/ui.c \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
   /usr/include/strings.h \
-  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
-  /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
   /usr/include/stdio.h \
   /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
@@ -624,9 +594,7 @@ CMakeFiles/ZombieShooter.dir/src/ui.c.o: ../src/ui.c \
   /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio.h \
-  /usr/include/x86_64-linux-gnu/bits/stdio2.h
+  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h
 
 CMakeFiles/ZombieShooter.dir/src/weapon.c.o: ../src/weapon.c \
   /usr/include/stdc-predef.h \
@@ -683,7 +651,6 @@ CMakeFiles/ZombieShooter.dir/src/weapon.c.o: ../src/weapon.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -691,9 +658,7 @@ CMakeFiles/ZombieShooter.dir/src/weapon.c.o: ../src/weapon.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
   /usr/include/stdc-predef.h \
@@ -747,7 +712,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -755,9 +719,7 @@ CMakeFiles/ZombieShooter.dir/src/zombie.c.o: ../src/zombie.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
 
 CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
   /usr/include/stdc-predef.h \
@@ -800,7 +762,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
   /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
-  /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -808,9 +769,7 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/alloca.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
-  /usr/include/x86_64-linux-gnu/bits/stdlib.h \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/math-vector.h \
   /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -823,8 +782,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
   /usr/include/strings.h \
-  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
-  /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
   ../raylib_src/src/raymath.h
 
 
@@ -854,10 +811,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 ../src/ui.h:
 
-/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
-
-/usr/include/x86_64-linux-gnu/bits/strings_fortified.h:
-
 /usr/include/strings.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
@@ -867,8 +820,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
@@ -908,17 +859,9 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 /usr/include/math.h:
 
-../src/camera.h:
-
-/usr/include/x86_64-linux-gnu/bits/endianness.h:
-
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
 /usr/include/x86_64-linux-gnu/bits/fp-fast.h:
-
-../src/camera.c:
-
-/usr/include/stdlib.h:
 
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
@@ -929,6 +872,10 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h:
 
 ../raylib_src/src/raylib.h:
+
+/usr/include/stdlib.h:
+
+../src/camera.c:
 
 ../src/zombie.c:
 
@@ -951,8 +898,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 ../src/renderer.c:
 
 ../src/game.c:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
 
@@ -1006,6 +951,12 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
+../src/renderer.h:
+
+/usr/include/stdc-predef.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
 
 /usr/include/string.h:
@@ -1027,10 +978,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 ../src/debug.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
-
-/usr/include/x86_64-linux-gnu/bits/select2.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio2.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
@@ -1054,10 +1001,6 @@ CMakeFiles/ZombieShooter.dir/src/zombie_mesh.c.o: ../src/zombie_mesh.c \
 
 /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
 
-../src/renderer.h:
+/usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/usr/include/stdc-predef.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
+../src/camera.h:

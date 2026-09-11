@@ -6,9 +6,12 @@
 
 1. **STOP** and read the **Screenshot Workflow** section in full
 2. **STOP** and read the **Judge Protocol** section in full
-3. Execute the screenshot workflow after your change
-4. Apply the Judge Protocol to verify the result
-5. Do NOT declare the update complete until the Judge Protocol confirms success
+3. **BUILD** the project and verify it compiles with zero errors
+4. **RUN** the built executable in headless mode (`xvfb-run -a -s "-screen 0 1280x720x24"`) and verify it actually executes without crashing
+5. Execute the screenshot workflow after your change
+6. Apply the Judge Protocol to verify the result
+7. Do NOT declare the update complete until the Judge Protocol confirms success
+8. Do NOT commit, push, or report to the user until steps 3–7 are verified
 
 This applies to **every** update, including:
 - Visual/rendering changes

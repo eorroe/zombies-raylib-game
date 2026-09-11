@@ -153,7 +153,23 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
         DebugLog(&game->debug, "No zombie head textures uploaded", DEBUG_WARN);
     }
     
-    SpawnWave(game);
+    if (game->screenshotMode == SCREENSHOT_MODE_WORLD) {
+        game->zombieCount = 0;
+        game->zombiesRemaining = 0;
+    } else if (game->screenshotMode == SCREENSHOT_MODE_ZOMBIE) {
+        game->zombieCount = 0;
+        game->zombiesRemaining = 0;
+        SpawnZombie(game, (Vector3){ 0, 0, 2.0f }, ZOMBIE_TYPE_DEFAULT, 0);
+        CameraSetMode(&game->camera, GAME_CAMERA_MODE_THIRD_PERSON);
+        game->camera.baseMode = GAME_CAMERA_MODE_THIRD_PERSON;
+    } else if (game->screenshotMode == SCREENSHOT_MODE_PLAYER) {
+        game->zombieCount = 0;
+        game->zombiesRemaining = 0;
+        CameraSetMode(&game->camera, GAME_CAMERA_MODE_THIRD_PERSON);
+        game->camera.baseMode = GAME_CAMERA_MODE_THIRD_PERSON;
+    } else {
+        SpawnWave(game);
+    }
 }
 
 static bool PointInAABB(Vector3 p, Vector3 center, Vector3 size) {
@@ -507,27 +523,29 @@ void GameUpdate(Game *game, float dt, InputState *input) {
         game->state = GAME_STATE_GAMEOVER;
     }
     
-    if (input->cameraTogglePressed) {
-        CameraToggleMode(&game->camera);
-    }
-    
-    if (input->mouseRightDown) {
-        CameraSetMode(&game->camera, GAME_CAMERA_MODE_FIRST_PERSON);
-    } else {
-        CameraSetMode(&game->camera, game->camera.baseMode);
-    }
-    CameraSetCrouch(&game->camera, input->ctrlPressed);
-    
-    if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
-        WeaponShoot(&game->weapon);
-        AudioPlayGunshot(&game->audio);
-        game->firstShotFired = true;
+    if (game->screenshotMode == SCREENSHOT_MODE_NONE) {
+        if (input->cameraTogglePressed) {
+            CameraToggleMode(&game->camera);
+        }
         
-        RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
-        if (hit.hit) {
-            ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
-            if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
-                game->score += 100;
+        if (input->mouseRightDown) {
+            CameraSetMode(&game->camera, GAME_CAMERA_MODE_FIRST_PERSON);
+        } else {
+            CameraSetMode(&game->camera, game->camera.baseMode);
+        }
+        CameraSetCrouch(&game->camera, input->ctrlPressed);
+        
+        if (input->mouseLeftPressed && WeaponCanShoot(&game->weapon) && game->firstShotGraceTimer <= 0.0f) {
+            WeaponShoot(&game->weapon);
+            AudioPlayGunshot(&game->audio);
+            game->firstShotFired = true;
+            
+            RayHitInfo hit = WeaponRaycast(&game->weapon, game->camera.camera, game->zombies, game->zombieCount);
+            if (hit.hit) {
+                ZombieTakeDamage(&game->zombies[hit.zombieIndex], WEAPON_DAMAGE);
+                if (!ZombieIsAlive(&game->zombies[hit.zombieIndex])) {
+                    game->score += 100;
+                }
                 game->totalDeadZombies += 1;
                 if (game->zombies[hit.zombieIndex].type == ZOMBIE_TYPE_IMAGE_HEAD && game->zombieMode == ZOMBIE_MODE_MIXED) {
                     bool anyImageAlive = false;
@@ -640,27 +658,39 @@ void GameUpdate(Game *game, float dt, InputState *input) {
     
     if (game->muzzleFlashTimer > 0) game->muzzleFlashTimer -= dt;
     
-    bool allDead = true;
-    for (int i = 0; i < game->zombieCount; i++) {
-        if (ZombieIsAlive(&game->zombies[i])) { allDead = false; break; }
-    }
-    if (allDead) {
-        SpawnWave(game);
+    if (game->screenshotMode == SCREENSHOT_MODE_NONE) {
+        bool allDead = true;
+        for (int i = 0; i < game->zombieCount; i++) {
+            if (ZombieIsAlive(&game->zombies[i])) { allDead = false; break; }
+        }
+        if (allDead) {
+            SpawnWave(game);
+        }
     }
 }
 
 void GameRender(Game *game) {
     Camera3D cam = CameraGetCamera(&game->camera);
     RendererBegin(game, cam);
-    RendererDrawScene(game);
-    RendererDrawBloodDecals(game);
-    RendererDrawZombies(game, game->shaders.pbr);
-    if (CameraGetMode(&game->camera) == GAME_CAMERA_MODE_THIRD_PERSON) {
-        RendererDrawPlayer(&game->player, game->shaders.pbr);
-        WeaponRender(&game->weapon, cam, game->player.yaw);
-    } else {
-        WeaponRenderFirstPerson(&game->weapon, cam, game->player.yaw);
+    
+    if (game->screenshotMode != SCREENSHOT_MODE_ZOMBIE && game->screenshotMode != SCREENSHOT_MODE_PLAYER) {
+        RendererDrawScene(game);
     }
+    
+    if (game->screenshotMode != SCREENSHOT_MODE_PLAYER) {
+        RendererDrawBloodDecals(game);
+        RendererDrawZombies(game, game->shaders.pbr);
+    }
+    
+    if (game->screenshotMode != SCREENSHOT_MODE_ZOMBIE) {
+        if (CameraGetMode(&game->camera) == GAME_CAMERA_MODE_THIRD_PERSON) {
+            RendererDrawPlayer(&game->player, game->shaders.pbr);
+            WeaponRender(&game->weapon, cam, game->player.yaw);
+        } else {
+            WeaponRenderFirstPerson(&game->weapon, cam, game->player.yaw);
+        }
+    }
+    
     RendererDrawParticles(game->particles, game->particleCount);
     RendererEnd(game);
     RendererDrawZombieHeads(game);
@@ -721,6 +751,15 @@ int main(void) {
     float lastYaw = 0.0f;
     const float autoRotateSpeed = 9.5f;
     const float autoRotateAngleThreshold = PI * 0.5f;
+    
+    game.screenshotMode = SCREENSHOT_MODE_NONE;
+    if (getenv("ZOMBIE_SCREENSHOT_WORLD") != NULL) {
+        game.screenshotMode = SCREENSHOT_MODE_WORLD;
+    } else if (getenv("ZOMBIE_SCREENSHOT_ZOMBIE") != NULL) {
+        game.screenshotMode = SCREENSHOT_MODE_ZOMBIE;
+    } else if (getenv("ZOMBIE_SCREENSHOT_PLAYER") != NULL) {
+        game.screenshotMode = SCREENSHOT_MODE_PLAYER;
+    }
     
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_F1)) DebugToggle(&game.debug);

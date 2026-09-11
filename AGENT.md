@@ -168,12 +168,37 @@ Examples:
 | `ZOMBIE_AUTO_START=1` | Skips menu and starts gameplay automatically after 30 frames |
 | `ZOMBIE_AUTO_QUIT_MS=5000` | Auto-quits after the specified milliseconds (prevents hangs) |
 | `ZOMBIE_SCREENSHOT_ROTATE=1` | Auto-rotates camera 360° and captures 4 screenshots at 90° intervals |
+| `ZOMBIE_SCREENSHOT_WORLD=1` | Spawns world only (no zombies) and captures 4 rotating screenshots |
+| `ZOMBIE_SCREENSHOT_ZOMBIE=1` | Spawns 1 zombie only (blank background) and captures 4 rotating screenshots |
+| `ZOMBIE_SCREENSHOT_PLAYER=1` | Spawns player only (blank background) and captures 4 rotating screenshots |
 
 ### Command Template
 
 ```bash
 cd /workspace/.../sessions/agent_xxx/build
 ZOMBIE_AUTO_START=1 ZOMBIE_AUTO_QUIT_MS=5000 \
+  xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
+```
+
+### Screenshot Modes
+
+Use one of these environment variables to control what is rendered:
+
+```bash
+# Full world, no zombies
+ZOMBIE_SCREENSHOT_WORLD=1
+
+# Single zombie on blank background
+ZOMBIE_SCREENSHOT_ZOMBIE=1
+
+# Player only on blank background
+ZOMBIE_SCREENSHOT_PLAYER=1
+```
+
+Combine with `ZOMBIE_SCREENSHOT_ROTATE=1` to capture 4 angles at 90° intervals:
+
+```bash
+ZOMBIE_AUTO_START=1 ZOMBIE_SCREENSHOT_ROTATE=1 ZOMBIE_SCREENSHOT_ZOMBIE=1 ZOMBIE_AUTO_QUIT_MS=30000 \
   xvfb-run -a -s "-screen 0 1280x720x24" ./ZombieShooter
 ```
 

@@ -15,10 +15,18 @@
 #include "input.h"
 #include "debug.h"
 
+typedef enum {
+    SCREENSHOT_MODE_NONE = 0,
+    SCREENSHOT_MODE_WORLD,
+    SCREENSHOT_MODE_ZOMBIE,
+    SCREENSHOT_MODE_PLAYER
+} ScreenshotMode;
+
 typedef struct Game {
     GameState state;
     GameMode mode;
     ZombieMode zombieMode;
+    ScreenshotMode screenshotMode;
     int score;
     int totalDeadZombies;
     int round;

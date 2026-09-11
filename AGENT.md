@@ -2,7 +2,17 @@
 
 ## Rendering Rules
 
-### 1. Render Texture Lifecycle
+### 1. Branch Policy
+
+**ONLY work on the `doodle-style` branch in this session.**
+
+- All commits MUST be made to `doodle-style`
+- NEVER create, push, or update any other branch
+- NEVER push to `main`, `master`, or any branch other than `doodle-style`
+- If you find yourself on another branch, switch to `doodle-style` immediately
+- Before committing, verify: `git branch --show-current` must output `doodle-style`
+
+### 2. Render Texture Lifecycle
 
 Every render texture target MUST follow this exact lifecycle:
 

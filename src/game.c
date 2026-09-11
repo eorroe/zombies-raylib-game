@@ -750,7 +750,17 @@ int main(void) {
     float autoRotateAccum = 0.0f;
     float lastYaw = 0.0f;
     const float autoRotateSpeed = 9.5f;
-    const float autoRotateAngleThreshold = PI * 0.5f;
+    float autoRotateAngleThreshold = PI * 0.5f;
+    int autoRotateMaxScreenshots = 4;
+    const char *stepEnv = getenv("ZOMBIE_SCREENSHOT_STEP_DEGREES");
+    if (stepEnv) {
+        float stepDeg = atof(stepEnv);
+        if (stepDeg > 0.1f && stepDeg <= 180.0f) {
+            autoRotateAngleThreshold = stepDeg * PI / 180.0f;
+            autoRotateMaxScreenshots = (int)(360.0f / stepDeg);
+            if (autoRotateMaxScreenshots < 1) autoRotateMaxScreenshots = 1;
+        }
+    }
     
     game.screenshotMode = SCREENSHOT_MODE_NONE;
     if (getenv("ZOMBIE_SCREENSHOT_WORLD") != NULL) {
@@ -786,7 +796,7 @@ int main(void) {
             GameInit(&game, screenWidth, screenHeight);
         }
         
-        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < 4) {
+        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < autoRotateMaxScreenshots) {
             fprintf(stderr, "AUTO_ROTATE: stage=%d yaw=%.3f accum=%.3f\n", autoRotateStage, game.player.yaw, autoRotateAccum);
             input.mouseDelta.x = autoRotateSpeed;
             input.mouseDelta.y = 0.0f;
@@ -796,7 +806,7 @@ int main(void) {
             GameUpdate(&game, GetFrameTime(), &input);
         }
         
-        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < 4) {
+        if (autoRotate && game.state == GAME_STATE_PLAYING && !game.menu.active && autoRotateStage < autoRotateMaxScreenshots) {
             float currentYaw = game.player.yaw;
             float deltaYaw = currentYaw - lastYaw;
             autoRotateAccum += deltaYaw;
@@ -811,7 +821,7 @@ int main(void) {
                 autoRotateStage++;
             }
             
-            if (autoRotateStage >= 4) {
+            if (autoRotateStage >= autoRotateMaxScreenshots) {
                 break;
             }
         }

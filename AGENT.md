@@ -167,10 +167,11 @@ Examples:
 |----------|---------|
 | `ZOMBIE_AUTO_START=1` | Skips menu and starts gameplay automatically after 30 frames |
 | `ZOMBIE_AUTO_QUIT_MS=5000` | Auto-quits after the specified milliseconds (prevents hangs) |
-| `ZOMBIE_SCREENSHOT_ROTATE=1` | Auto-rotates camera 360° and captures 4 screenshots at 90° intervals |
-| `ZOMBIE_SCREENSHOT_WORLD=1` | Spawns world only (no zombies) and captures 4 rotating screenshots |
-| `ZOMBIE_SCREENSHOT_ZOMBIE=1` | Spawns 1 zombie only (blank background) and captures 4 rotating screenshots |
-| `ZOMBIE_SCREENSHOT_PLAYER=1` | Spawns player only (blank background) and captures 4 rotating screenshots |
+| `ZOMBIE_SCREENSHOT_ROTATE=1` | Auto-rotates camera 360° and captures screenshots at the interval set by `ZOMBIE_SCREENSHOT_STEP_DEGREES` |
+| `ZOMBIE_SCREENSHOT_STEP_DEGREES=45` | Rotation step in degrees; total screenshots = 360 / step (default 90° = 4 screenshots) |
+| `ZOMBIE_SCREENSHOT_WORLD=1` | Spawns world only (no zombies) and captures rotating screenshots |
+| `ZOMBIE_SCREENSHOT_ZOMBIE=1` | Spawns 1 zombie only (blank background) and captures rotating screenshots |
+| `ZOMBIE_SCREENSHOT_PLAYER=1` | Spawns player only (blank background) and captures rotating screenshots |
 
 ### Command Template
 

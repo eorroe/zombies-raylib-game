@@ -88,7 +88,81 @@ Before committing any rendering change:
 - [ ] Build succeeds with zero errors
 - [ ] Screenshot taken and visually verified (no blown whites, scene visible)
 
-### 7. Failure Symptoms and Causes
+### 7. Doodle Style Rendering Rules
+
+The current target style is **blue pen ink on notebook paper**. All rendering changes must respect this style.
+
+#### 7.1 Color Palette
+
+| Element | Color | Purpose |
+|---------|-------|---------|
+| Paper background | `(245, 240, 232)` | Cream notebook paper |
+| Ink blue (primary) | `(0.08, 0.18, 0.52)` | Main ink color |
+| Ink cyan (secondary) | `(0.06, 0.36, 0.60)` | Variation in ink tone |
+| Dark ink | `(20, 30, 60)` | Outlines, wireframes, text |
+| Medium blue ink | `(40, 80, 160)` | HUD elements, crosshair |
+| Light blue ink | `(100, 140, 180)` | Ground, distant objects |
+| Red ink (warning) | `(120, 40, 40)` | Damage, reloading alerts only |
+
+#### 7.2 Post-Processing Pipeline
+
+The post-process shader MUST be applied every frame. The required pipeline is:
+
+```c
+// In RendererEnd:
+EndMode3D();
+EndTextureMode();
+
+// Blit scene to backbuffer
+DrawTextureRec(sceneTarget.texture, ...);
+
+// Apply post-process shader
+BeginTextureMode(postProcessTarget);
+ClearBackground(BLANK);
+BeginShaderMode(game->shaders.postProcess);
+DrawTextureRec(sceneTarget.texture, ...);
+EndShaderMode();
+EndTextureMode();
+
+// Blit final result to backbuffer
+DrawTextureRec(postProcessTarget.texture, ...);
+
+// NOW draw HUD on backbuffer
+```
+
+#### 7.3 Post-Process Shader Requirements
+
+The post-process shader MUST include:
+- Paper background with notebook ruled lines (horizontal + vertical margin)
+- Blue ink edge detection
+- Color quantization for hand-drawn banding effect
+- Paper grain noise
+- Gamma correction at the end
+- NO additional gamma if PBR already applies it
+
+#### 7.4 Scene Color Guidelines
+
+- All hardcoded scene colors MUST use the blue ink palette
+- No warm earth tones (browns, oranges, reds) except for damage/warnings
+- Wireframes and outlines MUST be dark ink `(20, 30, 60)`
+- Blood decals MUST be dark blue ink, not red
+- Particle colors MUST be blue ink tones
+
+#### 7.5 Model Color Guidelines
+
+- All model tint colors MUST be blue ink tones
+- Player, zombie, and weapon models MUST NOT use white or warm skin tones
+- Use `(60, 100, 160)` range for primary model ink color
+
+#### 7.6 HUD Guidelines
+
+- HUD background MUST be light paper `(230, 235, 240, 200)`
+- HUD text and borders MUST be dark ink `(20, 30, 60)`
+- Health bar MUST be medium blue ink
+- Crosshair MUST be medium blue ink
+- Warnings (reloading, low health) MAY use red ink
+
+### 8. Failure Symptoms and Causes
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
@@ -100,10 +174,13 @@ Before committing any rendering change:
 | Zombie heads at wrong positions | `GetWorldToScreen` called inside texture mode | Call after `EndTextureMode`, on backbuffer |
 | Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` | Call `RendererInit` first so shader is valid |
 | Crouch snaps or doesn't work | Target/current value confused in lerp | Use separate `crouchTarget` and `crouchAmount` |
+| Scene not blue ink style | Post-process shader not applied or colors wrong | Apply post-process every frame, use blue ink palette |
+| Paper lines missing | Post-process shader missing notebook line code | Add horizontal ruled lines and vertical margin |
+| Double gamma / washed out | Gamma applied in both PBR and post-process | Keep gamma in only one shader, not both |
 
 ## Game Logic Rules
 
-### 8. Initialization Order
+### 9. Initialization Order
 
 `GameInit()` MUST follow this order:
 1. `RendererInit()` — initializes shaders first
@@ -112,14 +189,14 @@ Before committing any rendering change:
 4. `CameraInit()` — doesn't need shader
 5. `AudioInit()`, `TextureGenerate()`, etc.
 
-### 9. Main Loop State Machine
+### 10. Main Loop State Machine
 
 `main()` MUST:
 - Start with `menu.active = true` and `state = GAME_STATE_MENU`
 - Only call `GameInit()` from `UIUpdate()` when user starts game, or from auto-start path
 - Never call `GameInit()` directly in `main()` before the main loop
 
-### 10. Input Handling Rules
+### 11. Input Handling Rules
 
 | Action | Input | Implementation |
 |--------|-------|----------------|
@@ -130,20 +207,20 @@ Before committing any rendering change:
 | Crouch | Ctrl hold | `ctrlPressed` |
 | Jump | Space press | `spacePressed` |
 
-### 11. Camera Mode System
+### 12. Camera Mode System
 
 - `baseMode` — persistent mode set by C key toggle (3rd/1st person)
 - `mode` — current mode, can be temporarily overridden by right-click hold
 - Right-click hold forces `mode = FIRST_PERSON`, release restores `mode = baseMode`
 - `CameraUpdate()` lerps `firstPersonBlend` based on `mode`
 
-### 12. Crouch Implementation
+### 13. Crouch Implementation
 
 - `CameraSetCrouch()` sets `crouchTarget` to 1.0 (crouching) or 0.0 (standing)
 - `CameraUpdate()` lerps `crouchAmount` toward `crouchTarget` at 8.0 units/sec
 - Crouch offset: `crouchAmount * 0.7f` subtracted from both 3rd-person and 1st-person camera Y
 
-### 13. Jump Physics
+### 14. Jump Physics
 
 - `Player` struct has `velocityY` and `isGrounded`
 - Jump: `velocityY = PLAYER_JUMP_FORCE` on space press when grounded

@@ -27,7 +27,7 @@ static Vector3 RotateOffsetY(Vector3 offset, float cosYaw, float sinYaw) {
 
 static void DrawLimb(Model model, Vector3 origin, Vector3 offsetDir, Vector3 rotationAxis, float angle, float length) {
     Vector3 mid = Vector3Add(origin, Vector3Scale(offsetDir, length * 0.5f));
-    DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, (Color){ 50, 85, 145, 255 });
 }
 
 static void DrawBone(Model model, Vector3 start, Vector3 end, float meshLength, Color color) {
@@ -249,27 +249,27 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 torsoPos = Vector3Add(player->position, RotateOffsetY(torsoOffset, cosYaw, sinYaw));
     float bodyY = torsoPos.y;
 
-    DrawModelEx(player->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->bodyModel, (Vector3){ torsoPos.x, bodyY, torsoPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 spineOffset = (Vector3){ 0.0f, bodyY - torsoPos.y - torsoHeight * 0.15f, 0.0f };
     Vector3 spinePos = Vector3Add(torsoPos, RotateOffsetY(spineOffset, cosYaw, sinYaw));
-    DrawModelEx(player->spineModel, spinePos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->spineModel, spinePos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 ribOffset = (Vector3){ 0.0f, bodyY - torsoPos.y + torsoHeight * 0.05f, 0.0f };
     Vector3 ribPos = Vector3Add(torsoPos, RotateOffsetY(ribOffset, cosYaw, sinYaw));
-    DrawModelEx(player->ribcageModel, ribPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->ribcageModel, ribPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 pelvisOffset = (Vector3){ 0.0f, bodyY - torsoPos.y - torsoHeight * 0.35f, 0.0f };
     Vector3 pelvisPos = Vector3Add(torsoPos, RotateOffsetY(pelvisOffset, cosYaw, sinYaw));
-    DrawModelEx(player->pelvisModel, pelvisPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->pelvisModel, pelvisPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 headOffset = (Vector3){ 0.0f, headCenterY - torsoPos.y, 0.0f };
     Vector3 headPos = Vector3Add(torsoPos, RotateOffsetY(headOffset, cosYaw, sinYaw));
-    DrawModelEx(player->headModel, (Vector3){ headPos.x, headPos.y, headPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->headModel, (Vector3){ headPos.x, headPos.y, headPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 jawOffset = (Vector3){ 0.0f, -0.22f * 0.3f, 0.22f * 0.4f };
     Vector3 jawPos = Vector3Add(headPos, RotateOffsetY(jawOffset, cosYaw, sinYaw));
-    DrawModelEx(player->jawModel, (Vector3){ jawPos.x, jawPos.y, jawPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->jawModel, (Vector3){ jawPos.x, jawPos.y, jawPos.z }, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 shoulderLOffset = (Vector3){ -0.55f * 0.6f, torsoCenterY + torsoHeight * 0.35f - torsoPos.y, 0.0f };
     Vector3 shoulderROffset = (Vector3){ 0.55f * 0.6f, torsoCenterY + torsoHeight * 0.35f - torsoPos.y, 0.0f };
@@ -294,11 +294,11 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 elbowL = Vector3Add(shoulderL, Vector3Scale(armOffsetDirRotated, 0.55f));
     Vector3 elbowR = Vector3Add(shoulderR, Vector3Scale(armOffsetDirRight, 0.55f));
 
-    DrawBone(player->leftUpperArm, shoulderL, elbowL, 0.55f, WHITE);
-    DrawBone(player->leftLowerArm, elbowL, Vector3Add(elbowL, Vector3Scale(armOffsetDirRotated, 0.5f)), 0.5f, WHITE);
+    DrawBone(player->leftUpperArm, shoulderL, elbowL, 0.55f, (Color){ 60, 100, 160, 255 });
+    DrawBone(player->leftLowerArm, elbowL, Vector3Add(elbowL, Vector3Scale(armOffsetDirRotated, 0.5f)), 0.5f, (Color){ 60, 100, 160, 255 });
 
-    DrawBone(player->rightUpperArm, shoulderR, elbowR, 0.55f, WHITE);
-    DrawBone(player->rightLowerArm, elbowR, Vector3Add(elbowR, Vector3Scale(armOffsetDirRight, 0.5f)), 0.5f, WHITE);
+    DrawBone(player->rightUpperArm, shoulderR, elbowR, 0.55f, (Color){ 60, 100, 160, 255 });
+    DrawBone(player->rightLowerArm, elbowR, Vector3Add(elbowR, Vector3Scale(armOffsetDirRight, 0.5f)), 0.5f, (Color){ 60, 100, 160, 255 });
 
     DrawLimb(player->leftUpperLeg, hipL, legOffsetDirRotatedUpper, zombieRight, legSwing, 0.45f);
     DrawLimb(player->leftLowerLeg, Vector3Add(hipL, RotateOffsetY((Vector3){ -0.2f * 0.45f, -1.0f * 0.45f, 0.0f }, cosYaw, sinYaw)), legOffsetDirRotatedLower, zombieRight, legSwing * 1.2f, 0.45f);
@@ -310,13 +310,13 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 wristR = Vector3Add(elbowR, Vector3Scale(armOffsetDirRight, 0.5f));
     Vector3 leftHandPos = wristL;
     Vector3 rightHandPos = wristR;
-    DrawModelEx(player->leftHandModel, leftHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightHandModel, rightHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->leftHandModel, leftHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
+    DrawModelEx(player->rightHandModel, rightHandPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 
     Vector3 leftFootPos = Vector3Add(hipL, RotateOffsetY((Vector3){ -0.2f * 0.45f, -1.0f * 0.45f - 0.45f * 0.5f, 0.0f }, cosYaw, sinYaw));
     Vector3 rightFootPos = Vector3Add(hipR, RotateOffsetY((Vector3){ 0.2f * 0.45f, -1.0f * 0.45f - 0.45f * 0.5f, 0.0f }, cosYaw, sinYaw));
-    DrawModelEx(player->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(player->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
+    DrawModelEx(player->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
 }
 
 void PlayerShutdown(Player *player) {

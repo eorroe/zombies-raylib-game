@@ -216,7 +216,7 @@ static Vector3 RotateOffsetY(Vector3 offset, float cosYaw, float sinYaw) {
 
 static void DrawLimb(Model model, Vector3 origin, Vector3 offsetDir, Vector3 rotationAxis, float angle, float length) {
     Vector3 mid = Vector3Add(origin, Vector3Scale(offsetDir, length * 0.5f));
-    DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
+    DrawModelEx(model, mid, rotationAxis, angle * RAD2DEG, (Vector3){ 1, 1, 1 }, (Color){ 40, 70, 130, 255 });
 }
 
 void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int headTextureCount, Shader shader) {
@@ -231,10 +231,10 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         if (cycle < 0.5f) flash = 1.0f;
     }
     
-    Color skinColor = (Color){ 255, 0, 0, 255 };
-    Color shirtColor = (Color){ 0, 255, 0, 255 };
-    Color pantsColor = (Color){ 0, 0, 255, 255 };
-    Color flashRed = (Color){ 255, 0, 0, 255 };
+    Color skinColor = (Color){ 70, 110, 170, 255 };
+    Color shirtColor = (Color){ 50, 90, 150, 255 };
+    Color pantsColor = (Color){ 40, 70, 130, 255 };
+    Color flashRed = (Color){ 120, 40, 40, 255 };
     
     Color bodyColor = (Color){
         (unsigned char)(shirtColor.r + (flashRed.r - shirtColor.r) * flash),

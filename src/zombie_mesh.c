@@ -84,8 +84,8 @@ static float TorsoRadius(float ny, float theta, float width, float height, float
 }
 
 Mesh ZombieMesh_CreateTorso(float width, float height, float depth) {
-    int radialSegs = 96;
-    int heightSegs = 48;
+    int radialSegs = 64;
+    int heightSegs = 32;
     int ringVerts = radialSegs + 1;
     int bodyVerts = ringVerts * (heightSegs + 1);
     int quadCount = radialSegs * heightSegs;
@@ -216,8 +216,8 @@ Mesh ZombieMesh_CreateTorso(float width, float height, float depth) {
 }
 
 Mesh ZombieMesh_CreateHead(float radius) {
-    int widthSegs = 96;
-    int heightSegs = 96;
+    int widthSegs = 64;
+    int heightSegs = 64;
     int ringVerts = widthSegs + 1;
     int bodyVerts = ringVerts * (heightSegs + 1);
     int quadCount = widthSegs * heightSegs;

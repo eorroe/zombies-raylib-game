@@ -215,6 +215,8 @@ static const char *postFragShader =
     "    \n"
     "    result = mix(result, inkColor, inkMask * 0.25);\n"
     "    \n"
+    "    result = vec3(1.0, 0.0, 0.0);\n"
+    "    \n"
     "    float h1 = step(0.5, fract((uv.x + uv.y) * 36.0));\n"
     "    float h2 = step(0.5, fract((uv.x - uv.y) * 36.0));\n"
     "    float hatch = 0.0;\n"

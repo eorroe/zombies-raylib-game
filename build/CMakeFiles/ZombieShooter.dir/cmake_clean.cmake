@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ZombieShooter.dir/src/particle.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/player.c.o"
   "CMakeFiles/ZombieShooter.dir/src/player.c.o.d"
+  "CMakeFiles/ZombieShooter.dir/src/player_mesh.c.o"
+  "CMakeFiles/ZombieShooter.dir/src/player_mesh.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/renderer.c.o"
   "CMakeFiles/ZombieShooter.dir/src/renderer.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/shader.c.o"

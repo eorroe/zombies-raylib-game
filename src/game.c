@@ -5,6 +5,7 @@
 #include "audio.h"
 #include "raymath.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 #if defined(_WIN32) || defined(_WIN64)

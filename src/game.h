@@ -53,6 +53,7 @@ typedef struct Game {
     int bloodDecalCount;
     Vector3 muzzleFlashPos;
     float muzzleFlashTimer;
+    bool scopeActive;
     AudioManager audio;
     ProceduralTextures textures;
     ImageUpload imageUpload;

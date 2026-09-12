@@ -106,19 +106,19 @@ static void AddNoiseLayer(Image *img, float scale, float amplitude, int octaves)
 }
 
   static Image GenerateZombieSkin(int width, int height) {
-      Image img = GenImageColor(width, height, (Color){ 80, 120, 170, 255 });
+      Image img = GenImageColor(width, height, (Color){ 90, 85, 75, 255 });
       unsigned char *data = (unsigned char *)img.data;
       for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
               float baseNoise = FractalNoise(x, y, 6, 0.5f);
               float poreNoise = FractalNoise(x + 100, y + 100, 4, 0.6f);
               int idx = (y * width + x) * 4;
-              int r = 80 + (int)(baseNoise * 60 + poreNoise * 10);
-              int g = 120 + (int)(baseNoise * 30 - poreNoise * 10);
-              int b = 170 + (int)(baseNoise * 40 - poreNoise * 10);
-              if (r > 150) r = 150; if (r < 60) r = 60;
-              if (g > 150) g = 150; if (g < 60) g = 60;
-              if (b > 150) b = 150; if (b < 60) b = 60;
+              int r = 90 + (int)(baseNoise * 50 + poreNoise * 10);
+              int g = 85 + (int)(baseNoise * 40 - poreNoise * 10);
+              int b = 75 + (int)(baseNoise * 30 - poreNoise * 10);
+              if (r > 140) r = 140; if (r < 50) r = 50;
+              if (g > 130) g = 130; if (g < 50) g = 50;
+              if (b > 120) b = 120; if (b < 40) b = 40;
               data[idx + 0] = (unsigned char)r;
               data[idx + 1] = (unsigned char)g;
               data[idx + 2] = (unsigned char)b;

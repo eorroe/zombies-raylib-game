@@ -4,8 +4,8 @@
 #include "raylib.h"
 #include "texture.h"
 
-#define MAX_ZOMBIES 128
-#define ZOMBIE_SPEED_BASE 2.5f
+#define MAX_ZOMBIES 150
+#define ZOMBIE_SPEED_BASE 4.5f
 #define LIMB_RADIUS 0.13f
 #define TORSO_WIDTH 0.60f
 #define TORSO_HEIGHT 0.90f

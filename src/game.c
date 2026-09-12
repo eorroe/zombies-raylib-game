@@ -37,7 +37,7 @@ static void SpawnImageZombie(Game *game, int texIdx) {
 
 static void SpawnWave(Game *game) {
     game->round++;
-    game->zombiesRemaining = 30 + game->round * 10;
+    game->zombiesRemaining = 40 + game->round * 10;
     if (game->zombiesRemaining > MAX_ZOMBIES) game->zombiesRemaining = MAX_ZOMBIES;
     game->nonImageDeathsSinceLastImage = 0;
     bool usedImages[16] = { false };

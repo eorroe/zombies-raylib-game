@@ -139,9 +139,9 @@ void RendererBegin(Game *game, Camera3D camera) {
     (void)camera;
     
     BeginTextureMode(game->sceneTarget);
-    ClearBackground((Color){245,240,232,255});
-    DrawRectangleGradientV(0, 0, 1280, 360, (Color){200,220,240,255}, (Color){235,240,245,255});
-    DrawRectangleGradientV(0, 360, 1280, 360, (Color){235,240,245,255}, (Color){220,230,240,255});
+    ClearBackground((Color){10, 12, 18, 255});
+    DrawRectangleGradientV(0, 0, 1280, 400, (Color){15, 20, 35, 255}, (Color){40, 35, 30, 255});
+    DrawRectangleGradientV(0, 400, 1280, 320, (Color){60, 40, 25, 255}, (Color){30, 20, 15, 255});
     BeginMode3D(camera);
     rlDisableBackfaceCulling();
 }
@@ -155,13 +155,13 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 0.5f * flicker, 0.7f * flicker, 1.0f * flicker };
+        lightColors[i] = (Vector3){ 0.8f * flicker, 0.5f * flicker, 0.2f * flicker };
     }
     int lightCount = 4;
     
     ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
-    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.7f, 0.85f, 1.0f });
+    ShaderSetFog(&game->shaders, (Vector3){ 0.25f, 0.20f, 0.15f }, 0.02f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.5f, 0.45f, 0.35f });
     
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
@@ -328,8 +328,8 @@ void RendererDrawZombies(Game *game, Shader shader) {
     printf("ZOMBIES: count=%d\n", game->zombieCount);
     Camera3D cam = CameraGetCamera(&game->camera);
     ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.6f, 0.5f, 0.4f }, 0.001f);
-    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.7f, 0.85f, 1.0f });
+    ShaderSetFog(&game->shaders, (Vector3){ 0.25f, 0.20f, 0.15f }, 0.02f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.5f, 0.45f, 0.35f });
     ShaderSetSubsurface(&game->shaders, 0.3f);
     Vector3 lightPositions[4];
     Vector3 lightColors[4];
@@ -337,7 +337,7 @@ void RendererDrawZombies(Game *game, Shader shader) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 0.5f * flicker, 0.7f * flicker, 1.0f * flicker };
+        lightColors[i] = (Vector3){ 0.8f * flicker, 0.5f * flicker, 0.2f * flicker };
     }
     int lightCount = 4;
     for (int i = 0; i < 4; i++) {
@@ -387,8 +387,8 @@ void RendererDrawZombieHeads(Game *game) {
                 float barX = screenPos.x - size / 2;
                 float barY = screenPos.y - size / 2 - barHeight - 4.0f;
                 float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
-                DrawRectangle(barX, barY, barWidth, barHeight, (Color){20, 30, 60, 255});
-                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, (Color){40, 80, 160, 255});
+                DrawRectangle(barX, barY, barWidth, barHeight, (Color){80, 20, 20, 255});
+                DrawRectangle(barX, barY, barWidth * healthPct, barHeight, (Color){180, 40, 40, 255});
             }
         } else {
             Vector2 screenPos = GetWorldToScreen(headPos, cam);
@@ -396,7 +396,7 @@ void RendererDrawZombieHeads(Game *game) {
             float barHeight = 4.0f;
             float healthPct = (z->maxHealth > 0.0f) ? (z->health / z->maxHealth) : 0.0f;
             DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth, barHeight, (Color){20, 30, 60, 255});
-            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth * healthPct, barHeight, (Color){40, 80, 160, 255});
+            DrawRectangle(screenPos.x - barWidth / 2, screenPos.y - barHeight / 2, barWidth * healthPct, barHeight, (Color){180, 40, 40, 255});
         }
     }
 }
@@ -452,7 +452,7 @@ void RendererDrawParticles(Particle *particles, int count) {
     
     for (int i = 0; i < count; i++) {
         if (particles[i].type == PARTICLE_BLOOD) {
-            DrawSphere(particles[i].position, particles[i].size * 4.0f, (Color){20, 30, 60, 200});
+            DrawSphere(particles[i].position, particles[i].size * 4.0f, (Color){120, 20, 20, 200});
         }
     }
 }
@@ -461,29 +461,29 @@ void RendererDrawHUD(Game *game) {
     int w = game->sceneTarget.texture.width;
     int h = game->sceneTarget.texture.height;
     
-    DrawRectangle(0, h - 70, w, 70, (Color){230, 235, 240, 200});
+    DrawRectangle(0, h - 70, w, 70, (Color){20, 20, 25, 180});
     
     int ammoX = w - 20;
     int ammoY = h - 45;
     const char *ammoText = TextFormat("%d / %d", game->weapon.ammo, MAX_AMMO);
     int ammoW = MeasureText(ammoText, 28);
-    DrawText(ammoText, ammoX - ammoW, ammoY, 28, WHITE);
+    DrawText(ammoText, ammoX - ammoW, ammoY, 28, (Color){220, 220, 220, 255});
     
     int healthX = 20;
     int healthY = h - 45;
     float healthPct = game->player.health / game->player.maxHealth;
-    DrawRectangle(healthX, healthY, 200, 18, (Color){230, 235, 240, 200});
-    DrawRectangle(healthX, healthY, (int)(200 * healthPct), 18, (Color){40, 80, 160, 255});
-    DrawRectangleLines(healthX, healthY, 200, 18, (Color){20, 30, 60, 255});
-    DrawText(TextFormat("%.0f", game->player.health), healthX + 205, healthY, 20, WHITE);
+    DrawRectangle(healthX, healthY, 200, 18, (Color){20, 20, 25, 180});
+    DrawRectangle(healthX, healthY, (int)(200 * healthPct), 18, (Color){160, 40, 40, 255});
+    DrawRectangleLines(healthX, healthY, 200, 18, (Color){100, 25, 25, 255});
+    DrawText(TextFormat("%.0f", game->player.health), healthX + 205, healthY, 20, (Color){220, 220, 220, 255});
     
     if (CameraGetADSBlend(&game->camera) > 0.5f || CameraGetFirstPersonBlend(&game->camera) > 0.5f) {
         int cx = w / 2;
         int cy = h / 2;
-        DrawLine(cx - 12, cy, cx - 4, cy, (Color){40, 80, 160, 180});
-        DrawLine(cx + 4, cy, cx + 12, cy, (Color){40, 80, 160, 180});
-        DrawLine(cx, cy - 12, cx, cy - 4, (Color){40, 80, 160, 180});
-        DrawLine(cx, cy + 4, cx, cy + 12, (Color){40, 80, 160, 180});
+        DrawLine(cx - 12, cy, cx - 4, cy, (Color){200, 200, 200, 180});
+        DrawLine(cx + 4, cy, cx + 12, cy, (Color){200, 200, 200, 180});
+        DrawLine(cx, cy - 12, cx, cy - 4, (Color){200, 200, 200, 180});
+        DrawLine(cx, cy + 4, cx, cy + 12, (Color){200, 200, 200, 180});
     }
     
     if (game->weapon.reloading) {

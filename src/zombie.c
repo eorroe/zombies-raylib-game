@@ -172,18 +172,19 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
         return;
     }
     if (firstShotFired) {
-        zombie->walkCycle += dt * 6.0f;
+        zombie->walkCycle += dt * 8.0f;
         Vector3 dir = Vector3Subtract(playerPos, zombie->position);
         float dist = Vector3Length(dir);
         if (dist > 0.1f) {
             dir = Vector3Normalize(dir);
-            zombie->velocity = Vector3Scale(dir, zombie->speed);
+            float speedMult = 1.0f + (dist < 5.0f ? 0.5f : 0.0f);
+            zombie->velocity = Vector3Scale(dir, zombie->speed * speedMult);
             zombie->position = Vector3Add(zombie->position, Vector3Scale(zombie->velocity, dt));
             float targetAngle = atan2f(dir.x, dir.z);
             float diff = targetAngle - zombie->facingAngle;
             while (diff > PI) diff -= 2.0f * PI;
             while (diff < -PI) diff += 2.0f * PI;
-            zombie->facingAngle += diff * 5.0f * dt;
+            zombie->facingAngle += diff * 8.0f * dt;
             while (zombie->facingAngle > PI) zombie->facingAngle -= 2.0f * PI;
             while (zombie->facingAngle < -PI) zombie->facingAngle += 2.0f * PI;
         }

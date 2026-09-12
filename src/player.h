@@ -19,10 +19,15 @@ typedef struct {
     float pitch;
     Model bodyModel;
     Model headModel;
+    Model helmetModel;
     Model leftArmModel;
     Model rightArmModel;
     Model leftLegModel;
     Model rightLegModel;
+    Model leftHandModel;
+    Model rightHandModel;
+    Model leftFootModel;
+    Model rightFootModel;
     Texture2D uniformTex;
     Texture2D skinTex;
     bool isMoving;
@@ -31,7 +36,7 @@ typedef struct {
     Vector3 moveDir;
 } Player;
 
-void PlayerInit(Player *player, Vector3 startPos);
+void PlayerInit(Player *player, Vector3 startPos, Shader pbr);
 void PlayerUpdate(Player *player, InputState *input, float dt);
 void PlayerRender(Player *player, Shader shader);
 void PlayerShutdown(Player *player);

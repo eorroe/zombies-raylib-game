@@ -220,7 +220,7 @@ static void DrawStickLimb(Vector3 start, Vector3 end, float radius, Color color)
         rotationAxis = Vector3Normalize(rotationAxis);
     }
     
-    DrawCylinder3D(mid, radius, radius, len, 6, color);
+    DrawCylinderEx(start, end, radius, radius, 6, color);
     DrawSphere(start, radius * 1.2f, color);
     DrawSphere(end, radius * 1.2f, color);
 }
@@ -308,10 +308,15 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     DrawStickLimb(neckPos, shoulderL, 0.02f, skinColor);
     DrawStickLimb(neckPos, shoulderR, 0.02f, skinColor);
 
-    Vector3 shoulderL = Vector3Add(torsoPos, RotateY(shoulderLOffset, zombie->facingAngle));
-    Vector3 shoulderR = Vector3Add(torsoPos, RotateY(shoulderROffset, zombie->facingAngle));
-    Vector3 hipL = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipLOffset, zombie->facingAngle));
-    Vector3 hipR = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipROffset, zombie->facingAngle));
+    Vector3 shoulderLOffset = (Vector3){ -zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 };
+    Vector3 shoulderROffset = (Vector3){ zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 };
+    Vector3 hipLOffset = (Vector3){ -zombie->torsoWidth * 0.35f, 0, 0 };
+    Vector3 hipROffset = (Vector3){ zombie->torsoWidth * 0.35f, 0, 0 };
+    
+    Vector3 animShoulderL = Vector3Add(torsoPos, RotateY(shoulderLOffset, zombie->facingAngle));
+    Vector3 animShoulderR = Vector3Add(torsoPos, RotateY(shoulderROffset, zombie->facingAngle));
+    Vector3 animHipL = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipLOffset, zombie->facingAngle));
+    Vector3 animHipR = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY(hipROffset, zombie->facingAngle));
 
     float armSwing = walk * (0.5f + zombie->armSwingOffset);
     float legSwing = walk * (0.6f + zombie->legSwingOffset);
@@ -322,10 +327,10 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
         armSwing = deathProgress * 3.0f;
         legSwing = deathProgress * 2.5f;
         float groundY = 0.05f;
-        shoulderL.y = shoulderL.y + (groundY - shoulderL.y) * deathProgress;
-        shoulderR.y = shoulderR.y + (groundY - shoulderR.y) * deathProgress;
-        hipL.y = hipL.y + (groundY - hipL.y) * deathProgress;
-        hipR.y = hipR.y + (groundY - hipR.y) * deathProgress;
+        animShoulderL.y = animShoulderL.y + (groundY - animShoulderL.y) * deathProgress;
+        animShoulderR.y = animShoulderR.y + (groundY - animShoulderR.y) * deathProgress;
+        animHipL.y = animHipL.y + (groundY - animHipL.y) * deathProgress;
+        animHipR.y = animHipR.y + (groundY - animHipR.y) * deathProgress;
     }
 
     Vector3 playerPos = camera.position;

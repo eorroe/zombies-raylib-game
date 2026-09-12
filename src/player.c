@@ -168,7 +168,7 @@ static void DrawStickLimb(Vector3 start, Vector3 end, float radius, Color color)
         rotationAxis = Vector3Normalize(rotationAxis);
     }
     
-    DrawCylinder3D(mid, radius, radius, len, 6, color);
+    DrawCylinderEx(start, end, radius, radius, 6, color);
     DrawSphere(start, radius * 1.2f, color);
     DrawSphere(end, radius * 1.2f, color);
 }

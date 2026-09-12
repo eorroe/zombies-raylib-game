@@ -1,5 +1,13 @@
 # Agent Instructions
 
+## Repository Branch Policy
+
+**All commits and pushes MUST go to the `doodle-style` branch.**
+
+- Commit to: `doodle-style`
+- Push to: `origin/doodle-style`
+- Do NOT commit to or push any other branch unless explicitly instructed
+
 ## Mandatory Build Protocol
 
 **Before making ANY update—code, rendering, or otherwise—you MUST:**

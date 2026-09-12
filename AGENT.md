@@ -226,18 +226,18 @@ print(f'B range: {min(p[2] for p in pixels)}-{max(p[2] for p in pixels)}')
 #### 4. Estimated Composition
 ```python
 # Adjust these rules to match the target style being analyzed
-background_pixels = sum(1 for p in pixels if is_background(p))
-primary_ink_pixels = sum(1 for p in pixels if is_primary_ink(p))
-secondary_ink_pixels = sum(1 for p in pixels if is_secondary_ink(p))
-dark_ink_pixels = sum(1 for p in pixels if is_dark_ink(p))
+base_pixels = sum(1 for p in pixels if is_base_surface(p))
+primary_color_pixels = sum(1 for p in pixels if is_primary_color(p))
+secondary_color_pixels = sum(1 for p in pixels if is_secondary_color(p))
+dark_detail_pixels = sum(1 for p in pixels if is_dark_detail(p))
 
-print(f'Background: {background_pixels/total*100:.1f}%')
-print(f'Primary ink: {primary_ink_pixels/total*100:.1f}%')
-print(f'Secondary ink: {secondary_ink_pixels/total*100:.1f}%')
-print(f'Dark ink: {dark_ink_pixels/total*100:.1f}%')
+print(f'Base surface: {base_pixels/total*100:.1f}%')
+print(f'Primary color: {primary_color_pixels/total*100:.1f}%')
+print(f'Secondary color: {secondary_color_pixels/total*100:.1f}%')
+print(f'Dark detail: {dark_detail_pixels/total*100:.1f}%')
 ```
 
-Define `is_background()`, `is_primary_ink()`, etc. based on the reference style.
+Define `is_base_surface()`, `is_primary_color()`, etc. based on the reference style. These classification functions should identify the major visual regions without hardcoding style-specific labels.
 
 #### 5. Spatial Layout
 ```python
@@ -251,11 +251,11 @@ for row in range(grid_rows):
         cell_pixels = list(crop.getdata())
         cell_total = len(cell_pixels)
         
-        cell_background = sum(1 for p in cell_pixels if is_background(p))
-        cell_primary = sum(1 for p in cell_pixels if is_primary_ink(p))
-        cell_dark = sum(1 for p in cell_pixels if is_dark_ink(p))
+        cell_base = sum(1 for p in cell_pixels if is_base_surface(p))
+        cell_primary = sum(1 for p in cell_pixels if is_primary_color(p))
+        cell_dark = sum(1 for p in cell_pixels if is_dark_detail(p))
         
-        print(f'Cell ({col},{row}): background={cell_background/cell_total*100:.1f}%, primary={cell_primary/cell_total*100:.1f}%, dark={cell_dark/cell_total*100:.1f}%')
+        print(f'Cell ({col},{row}): base={cell_base/cell_total*100:.1f}%, primary={cell_primary/cell_total*100:.1f}%, dark={cell_dark/cell_total*100:.1f}%')
 ```
 
 #### 6. Forms and Objects
@@ -269,18 +269,18 @@ Manually inspect the screenshot and document:
 ```python
 # Count edge-like transitions
 edges = 0
-primary_edges = 0
+primary_color_edges = 0
 for i in range(1, len(pixels) - 1):
     r1, g1, b1 = pixels[i-1]
     r2, g2, b2 = pixels[i+1]
     diff = abs(r1-r2) + abs(g1-g2) + abs(b1-b2)
     if diff > threshold:  # threshold depends on style
         edges += 1
-        if is_primary_ink((r1, g1, b1)) or is_primary_ink((r2, g2, b2)):
-            primary_edges += 1
+        if is_primary_color((r1, g1, b1)) or is_primary_color((r2, g2, b2)):
+            primary_color_edges += 1
 
 print(f'Total edge transitions: {edges:,} ({edges/total*100:.1f}%)')
-print(f'Primary ink edges: {primary_edges:,} ({primary_edges/total*100:.1f}%)')
+print(f'Primary color edges: {primary_color_edges:,} ({primary_color_edges/total*100:.1f}%)')
 ```
 
 Adjust the threshold and edge classification based on the target style.

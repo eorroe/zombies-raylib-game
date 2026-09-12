@@ -171,13 +171,13 @@ This is not optional. A visual change is NOT complete until the screenshot workf
 - Always verify `git push origin doodle-style` succeeds before reporting completion
 - If push fails, fix the issue before declaring the update complete
 
-### 5.2 Screenshot Analysis Using Judge Protocol Steps
+### 5.2 Screenshot Analysis Using Full Analysis Workflow
 
-Use the same systematic analysis process as the Reference Analysis Workflow in Section 5.4, but **do not create any markdown file**. The screenshot workflow is for verification only.
+Use the same systematic analysis process as the Reference Analysis Workflow in Section 5.5, but **do not create any markdown file**. The screenshot workflow is for verification only.
 
-For each screenshot, follow these steps in order:
+For each screenshot, perform ALL of the following analysis steps in order:
 
-#### Step 1: Analyze ALL pixels first
+#### 1. Image Properties
 ```python
 from PIL import Image
 img = Image.open('workflow/iteration_XX.png')
@@ -185,17 +185,21 @@ width, height = img.size
 pixels = list(img.getdata())
 print(f'Total pixels: {len(pixels)}')
 print(f'Size: {width}x{height}')
+print(f'Aspect ratio: {width/height:.2f}')
 ```
 
-#### Step 2: Get global statistics
+#### 2. Overall Brightness
 ```python
-brightness = sum(sum(p[:3])/3 for p in pixels if len(p) >= 3) / len(pixels)
-white_count = sum(1 for p in pixels if len(p) >= 3 and p[0] > 240 and p[1] > 240 and p[2] > 240)
-print(f'Average brightness: {brightness:.1f}')
-print(f'White-ish pixels: {white_count}')
+dark = sum(1 for p in pixels if (p[0]+p[1]+p[2])/3 < 64)
+mid = sum(1 for p in pixels if 64 <= (p[0]+p[1]+p[2])/3 < 192)
+bright = sum(1 for p in pixels if (p[0]+p[1]+p[2])/3 >= 192)
+total = len(pixels)
+print(f'Dark (<64): {dark/total*100:.1f}%')
+print(f'Mid (64-192): {mid/total*100:.1f}%')
+print(f'Bright (>192): {bright/total*100:.1f}%')
 ```
 
-#### Step 3: Identify dominant colors across entire image
+#### 3. Dominant Palette
 ```python
 from collections import Counter
 color_counts = Counter()
@@ -207,42 +211,85 @@ for p in pixels:
 top_colors = color_counts.most_common(10)
 for color, count in top_colors:
     r, g, b = color[0] * 16 + 8, color[1] * 16 + 8, color[2] * 16 + 8
-    print(f'RGB({r:3d},{g:3d},{b:3d}): {count:6d} pixels ({count/len(pixels)*100:.1f}%)')
+    print(f'RGB({r:3d},{g:3d},{b:3d}): {count:6d} pixels ({count/total*100:.1f}%)')
+
+avg_r = sum(p[0] for p in pixels) / total
+avg_g = sum(p[1] for p in pixels) / total
+avg_b = sum(p[2] for p in pixels) / total
+print(f'Average RGB: ({avg_r:.1f}, {avg_g:.1f}, {avg_b:.1f})')
 ```
 
-#### Step 4: Filter by target color across ENTIRE image
+#### 4. Estimated Composition
 ```python
-# Example: find all blue pixels
-blue_pixels = []
-for y in range(height):
-    for x in range(width):
-        p = pixels[y * width + x]
-        r, g, b = p[:3]
-        if b > 80 and b > r + 5 and b > g + 5:
-            blue_pixels.append((x, y, p[:3]))
+# Paper: light colors with warm tint
+paper_pixels = sum(1 for p in pixels if (p[0]+p[1]+p[2])/3/255 > 0.75 and p[0] > p[1] and p[0] > p[2])
+# Blue ink: blue dominant
+blue_ink_pixels = sum(1 for p in pixels if p[2] > p[0] and p[2] > p[1] and p[2] > 100)
+# Dark ink: low luminance
+dark_ink_pixels = sum(1 for p in pixels if (p[0]+p[1]+p[2])/3/255 < 0.2)
 
-print(f'Blue pixels: {len(blue_pixels)}')
+print(f'Paper: {paper_pixels/total*100:.1f}%')
+print(f'Blue ink: {blue_ink_pixels/total*100:.1f}%')
+print(f'Dark ink: {dark_ink_pixels/total*100:.1f}%')
 ```
 
-#### Step 5: Cluster and analyze filtered pixels
+#### 5. Spatial Layout
 ```python
-from collections import Counter
-y_counts = Counter(y for x, y, c in blue_pixels)
-top_y = y_counts.most_common(10)
-print('Top y positions:')
-for y, count in top_y:
-    xs = [x for x, yy, c in blue_pixels if yy == y]
-    print(f'  y={y}: {count} pixels, x range {min(xs)}-{max(xs)}')
+grid_cols, grid_rows = 6, 4
+cell_w, cell_h = width // grid_cols, height // grid_rows
+
+for row in range(grid_rows):
+    for col in range(grid_cols):
+        x1, y1 = col * cell_w, row * cell_h
+        crop = img.crop((x1, y1, x1 + cell_w, y1 + cell_h))
+        cell_pixels = list(crop.getdata())
+        cell_total = len(cell_pixels)
+        
+        cell_paper = sum(1 for p in cell_pixels if (p[0]+p[1]+p[2])/3 > 200 and p[0] > p[1])
+        cell_blue = sum(1 for p in cell_pixels if p[2] > p[0] and p[2] > p[1] and p[2] > 100)
+        cell_dark = sum(1 for p in cell_pixels if (p[0]+p[1]+p[2])/3 < 100)
+        
+        print(f'Cell ({col},{row}): paper={cell_paper/cell_total*100:.1f}%, blue={cell_blue/cell_total*100:.1f}%, dark={cell_dark/cell_total*100:.1f}%')
 ```
 
-#### Step 6: Refine search based on clusters
-- If one cluster is dominant (e.g., sky), filter it out
-- Focus on remaining clusters
-- Sample pixels around suspected target areas
+#### 6. Forms and Objects
+Manually inspect the screenshot and document:
+- Recognizable 3D objects or scene elements
+- How each object is rendered (outline only, filled, hatched, etc.)
+- Spatial relationships between objects
+- Any text, UI elements, or overlays
 
-**Key Principle:** Always analyze the **entire image first**, then iteratively filter. Never start with a small region unless you already know the target location from prior analysis.
+#### 7. Edges
+```python
+# Count edge-like transitions
+edges = 0
+blue_edges = 0
+for i in range(1, len(pixels) - 1):
+    r1, g1, b1 = pixels[i-1]
+    r2, g2, b2 = pixels[i+1]
+    diff = abs(r1-r2) + abs(g1-g2) + abs(b1-b2)
+    if diff > 50:  # threshold depends on style
+        edges += 1
+        if b1 > 100 and b1 > r1 and b1 > g1:
+            blue_edges += 1
 
-**Important:** This analysis is for verification only. Do NOT create markdown files during the screenshot workflow. Only create analysis documents when explicitly analyzing a reference image per Section 5.4.
+print(f'Total edge transitions: {edges:,} ({edges/total*100:.1f}%)')
+print(f'Blue-ish edges: {blue_edges:,} ({blue_edges/total*100:.1f}%)')
+```
+
+#### 8. Faces/Surfaces
+- Describe surface treatment (flat, textured, hatched, etc.)
+- Note tonal variation approach
+- Identify any fill patterns or hatching styles
+
+#### 9. Implementation Implications
+Based on the analysis, document:
+- What the current implementation is missing
+- What needs to change in shaders, materials, or rendering pipeline
+- Priority of changes (high/medium/low)
+- Any technical constraints or limitations discovered
+
+**Key rule:** perform ALL 9 analysis steps for every screenshot. This is verification analysis, not documentation—**do not create markdown files during the screenshot workflow**. Only create analysis documents when explicitly analyzing a reference image per Section 5.5.
 
 ### 5.3 Screenshot Commit and Push Requirements
 

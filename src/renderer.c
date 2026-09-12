@@ -4,6 +4,8 @@
 #include "particle.h"
 #include "zombie.h"
 #include "raymath.h"
+#include "player_mesh.h"
+#include "soldier_mesh.h"
 
 static void SetModelTexture(Model *model, Texture2D diffuse, Texture2D normal) {
     if (model->meshCount > 0 && model->materialCount > 0) {
@@ -102,6 +104,13 @@ void RendererInit(Game *game, int screenWidth, int screenHeight) {
     }
     game->platformModel.materials[0].shader = game->shaders.pbr;
     
+    Mesh vehicleMesh = GenMeshCube(1.2f, 0.7f, 2.5f);
+    game->vehicleModel = LoadModelFromMesh(vehicleMesh);
+    if (game->textures.generated && game->textures.metal.id != 0) {
+        SetModelTexture(&game->vehicleModel, game->textures.metal, game->textures.metalNormal);
+    }
+    game->vehicleModel.materials[0].shader = game->shaders.pbr;
+    
     Mesh rubbleMesh = GenMeshCube(0.3f, 0.15f, 0.3f);
     game->rubbleModel = LoadModelFromMesh(rubbleMesh);
     if (game->textures.generated && game->textures.concrete.id != 0) {
@@ -197,11 +206,25 @@ void RendererDrawScene(Game *game) {
     DrawModel(game->platformModel, (Vector3){ 12.0f, 0.3f, 3.0f }, 1.0f, (Color){130, 140, 150, 255});
     DrawCube((Vector3){ 10.0f, 0.55f, 4.2f }, 4.5f, 0.3f, 0.3f, (Color){130, 140, 150, 255});
     
+    SetPBRMaterial(game, game->textures.metal, game->textures.metalNormal, 0.9f, 0.3f);
+    Vector3 carPos = { 5.0f, 0.5f, 2.0f };
+    DrawModel(game->vehicleModel, carPos, 1.0f, (Color){60, 80, 110, 255});
+    DrawCube((Vector3){ carPos.x + 0.6f, carPos.y + 0.35f, carPos.z }, 1.2f, 0.5f, 0.8f, (Color){50, 70, 100, 255});
+    
     for (int i = 0; i < 40; i++) {
         float x = -20.0f + (i % 20) * 2.0f + (i / 20) * 0.5f;
         float z = -5.0f + (i % 7) * 1.5f;
         float y = 0.08f + (i % 3) * 0.04f;
         DrawModel(game->rubbleModel, (Vector3){ x, y, z }, 1.0f, (Color){100, 110, 120, 255});
+    }
+    
+    for (int i = 0; i < 60; i++) {
+        float x = -18.0f + (i % 30) * 1.2f;
+        float z = -4.0f + (i % 10) * 1.2f;
+        float y = 0.05f + (i % 4) * 0.03f;
+        float sx = 0.2f + (i % 3) * 0.15f;
+        float sz = 0.2f + (i % 2) * 0.1f;
+        DrawCube((Vector3){ x, y, z }, sx, 0.08f, sz, (Color){80, 90, 100, 255});
     }
     
     SetPBRMaterial(game, game->textures.concrete, game->textures.concreteNormal, 0.1f, 0.7f);
@@ -383,6 +406,47 @@ void RendererDrawPlayer(Player *player, Shader shader) {
     PlayerRender(player, shader);
 }
 
+void RendererDrawSoldiers(Soldier *soldiers, int count, Shader shader) {
+    (void)shader;
+    for (int i = 0; i < count; i++) {
+        Soldier *s = &soldiers[i];
+        float yawDeg = s->yaw * RAD2DEG;
+        
+        Vector3 bodyPos = s->position;
+        bodyPos.y += 1.0f;
+        DrawModelEx(s->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
+        
+        Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
+        DrawModelEx(s->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 80, 120, 170, 255 });
+        
+        Vector3 helmetPos = Vector3Add(headPos, (Vector3){ 0, 0.05f, 0 });
+        DrawModelEx(s->helmetModel, helmetPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 20, 30, 60, 255 });
+        
+        float cosYaw = cosf(s->yaw);
+        float sinYaw = sinf(s->yaw);
+        Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
+        Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
+        Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f * cosYaw, -0.6f, 0.2f * sinYaw });
+        Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f * cosYaw, -0.6f, -0.2f * sinYaw });
+        
+        DrawModelEx(s->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+        DrawModelEx(s->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+        
+        DrawModelEx(s->leftLegModel, leftHip, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+        DrawModelEx(s->rightLegModel, rightHip, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+        
+        Vector3 leftHandPos = Vector3Add(leftShoulder, (Vector3){ 0, -0.8f, 0 });
+        Vector3 rightHandPos = Vector3Add(rightShoulder, (Vector3){ 0, -0.8f, 0 });
+        DrawModelEx(s->leftHandModel, leftHandPos, (Vector3){ 0, 0, 1 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+        DrawModelEx(s->rightHandModel, rightHandPos, (Vector3){ 0, 0, 1 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+        
+        Vector3 leftFootPos = Vector3Add(leftHip, (Vector3){ 0, -1.0f, 0 });
+        Vector3 rightFootPos = Vector3Add(rightHip, (Vector3){ 0, -1.0f, 0 });
+        DrawModelEx(s->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+        DrawModelEx(s->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    }
+}
+
 void RendererDrawParticles(Particle *particles, int count) {
     ParticleSystemRender(particles, count);
     
@@ -459,4 +523,5 @@ void RendererShutdown(Game *game) {
     if (game->containerModel.meshCount > 0) UnloadModel(game->containerModel);
     if (game->platformModel.meshCount > 0) UnloadModel(game->platformModel);
     if (game->rubbleModel.meshCount > 0) UnloadModel(game->rubbleModel);
+    if (game->vehicleModel.meshCount > 0) UnloadModel(game->vehicleModel);
 }

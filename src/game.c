@@ -4,6 +4,8 @@
 #include "renderer.h"
 #include "audio.h"
 #include "raymath.h"
+#include "soldier_mesh.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -97,6 +99,12 @@ static void SpawnWave(Game *game) {
         }
         SpawnZombie(game, pos, type, texIdx);
     }
+    
+    game->soldierCount = 3;
+    for (int i = 0; i < game->soldierCount; i++) {
+        game->soldiers[i].position = (Vector3){ -3.0f + i * 3.0f, 0, -2.0f };
+        game->soldiers[i].yaw = 0.0f;
+    }
 }
 
 void GameInit(Game *game, int screenWidth, int screenHeight) {
@@ -121,6 +129,56 @@ void GameInit(Game *game, int screenWidth, int screenHeight) {
     PlayerInit(&game->player, (Vector3){ 0, 1.5f, 0 }, game->shaders.pbr);
     WeaponInit(&game->weapon, game->shaders.pbr);
     CameraInit(&game->camera, &game->player);
+    
+    for (int i = 0; i < 8; i++) {
+        game->soldiers[i].position = (Vector3){ 0 };
+        game->soldiers[i].yaw = 0.0f;
+        
+        Mesh bodyMesh = SoldierMesh_CreateTorso(0.55f, 1.4f, 0.3f);
+        game->soldiers[i].bodyModel = LoadModelFromMesh(bodyMesh);
+        game->soldiers[i].bodyModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh headMesh = SoldierMesh_CreateHead(0.27f);
+        game->soldiers[i].headModel = LoadModelFromMesh(headMesh);
+        game->soldiers[i].headModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh helmetMesh = SoldierMesh_CreateHelmet(0.31f);
+        game->soldiers[i].helmetModel = LoadModelFromMesh(helmetMesh);
+        game->soldiers[i].helmetModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh leftArm = SoldierMesh_CreateLimb(0.12f, 0.8f, 16);
+        game->soldiers[i].leftArmModel = LoadModelFromMesh(leftArm);
+        game->soldiers[i].leftArmModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh rightArm = SoldierMesh_CreateLimb(0.12f, 0.8f, 16);
+        game->soldiers[i].rightArmModel = LoadModelFromMesh(rightArm);
+        game->soldiers[i].rightArmModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh leftLeg = SoldierMesh_CreateLimb(0.14f, 1.0f, 16);
+        game->soldiers[i].leftLegModel = LoadModelFromMesh(leftLeg);
+        game->soldiers[i].leftLegModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh rightLeg = SoldierMesh_CreateLimb(0.14f, 1.0f, 16);
+        game->soldiers[i].rightLegModel = LoadModelFromMesh(rightLeg);
+        game->soldiers[i].rightLegModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh leftHand = SoldierMesh_CreateHand(0.07f);
+        game->soldiers[i].leftHandModel = LoadModelFromMesh(leftHand);
+        game->soldiers[i].leftHandModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh rightHand = SoldierMesh_CreateHand(0.07f);
+        game->soldiers[i].rightHandModel = LoadModelFromMesh(rightHand);
+        game->soldiers[i].rightHandModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh leftFoot = SoldierMesh_CreateFoot(0.09f);
+        game->soldiers[i].leftFootModel = LoadModelFromMesh(leftFoot);
+        game->soldiers[i].leftFootModel.materials[0].shader = game->shaders.pbr;
+        
+        Mesh rightFoot = SoldierMesh_CreateFoot(0.09f);
+        game->soldiers[i].rightFootModel = LoadModelFromMesh(rightFoot);
+        game->soldiers[i].rightFootModel.materials[0].shader = game->shaders.pbr;
+    }
+    game->soldierCount = 3;
     
     AudioInit(&game->audio);
     TextureGenerate(&game->textures);
@@ -658,6 +716,7 @@ void GameRender(Game *game) {
     RendererDrawZombies(game, game->shaders.pbr);
     if (CameraGetFirstPersonBlend(&game->camera) < 0.5f) {
         RendererDrawPlayer(&game->player, game->shaders.pbr);
+        RendererDrawSoldiers(game->soldiers, game->soldierCount, game->shaders.pbr);
     }
     WeaponRender(&game->weapon, cam, game->player.yaw);
     RendererDrawParticles(game->particles, game->particleCount);
@@ -671,6 +730,19 @@ void GameRender(Game *game) {
 void GameShutdown(Game *game) {
     for (int i = 0; i < game->zombieCount; i++) {
         ZombieShutdown(&game->zombies[i]);
+    }
+    for (int i = 0; i < game->soldierCount; i++) {
+        UnloadModel(game->soldiers[i].bodyModel);
+        UnloadModel(game->soldiers[i].headModel);
+        UnloadModel(game->soldiers[i].helmetModel);
+        UnloadModel(game->soldiers[i].leftArmModel);
+        UnloadModel(game->soldiers[i].rightArmModel);
+        UnloadModel(game->soldiers[i].leftLegModel);
+        UnloadModel(game->soldiers[i].rightLegModel);
+        UnloadModel(game->soldiers[i].leftHandModel);
+        UnloadModel(game->soldiers[i].rightHandModel);
+        UnloadModel(game->soldiers[i].leftFootModel);
+        UnloadModel(game->soldiers[i].rightFootModel);
     }
     PlayerShutdown(&game->player);
     WeaponShutdown(&game->weapon);

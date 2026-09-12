@@ -21,6 +21,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ZombieShooter.dir/src/renderer.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/shader.c.o"
   "CMakeFiles/ZombieShooter.dir/src/shader.c.o.d"
+  "CMakeFiles/ZombieShooter.dir/src/soldier_mesh.c.o"
+  "CMakeFiles/ZombieShooter.dir/src/soldier_mesh.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/texture.c.o"
   "CMakeFiles/ZombieShooter.dir/src/texture.c.o.d"
   "CMakeFiles/ZombieShooter.dir/src/ui.c.o"

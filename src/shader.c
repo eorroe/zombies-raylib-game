@@ -173,7 +173,7 @@ static const char *postFragShader =
     "    float gx = -tl - 2.0*l - bl + tr + 2.0*r + br;\n"
     "    float gy = -tl - 2.0*t - tr + bl + 2.0*b + br;\n"
     "    float edge = sqrt(gx*gx + gy*gy);\n"
-    "    float edgeLine = smoothstep(0.05, 0.12, edge);\n"
+    "    float edgeLine = smoothstep(0.08, 0.18, edge);\n"
 
     "    vec3 inkDark   = vec3(0.08, 0.18, 0.52);\n"
     "    vec3 inkMedium = vec3(0.15, 0.35, 0.65);\n"
@@ -186,14 +186,18 @@ static const char *postFragShader =
     "    inkCol = mix(inkMedium, inkCol, smoothstep(0.0, 0.4, inkAmount));\n"
     "    inkCol = mix(inkLight,  inkCol, smoothstep(0.0, 0.25, inkAmount));\n"
 
-    "    col = mix(col, inkCol, edgeLine * 0.8);\n"
+    "    float inkVar = sin(uv.x * 40.0 + time * 0.1) * 0.5 + 0.5;\n"
+    "    inkCol = mix(inkCol, inkMedium, inkVar * 0.15);\n"
+
+    "    col = mix(col, inkCol, edgeLine * 0.9);\n"
 
     "    float lineSpacing = 30.0;\n"
     "    float lineY = (uv.y - 0.5) * resolution.y / lineSpacing;\n"
     "    float lineFrac = fract(lineY);\n"
     "    float hLine = 1.0 - smoothstep(0.0, 1.2 / resolution.y, lineFrac) * smoothstep(0.0, 1.2 / resolution.y, 1.0 - lineFrac);\n"
     "    hLine *= smoothstep(0.0, 0.003, lineFrac) * smoothstep(0.0, 0.003, 1.0 - lineFrac);\n"
-    "    col = mix(col, col * vec3(0.70, 0.78, 0.90), hLine * 0.22);\n"
+    "    float lineVar = sin(uv.x * 20.0 + time * 0.05) * 0.5 + 0.5;\n"
+    "    col = mix(col, col * vec3(0.70, 0.78, 0.90), hLine * (0.18 + lineVar * 0.08));\n"
 
     "    float marginLineWidth = 1.4 / resolution.x;\n"
     "    float marginL = 1.0 - smoothstep(0.0, marginLineWidth, abs(uv.x - 0.10));\n"

@@ -14,6 +14,7 @@ void RendererDrawBloodDecals(Game *game);
 void RendererDrawZombies(Game *game, Shader shader);
 void RendererDrawZombieHeads(Game *game);
 void RendererDrawPlayer(Player *player, Shader shader);
+void RendererDrawSoldiers(Soldier *soldiers, int count, Shader shader);
 void RendererDrawParticles(Particle *particles, int count);
 void RendererDrawHUD(Game *game);
 void RendererDrawScope(Game *game);

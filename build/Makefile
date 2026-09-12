@@ -393,6 +393,30 @@ src/shader.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/shader.c.s
 .PHONY : src/shader.c.s
 
+src/soldier_mesh.o: src/soldier_mesh.c.o
+.PHONY : src/soldier_mesh.o
+
+# target to build an object file
+src/soldier_mesh.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/soldier_mesh.c.o
+.PHONY : src/soldier_mesh.c.o
+
+src/soldier_mesh.i: src/soldier_mesh.c.i
+.PHONY : src/soldier_mesh.i
+
+# target to preprocess a source file
+src/soldier_mesh.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/soldier_mesh.c.i
+.PHONY : src/soldier_mesh.c.i
+
+src/soldier_mesh.s: src/soldier_mesh.c.s
+.PHONY : src/soldier_mesh.s
+
+# target to generate assembly for a file
+src/soldier_mesh.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ZombieShooter.dir/build.make CMakeFiles/ZombieShooter.dir/src/soldier_mesh.c.s
+.PHONY : src/soldier_mesh.c.s
+
 src/texture.o: src/texture.c.o
 .PHONY : src/texture.o
 
@@ -555,6 +579,9 @@ help:
 	@echo "... src/shader.o"
 	@echo "... src/shader.i"
 	@echo "... src/shader.s"
+	@echo "... src/soldier_mesh.o"
+	@echo "... src/soldier_mesh.i"
+	@echo "... src/soldier_mesh.s"
 	@echo "... src/texture.o"
 	@echo "... src/texture.i"
 	@echo "... src/texture.s"

@@ -15,6 +15,22 @@
 #include "input.h"
 #include "debug.h"
 
+typedef struct {
+    Vector3 position;
+    float yaw;
+    Model bodyModel;
+    Model headModel;
+    Model helmetModel;
+    Model leftArmModel;
+    Model rightArmModel;
+    Model leftLegModel;
+    Model rightLegModel;
+    Model leftHandModel;
+    Model rightHandModel;
+    Model leftFootModel;
+    Model rightFootModel;
+} Soldier;
+
 typedef struct Game {
     GameState state;
     GameMode mode;
@@ -62,6 +78,10 @@ typedef struct Game {
     Model containerModel;
     Model platformModel;
     Model rubbleModel;
+    Model vehicleModel;
+    
+    Soldier soldiers[8];
+    int soldierCount;
     
     MenuState menu;
 } Game;

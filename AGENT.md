@@ -171,6 +171,104 @@ This is not optional. A visual change is NOT complete until the screenshot workf
 - Always verify `git push origin doodle-style` succeeds before reporting completion
 - If push fails, fix the issue before declaring the update complete
 
+### 5.2 Screenshot Analysis Using Judge Protocol Steps
+
+Use the same systematic analysis process as the Reference Analysis Workflow in Section 5.4, but **do not create any markdown file**. The screenshot workflow is for verification only.
+
+For each screenshot, follow these steps in order:
+
+#### Step 1: Analyze ALL pixels first
+```python
+from PIL import Image
+img = Image.open('workflow/iteration_XX.png')
+width, height = img.size
+pixels = list(img.getdata())
+print(f'Total pixels: {len(pixels)}')
+print(f'Size: {width}x{height}')
+```
+
+#### Step 2: Get global statistics
+```python
+brightness = sum(sum(p[:3])/3 for p in pixels if len(p) >= 3) / len(pixels)
+white_count = sum(1 for p in pixels if len(p) >= 3 and p[0] > 240 and p[1] > 240 and p[2] > 240)
+print(f'Average brightness: {brightness:.1f}')
+print(f'White-ish pixels: {white_count}')
+```
+
+#### Step 3: Identify dominant colors across entire image
+```python
+from collections import Counter
+color_counts = Counter()
+for p in pixels:
+    r, g, b = p[:3]
+    qr, qg, qb = r // 16, g // 16, b // 16
+    color_counts[(qr, qg, qb)] += 1
+
+top_colors = color_counts.most_common(10)
+for color, count in top_colors:
+    r, g, b = color[0] * 16 + 8, color[1] * 16 + 8, color[2] * 16 + 8
+    print(f'RGB({r:3d},{g:3d},{b:3d}): {count:6d} pixels ({count/len(pixels)*100:.1f}%)')
+```
+
+#### Step 4: Filter by target color across ENTIRE image
+```python
+# Example: find all blue pixels
+blue_pixels = []
+for y in range(height):
+    for x in range(width):
+        p = pixels[y * width + x]
+        r, g, b = p[:3]
+        if b > 80 and b > r + 5 and b > g + 5:
+            blue_pixels.append((x, y, p[:3]))
+
+print(f'Blue pixels: {len(blue_pixels)}')
+```
+
+#### Step 5: Cluster and analyze filtered pixels
+```python
+from collections import Counter
+y_counts = Counter(y for x, y, c in blue_pixels)
+top_y = y_counts.most_common(10)
+print('Top y positions:')
+for y, count in top_y:
+    xs = [x for x, yy, c in blue_pixels if yy == y]
+    print(f'  y={y}: {count} pixels, x range {min(xs)}-{max(xs)}')
+```
+
+#### Step 6: Refine search based on clusters
+- If one cluster is dominant (e.g., sky), filter it out
+- Focus on remaining clusters
+- Sample pixels around suspected target areas
+
+**Key Principle:** Always analyze the **entire image first**, then iteratively filter. Never start with a small region unless you already know the target location from prior analysis.
+
+**Important:** This analysis is for verification only. Do NOT create markdown files during the screenshot workflow. Only create analysis documents when explicitly analyzing a reference image per Section 5.4.
+
+### 5.3 Screenshot Commit and Push Requirements
+
+**All workflow screenshots MUST be committed and pushed to the repository.**
+
+The user must be able to verify visual changes on GitHub without building or running the application. Screenshots left only in the local working directory do not meet this requirement.
+
+**Commit requirements:**
+- Stage all `workflow/iteration_*.png` files before committing
+- Use a descriptive commit message that explains the visual change
+- Example: `feat(renderer): strengthen crosshatching and blue sketch outlines`
+- Commit MUST include both code changes AND screenshots together
+
+**Push requirements:**
+- Push to `origin/doodle-style` only
+- Verify push succeeds: `git push origin doodle-style`
+- If push fails with permission denied or other errors, fix before declaring completion
+- Never report "done" until `git push` returns success
+
+**Verification checklist before reporting completion:**
+- [ ] `workflow/iteration_XX.png` exists and is tracked by git
+- [ ] `git add workflow/iteration_XX.png` was executed
+- [ ] `git commit` includes the screenshot
+- [ ] `git push origin doodle-style` succeeded
+- [ ] Screenshot is visible on GitHub at https://github.com/eorroe/zombies-raylib-game/blob/doodle-style/workflow/iteration_XX.png
+
 ### 6. Pre-Commit Rendering Checklist
 
 Before committing any rendering change:
@@ -449,34 +547,9 @@ The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `s
 | HUD missing | HUD drawn inside texture mode, not on backbuffer |
 | Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` |
 
-### 5.2 Screenshot Commit and Push Requirements
+### 5.4 Judge Protocol (Systematic Pixel Analysis Algorithm)
 
-**All workflow screenshots MUST be committed and pushed to the repository.**
-
-The user must be able to verify visual changes on GitHub without building or running the application. Screenshots left only in the local working directory do not meet this requirement.
-
-**Commit requirements:**
-- Stage all `workflow/iteration_*.png` files before committing
-- Use a descriptive commit message that explains the visual change
-- Example: `feat(renderer): strengthen crosshatching and blue sketch outlines`
-- Commit MUST include both code changes AND screenshots together
-
-**Push requirements:**
-- Push to `origin/doodle-style` only
-- Verify push succeeds: `git push origin doodle-style`
-- If push fails with permission denied or other errors, fix before declaring completion
-- Never report "done" until `git push` returns success
-
-**Verification checklist before reporting completion:**
-- [ ] `workflow/iteration_XX.png` exists and is tracked by git
-- [ ] `git add workflow/iteration_XX.png` was executed
-- [ ] `git commit` includes the screenshot
-- [ ] `git push origin doodle-style` succeeded
-- [ ] Screenshot is visible on GitHub at https://github.com/eorroe/zombies-raylib-game/blob/doodle-style/workflow/iteration_XX.png
-
-### 5.3 Judge Protocol (Systematic Pixel Analysis Algorithm)
-
-The **Judge Protocol** is the mandatory verification method for all visual updates.
+The **Judge Protocol** is the mandatory systematic analysis method used by both the screenshot workflow (Section 5.1) and the reference analysis workflow (Section 5.5).
 
 After capturing a screenshot for a visual change, you MUST apply this algorithm to judge whether the change matches the intended result. Do not rely on visual inspection alone—use the quantitative steps below.
 
@@ -555,7 +628,7 @@ for y, count in top_y:
 - Use `xvfb-run -a` (auto-select display) to avoid conflicts with existing X servers
 - Use `-screen 0 1280x720x24` to match the game's window size and color depth
 
-### 5.4 Reference Analysis Workflow
+### 5.5 Reference Analysis Workflow
 
 Use this workflow when analyzing a **reference image** to extract style, color, composition, or implementation guidance. This workflow produces a markdown analysis document. It is separate from the screenshot workflow in Section 5.1, which captures gameplay screenshots and does **not** create markdown files.
 

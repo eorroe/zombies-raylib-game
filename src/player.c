@@ -147,10 +147,35 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }
 
+static void DrawStickLimb(Vector3 start, Vector3 end, float radius, Color color) {
+    Vector3 dir = Vector3Subtract(end, start);
+    float len = Vector3Length(dir);
+    if (len < 0.001f) return;
+    
+    Vector3 mid = Vector3Add(start, Vector3Scale(dir, 0.5f));
+    
+    Vector3 up = (Vector3){ 0, 1, 0 };
+    Vector3 axis = Vector3Normalize(dir);
+    float dot = Vector3DotProduct(up, axis);
+    if (dot > 1.0f) dot = 1.0f;
+    if (dot < -1.0f) dot = -1.0f;
+    
+    float angle = acosf(dot) * RAD2DEG;
+    Vector3 rotationAxis = Vector3CrossProduct(up, axis);
+    if (Vector3Length(rotationAxis) < 0.001f) {
+        rotationAxis = (Vector3){ 1, 0, 0 };
+    } else {
+        rotationAxis = Vector3Normalize(rotationAxis);
+    }
+    
+    DrawCylinder3D(mid, radius, radius, len, 6, color);
+    DrawSphere(start, radius * 1.2f, color);
+    DrawSphere(end, radius * 1.2f, color);
+}
+
 void PlayerRender(Player *player, Shader shader) {
     (void)shader;
-    if (!player->bodyModel.meshCount) return;
-
+    
     float walk = player->isMoving ? sinf(player->animTime) : 0.0f;
     float armSwing = walk * 0.3f;
 
@@ -160,21 +185,14 @@ void PlayerRender(Player *player, Shader shader) {
 
     Vector3 bodyPos = player->position;
     bodyPos.y += 1.0f;
-    DrawModelEx(player->bodyModel, bodyPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 60, 100, 160, 255 });
-
+    
     Vector3 headPos = Vector3Add(bodyPos, (Vector3){ 0, 0.7f, 0 });
-    DrawModelEx(player->headModel, headPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 80, 120, 170, 255 });
-
     Vector3 helmetPos = Vector3Add(headPos, (Vector3){ 0, 0.05f, 0 });
-    DrawModelEx(player->helmetModel, helmetPos, (Vector3){ 0, 1, 0 }, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 20, 30, 60, 255 });
-
+    
     Vector3 leftShoulder = Vector3Add(bodyPos, (Vector3){ -0.5f * cosYaw, 0.4f, 0.5f * sinYaw });
     Vector3 rightShoulder = Vector3Add(bodyPos, (Vector3){ 0.5f * cosYaw, 0.4f, -0.5f * sinYaw });
     Vector3 leftHip = Vector3Add(bodyPos, (Vector3){ -0.2f * cosYaw, -0.6f, 0.2f * sinYaw });
     Vector3 rightHip = Vector3Add(bodyPos, (Vector3){ 0.2f * cosYaw, -0.6f, -0.2f * sinYaw });
-
-    DrawModelEx(player->leftArmModel, leftShoulder, (Vector3){ 0, 1, 0 }, yawDeg + armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightArmModel, rightShoulder, (Vector3){ 0, 1, 0 }, yawDeg - armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
 
     Vector3 forward = PlayerGetForward(player);
     Vector3 right = PlayerGetRight(player);
@@ -202,18 +220,51 @@ void PlayerRender(Player *player, Shader shader) {
 
     float leftLegAngle = -legSwing * RAD2DEG;
     float rightLegAngle = legSwing * RAD2DEG;
-    DrawModelEx(player->leftLegModel, leftHip, leftAxis, leftLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightLegModel, rightHip, rightAxis, rightLegAngle, (Vector3){ 1, 1, 1 }, WHITE);
-
-    Vector3 leftHandPos = Vector3Add(leftShoulder, Vector3Scale(right, -0.35f));
-    Vector3 rightHandPos = Vector3Add(rightShoulder, Vector3Scale(right, -0.35f));
-    DrawModelEx(player->leftHandModel, leftHandPos, (Vector3){ 0, 0, 1 }, yawDeg + armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightHandModel, rightHandPos, (Vector3){ 0, 0, 1 }, yawDeg - armSwing * RAD2DEG, (Vector3){ 1, 1, 1 }, WHITE);
-
+    
+    // Calculate limb endpoints
+    Vector3 leftElbow = Vector3Add(leftShoulder, Vector3Scale(right, -0.35f));
+    Vector3 rightElbow = Vector3Add(rightShoulder, Vector3Scale(right, -0.35f));
+    Vector3 leftHandPos = Vector3Add(leftShoulder, Vector3Scale(right, -0.7f));
+    Vector3 rightHandPos = Vector3Add(rightShoulder, Vector3Scale(right, -0.7f));
+    Vector3 leftKnee = Vector3Add(leftHip, Vector3Scale(leftAxis, -PLAYER_LEG_LENGTH * 0.5f));
+    Vector3 rightKnee = Vector3Add(rightHip, Vector3Scale(rightAxis, -PLAYER_LEG_LENGTH * 0.5f));
     Vector3 leftFootPos = Vector3Add(leftHip, Vector3Scale(leftAxis, -PLAYER_LEG_LENGTH));
     Vector3 rightFootPos = Vector3Add(rightHip, Vector3Scale(rightAxis, -PLAYER_LEG_LENGTH));
-    DrawModelEx(player->leftFootModel, leftFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
-    DrawModelEx(player->rightFootModel, rightFootPos, (Vector3){ 0, 1, 0 }, 0.0f, (Vector3){ 1, 1, 1 }, WHITE);
+    
+    // Draw head
+    DrawSphere(helmetPos, 0.25f, (Color){ 20, 30, 60, 255 });
+    DrawSphere(headPos, 0.2f, (Color){ 80, 120, 170, 255 });
+    
+    // Draw torso
+    DrawStickLimb(leftShoulder, leftHip, 0.04f, (Color){ 60, 100, 160, 255 });
+    DrawStickLimb(rightShoulder, rightHip, 0.04f, (Color){ 60, 100, 160, 255 });
+    DrawStickLimb(leftShoulder, rightShoulder, 0.03f, (Color){ 60, 100, 160, 255 });
+    
+    // Draw arms
+    DrawStickLimb(leftShoulder, leftElbow, 0.025f, (Color){ 60, 100, 160, 255 });
+    DrawStickLimb(leftElbow, leftHandPos, 0.02f, (Color){ 80, 120, 170, 255 });
+    DrawStickLimb(rightShoulder, rightElbow, 0.025f, (Color){ 60, 100, 160, 255 });
+    DrawStickLimb(rightElbow, rightHandPos, 0.02f, (Color){ 80, 120, 170, 255 });
+    
+    // Draw legs
+    DrawStickLimb(leftHip, leftKnee, 0.03f, (Color){ 30, 50, 100, 255 });
+    DrawStickLimb(leftKnee, leftFootPos, 0.025f, (Color){ 30, 50, 100, 255 });
+    DrawStickLimb(rightHip, rightKnee, 0.03f, (Color){ 30, 50, 100, 255 });
+    DrawStickLimb(rightKnee, rightFootPos, 0.025f, (Color){ 30, 50, 100, 255 });
+    
+    // Draw joints
+    DrawSphere(leftShoulder, 0.04f, (Color){ 60, 100, 160, 255 });
+    DrawSphere(rightShoulder, 0.04f, (Color){ 60, 100, 160, 255 });
+    DrawSphere(leftHip, 0.04f, (Color){ 30, 50, 100, 255 });
+    DrawSphere(rightHip, 0.04f, (Color){ 30, 50, 100, 255 });
+    DrawSphere(leftElbow, 0.03f, (Color){ 60, 100, 160, 255 });
+    DrawSphere(rightElbow, 0.03f, (Color){ 60, 100, 160, 255 });
+    DrawSphere(leftKnee, 0.03f, (Color){ 30, 50, 100, 255 });
+    DrawSphere(rightKnee, 0.03f, (Color){ 30, 50, 100, 255 });
+    DrawSphere(leftHandPos, 0.03f, (Color){ 80, 120, 170, 255 });
+    DrawSphere(rightHandPos, 0.03f, (Color){ 80, 120, 170, 255 });
+    DrawSphere(leftFootPos, 0.035f, (Color){ 30, 50, 100, 255 });
+    DrawSphere(rightFootPos, 0.035f, (Color){ 30, 50, 100, 255 });
 }
 
 void PlayerShutdown(Player *player) {

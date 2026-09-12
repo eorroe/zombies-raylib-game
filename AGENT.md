@@ -554,3 +554,26 @@ for y, count in top_y:
 - If non-transparent pixels < 50% of frame, the scene may not be rendering to the backbuffer
 - Use `xvfb-run -a` (auto-select display) to avoid conflicts with existing X servers
 - Use `-screen 0 1280x720x24` to match the game's window size and color depth
+
+### 5.4 Reference Analysis Workflow
+
+Use this workflow when analyzing a **reference image** to extract style, color, composition, or implementation guidance. This workflow produces a markdown analysis document. It is separate from the screenshot workflow in Section 5.1, which captures gameplay screenshots and does **not** create markdown files.
+
+**Output requirement:** every reference image analysis MUST produce a corresponding markdown file in `references/` named `{reference-name}-analysis.md`.
+
+**Example:**
+- Reference: `references/doodle-style-reference.png`
+- Analysis: `references/doodle-style-reference-analysis.md`
+
+**Required analysis sections:**
+1. Image properties: resolution, aspect ratio, color mode, total pixels
+2. Overall brightness: dark/mid/bright percentages
+3. Dominant palette: top colors, averages, channel ranges, ordering patterns
+4. Estimated composition: paper/ink/dark percentages
+5. Spatial layout: grid-based ink concentration map
+6. Forms and objects: recognizable elements and rendering style
+7. Edges: color, width, consistency, selectivity
+8. Faces/surfaces: surface treatment, tonal variation, fill patterns
+9. Implementation implications: concrete changes needed, prioritized
+
+**Key rule:** only create a markdown analysis file when explicitly analyzing a reference image. The screenshot workflow in Section 5.1 is for verification only and does not generate analysis documents.

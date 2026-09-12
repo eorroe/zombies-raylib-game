@@ -139,9 +139,9 @@ void RendererBegin(Game *game, Camera3D camera) {
     (void)camera;
     
     BeginTextureMode(game->sceneTarget);
-    ClearBackground((Color){10, 12, 18, 255});
-    DrawRectangleGradientV(0, 0, 1280, 400, (Color){15, 20, 35, 255}, (Color){40, 35, 30, 255});
-    DrawRectangleGradientV(0, 400, 1280, 320, (Color){60, 40, 25, 255}, (Color){30, 20, 15, 255});
+    ClearBackground((Color){5, 6, 10, 255});
+    DrawRectangleGradientV(0, 0, 1280, 400, (Color){8, 10, 20, 255}, (Color){20, 18, 15, 255});
+    DrawRectangleGradientV(0, 400, 1280, 320, (Color){30, 20, 12, 255}, (Color){15, 10, 8, 255});
     BeginMode3D(camera);
     rlDisableBackfaceCulling();
 }
@@ -155,13 +155,13 @@ void RendererDrawScene(Game *game) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 0.8f * flicker, 0.5f * flicker, 0.2f * flicker };
+        lightColors[i] = (Vector3){ 0.15f * flicker, 0.08f * flicker, 0.03f * flicker };
     }
     int lightCount = 4;
     
     ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.25f, 0.20f, 0.15f }, 0.02f);
-    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.5f, 0.45f, 0.35f });
+    ShaderSetFog(&game->shaders, (Vector3){ 0.12f, 0.10f, 0.08f }, 0.05f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.25f, 0.20f, 0.15f });
     
     for (int i = 0; i < 4; i++) {
         SetShaderValue(game->shaders.pbr, game->shaders.pbrLocLightPos[i], &lightPositions[i], SHADER_UNIFORM_VEC3);
@@ -328,8 +328,8 @@ void RendererDrawZombies(Game *game, Shader shader) {
     printf("ZOMBIES: count=%d\n", game->zombieCount);
     Camera3D cam = CameraGetCamera(&game->camera);
     ShaderBeginPBR(&game->shaders);
-    ShaderSetFog(&game->shaders, (Vector3){ 0.25f, 0.20f, 0.15f }, 0.02f);
-    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.5f, 0.45f, 0.35f });
+    ShaderSetFog(&game->shaders, (Vector3){ 0.12f, 0.10f, 0.08f }, 0.05f);
+    ShaderSetDirectionalLight(&game->shaders, (Vector3){ 0.5f, 0.8f, 0.3f }, (Vector3){ 0.25f, 0.20f, 0.15f });
     ShaderSetSubsurface(&game->shaders, 0.3f);
     Vector3 lightPositions[4];
     Vector3 lightColors[4];
@@ -337,7 +337,7 @@ void RendererDrawZombies(Game *game, Shader shader) {
     for (int i = 0; i < 4; i++) {
         lightPositions[i] = fireLightPositions[i];
         float flicker = 1.0f + sinf(t * 8.0f + i * 2.5f) * 0.15f + sinf(t * 13.0f + i * 1.7f) * 0.1f;
-        lightColors[i] = (Vector3){ 0.8f * flicker, 0.5f * flicker, 0.2f * flicker };
+        lightColors[i] = (Vector3){ 0.15f * flicker, 0.08f * flicker, 0.03f * flicker };
     }
     int lightCount = 4;
     for (int i = 0; i < 4; i++) {

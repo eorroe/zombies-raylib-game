@@ -6,14 +6,14 @@
 
 #define MAX_ZOMBIES 150
 #define ZOMBIE_SPEED_BASE 4.5f
-#define LIMB_RADIUS 0.13f
-#define TORSO_WIDTH 0.60f
-#define TORSO_HEIGHT 0.90f
-#define HEAD_RADIUS 0.28f
-#define ARM_UPPER_LEN 0.70f
-#define ARM_LOWER_LEN 0.65f
-#define LEG_UPPER_LEN 0.80f
-#define LEG_LOWER_LEN 0.75f
+#define LIMB_RADIUS 0.09f
+#define TORSO_WIDTH 0.75f
+#define TORSO_HEIGHT 0.70f
+#define HEAD_RADIUS 0.32f
+#define ARM_UPPER_LEN 0.85f
+#define ARM_LOWER_LEN 0.75f
+#define LEG_UPPER_LEN 0.60f
+#define LEG_LOWER_LEN 0.55f
 #define REACH_DIST 4.0f
 #define FENCE_Z 8.5f
 

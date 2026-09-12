@@ -109,19 +109,19 @@ static const char *pbrFragShader =
 
     "    vec3 Ldir = normalize(dirLightDir);\n"
     "    float NdotLdir = max(dot(N, Ldir), 0.0);\n"
-    "    vec3 dirRadiance = dirLightCol * NdotLdir * 10.0;\n"
+    "    vec3 dirRadiance = dirLightCol * NdotLdir * 3.0;\n"
     "    vec3 Hdir = normalize(V + Ldir);\n"
     "    vec3 Fdir = FresnelSchlick(max(dot(Hdir, V), 0.0), F0);\n"
     "    vec3 kSdir = Fdir;\n"
     "    vec3 kDdir = (1.0 - kSdir) * (1.0 - metallic);\n"
     "    Lo += kDdir * albedo * dirRadiance + kSdir * dirRadiance;\n"
 
-    "    vec3 ambient = vec3(0.06, 0.05, 0.04) * albedo * ao;\n"
+    "    vec3 ambient = vec3(0.02, 0.02, 0.02) * albedo * ao;\n"
 
     "    vec3 color = ambient + Lo;\n"
 
     "    float sss = pow(clamp(1.0 + dot(V, N), 0.0, 1.0), 3.0) * subsurface;\n"
-    "    color += albedo * sss * vec3(0.3, 0.15, 0.1) * 0.5;\n"
+    "    color += albedo * sss * vec3(0.2, 0.1, 0.05) * 0.3;\n"
 
     "    float fogFactor = 1.0 - exp(-fogDensity * fogDensity * length(fragPosition) * length(fragPosition));\n"
     "    color = mix(color, fogColor, clamp(fogFactor, 0.0, 1.0));\n"
@@ -158,11 +158,13 @@ static const char *postFragShader =
 
     "    vec3 col = texture(texture0, uv).rgb;\n"
 
-    "    float vignette = 1.0 - length(uv - 0.5) * 0.9;\n"
+    "    col = mix(col, col * vec3(1.1, 1.05, 0.9), 0.5);\n"
+
+    "    float vignette = 1.0 - length(uv - 0.5) * 1.3;\n"
     "    col *= vignette;\n"
 
     "    float grain = fract(sin(dot(uv + vec2(time * 0.003, fract(time * 0.617)), vec2(12.9898, 78.233))) * 43758.5453);\n"
-    "    col += (grain - 0.5) * 0.06;\n"
+    "    col += (grain - 0.5) * 0.1;\n"
 
     "    col = pow(clamp(col, 0.0, 1.0), vec3(1.0 / 2.2));\n"
 

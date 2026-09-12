@@ -249,45 +249,45 @@ Mesh ZombieMesh_CreateHead(float radius) {
             float z = radius * sp * st;
 
             float displace = 0.0f;
-            displace += 0.02f * sinf(theta * 6.0f) * sinf(phi * 8.0f);
-            displace += 0.015f * sinf(theta * 10.0f - phi * 4.0f);
-            displace += 0.01f * sinf(theta * 14.0f + phi * 6.0f);
+            displace += 0.03f * sinf(theta * 6.0f) * sinf(phi * 8.0f);
+            displace += 0.02f * sinf(theta * 10.0f - phi * 4.0f);
+            displace += 0.015f * sinf(theta * 14.0f + phi * 6.0f);
 
             Vector3 eyeL = { -radius * 0.35f, radius * 0.1f, radius * 0.85f };
             Vector3 eyeR = { radius * 0.35f, radius * 0.1f, radius * 0.85f };
             float eyeR_r = radius * 0.18f;
             float dL = sqrtf((x-eyeL.x)*(x-eyeL.x) + (y-eyeL.y)*(y-eyeL.y) + (z-eyeL.z)*(z-eyeL.z));
             float dR = sqrtf((x-eyeR.x)*(x-eyeR.x) + (y-eyeR.y)*(y-eyeR.y) + (z-eyeR.z)*(z-eyeR.z));
-            if (dL < eyeR_r) displace -= (eyeR_r - dL) * 0.8f;
-            if (dR < eyeR_r) displace -= (eyeR_r - dR) * 0.8f;
+            if (dL < eyeR_r) displace -= (eyeR_r - dL) * 1.5f;
+            if (dR < eyeR_r) displace -= (eyeR_r - dR) * 1.5f;
 
             Vector3 nosePos = {0, -radius*0.15f, radius*0.95f};
             float noseR = radius * 0.12f;
             float dN = sqrtf((x-nosePos.x)*(x-nosePos.x) + (y-nosePos.y)*(y-nosePos.y) + (z-nosePos.z)*(z-nosePos.z));
-            if (dN < noseR) displace += (noseR - dN) * 0.6f;
+            if (dN < noseR) displace += (noseR - dN) * 1.0f;
 
             Vector3 mouthPos = {0, -radius*0.4f, radius*0.8f};
             float mouthR = radius * 0.2f;
             float dM = sqrtf((x-mouthPos.x)*(x-mouthPos.x) + (y-mouthPos.y)*(y-mouthPos.y) + (z-mouthPos.z)*(z-mouthPos.z));
-            if (dM < mouthR && z > radius * 0.6f) displace -= (mouthR - dM) * 0.4f;
+            if (dM < mouthR && z > radius * 0.6f) displace -= (mouthR - dM) * 0.8f;
 
             Vector3 browPos = {0, radius*0.35f, radius*0.75f};
             float browR = radius * 0.25f;
             float dB = sqrtf((x-browPos.x)*(x-browPos.x) + (y-browPos.y)*(y-browPos.y) + (z-browPos.z)*(z-browPos.z));
-            if (dB < browR) displace += (browR - dB) * 0.3f;
+            if (dB < browR) displace += (browR - dB) * 0.5f;
 
             Vector3 earL = {-radius*0.9f, 0, 0};
             Vector3 earR = {radius*0.9f, 0, 0};
             float earR_r = radius * 0.15f;
             float dEL = sqrtf((x-earL.x)*(x-earL.x) + (y-earL.y)*(y-earL.y) + (z-earL.z)*(z-earL.z));
             float dER = sqrtf((x-earR.x)*(x-earR.x) + (y-earR.y)*(y-earR.y) + (z-earR.z)*(z-earR.z));
-            if (dEL < earR_r && z > 0) displace += (earR_r - dEL) * 0.5f;
-            if (dER < earR_r && z > 0) displace += (earR_r - dER) * 0.5f;
+            if (dEL < earR_r && z > 0) displace += (earR_r - dEL) * 0.8f;
+            if (dER < earR_r && z > 0) displace += (earR_r - dER) * 0.8f;
 
             Vector3 jawPos = {0, -radius*0.65f, radius*0.3f};
             float jawR = radius * 0.3f;
             float dJ = sqrtf((x-jawPos.x)*(x-jawPos.x) + (y-jawPos.y)*(y-jawPos.y) + (z-jawPos.z)*(z-jawPos.z));
-            if (dJ < jawR && z > 0) displace += (jawR - dJ) * 0.35f;
+            if (dJ < jawR && z > 0) displace += (jawR - dJ) * 0.5f;
 
             Vector3 len = {x, y, z};
             float lenLen = Vector3Length(len);
@@ -804,3 +804,298 @@ Mesh ZombieMesh_CreateFoot(float scale) {
     ComputeMeshNormals(&mesh);
     return mesh;
 }
+
+Mesh ZombieMesh_CreateSpine(float height) {
+    int boneCount = 24;
+    float segmentH = height / (float)boneCount;
+    float radius = 0.06f;
+
+    int radialSegs = 24;
+    int heightSegs = 24;
+    int ringVerts = radialSegs + 1;
+    int bodyVerts = ringVerts * (heightSegs + 1);
+    int quadCount = radialSegs * heightSegs;
+    int triangleCount = quadCount * 2;
+    int topCenter = bodyVerts;
+    int bottomCenter = bodyVerts + 1;
+    int topRingStart = bottomCenter + 1;
+    int bottomRingStart = topRingStart + radialSegs;
+    int vertexCount = bottomRingStart + radialSegs;
+    int capTris = radialSegs * 2;
+    triangleCount += capTris;
+
+    Mesh mesh = { 0 };
+    mesh.vertexCount = vertexCount;
+    mesh.triangleCount = triangleCount;
+    mesh.vertices = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.texcoords = (float *)calloc(vertexCount * 2, sizeof(float));
+    mesh.normals = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.colors = (unsigned char *)calloc(vertexCount * 4, sizeof(unsigned char));
+    mesh.indices = (unsigned short *)calloc(triangleCount * 3, sizeof(unsigned short));
+
+    for (int j = 0; j <= heightSegs; j++) {
+        float v = (float)j / heightSegs;
+        float ny = v * 2.0f - 1.0f;
+        float y = ny * height * 0.5f;
+        float r = radius;
+        float vertebraPhase = ny * boneCount * 0.5f * PI;
+        r += 0.03f * sinf(vertebraPhase);
+        r += 0.015f * sinf(vertebraPhase * 2.3f);
+        for (int i = 0; i <= radialSegs; i++) {
+            float u = (float)i / radialSegs;
+            float theta = u * 2.0f * PI;
+            float x = r * cosf(theta);
+            float z = r * sinf(theta);
+            int idx = j * ringVerts + i;
+            mesh.vertices[idx * 3] = x;
+            mesh.vertices[idx * 3 + 1] = y;
+            mesh.vertices[idx * 3 + 2] = z;
+            mesh.texcoords[idx * 2] = u;
+            mesh.texcoords[idx * 2 + 1] = v;
+            mesh.colors[idx * 4] = 235;
+            mesh.colors[idx * 4 + 1] = 225;
+            mesh.colors[idx * 4 + 2] = 210;
+            mesh.colors[idx * 4 + 3] = 255;
+        }
+    }
+
+    mesh.vertices[topCenter * 3] = 0;
+    mesh.vertices[topCenter * 3 + 1] = height * 0.5f;
+    mesh.vertices[topCenter * 3 + 2] = 0;
+    mesh.texcoords[topCenter * 2] = 0.5f;
+    mesh.texcoords[topCenter * 2 + 1] = 1.0f;
+    mesh.colors[topCenter * 4] = 235; mesh.colors[topCenter * 4 + 1] = 225;
+    mesh.colors[topCenter * 4 + 2] = 210; mesh.colors[topCenter * 4 + 3] = 255;
+
+    mesh.vertices[bottomCenter * 3] = 0;
+    mesh.vertices[bottomCenter * 3 + 1] = -height * 0.5f;
+    mesh.vertices[bottomCenter * 3 + 2] = 0;
+    mesh.texcoords[bottomCenter * 2] = 0.5f;
+    mesh.texcoords[bottomCenter * 2 + 1] = 0.0f;
+    mesh.colors[bottomCenter * 4] = 235; mesh.colors[bottomCenter * 4 + 1] = 225;
+    mesh.colors[bottomCenter * 4 + 2] = 210; mesh.colors[bottomCenter * 4 + 3] = 255;
+
+    int ii = 0;
+    for (int j = 0; j < heightSegs; j++) {
+        for (int i = 0; i < radialSegs; i++) {
+            int a = j * ringVerts + i;
+            int b = a + 1;
+            int c = (j + 1) * ringVerts + i;
+            int d = c + 1;
+            mesh.indices[ii++] = a;
+            mesh.indices[ii++] = c;
+            mesh.indices[ii++] = b;
+            mesh.indices[ii++] = b;
+            mesh.indices[ii++] = c;
+            mesh.indices[ii++] = d;
+        }
+    }
+    for (int i = 0; i < radialSegs; i++) {
+        mesh.indices[ii++] = topCenter;
+        mesh.indices[ii++] = topRingStart + ((i + 1) % radialSegs);
+        mesh.indices[ii++] = topRingStart + i;
+    }
+    for (int i = 0; i < radialSegs; i++) {
+        mesh.indices[ii++] = bottomCenter;
+        mesh.indices[ii++] = bottomRingStart + i;
+        mesh.indices[ii++] = bottomRingStart + ((i + 1) % radialSegs);
+    }
+
+    ComputeMeshNormals(&mesh);
+    return mesh;
+}
+
+Mesh ZombieMesh_CreateRibcage(float width, float height) {
+    int ribCount = 12;
+    float ribW = width * 0.8f;
+    float ribH = height * 0.8f;
+    float ribDepth = 0.02f;
+
+    int radialSegs = 32;
+    int heightSegs = 32;
+    int ringVerts = radialSegs + 1;
+    int bodyVerts = ringVerts * (heightSegs + 1);
+    int quadCount = radialSegs * heightSegs;
+    int triangleCount = quadCount * 2;
+    int topCenter = bodyVerts;
+    int bottomCenter = bodyVerts + 1;
+    int topRingStart = bottomCenter + 1;
+    int bottomRingStart = topRingStart + radialSegs;
+    int vertexCount = bottomRingStart + radialSegs;
+    int capTris = radialSegs * 2;
+    triangleCount += capTris;
+
+    Mesh mesh = { 0 };
+    mesh.vertexCount = vertexCount;
+    mesh.triangleCount = triangleCount;
+    mesh.vertices = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.texcoords = (float *)calloc(vertexCount * 2, sizeof(float));
+    mesh.normals = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.colors = (unsigned char *)calloc(vertexCount * 4, sizeof(unsigned char));
+    mesh.indices = (unsigned short *)calloc(triangleCount * 3, sizeof(unsigned short));
+
+    for (int j = 0; j <= heightSegs; j++) {
+        float v = (float)j / heightSegs;
+        float ny = v * 2.0f - 1.0f;
+        float y = ny * ribH * 0.5f;
+        float ribPhase = ny * ribCount * 0.5f * PI;
+        float r = ribW * 0.5f + 0.04f * sinf(ribPhase);
+        r += 0.02f * sinf(ribPhase * 2.1f);
+        for (int i = 0; i <= radialSegs; i++) {
+            float u = (float)i / radialSegs;
+            float theta = u * 2.0f * PI;
+            float x = r * cosf(theta);
+            float z = ribDepth * sinf(theta);
+            int idx = j * ringVerts + i;
+            mesh.vertices[idx * 3] = x;
+            mesh.vertices[idx * 3 + 1] = y;
+            mesh.vertices[idx * 3 + 2] = z;
+            mesh.texcoords[idx * 2] = u;
+            mesh.texcoords[idx * 2 + 1] = v;
+            mesh.colors[idx * 4] = 230;
+            mesh.colors[idx * 4 + 1] = 225;
+            mesh.colors[idx * 4 + 2] = 210;
+            mesh.colors[idx * 4 + 3] = 255;
+        }
+    }
+
+    mesh.vertices[topCenter * 3] = 0;
+    mesh.vertices[topCenter * 3 + 1] = ribH * 0.5f;
+    mesh.vertices[topCenter * 3 + 2] = 0;
+    mesh.texcoords[topCenter * 2] = 0.5f;
+    mesh.texcoords[topCenter * 2 + 1] = 1.0f;
+    mesh.colors[topCenter * 4] = 230; mesh.colors[topCenter * 4 + 1] = 225;
+    mesh.colors[topCenter * 4 + 2] = 210; mesh.colors[topCenter * 4 + 3] = 255;
+
+    mesh.vertices[bottomCenter * 3] = 0;
+    mesh.vertices[bottomCenter * 3 + 1] = -ribH * 0.5f;
+    mesh.vertices[bottomCenter * 3 + 2] = 0;
+    mesh.texcoords[bottomCenter * 2] = 0.5f;
+    mesh.texcoords[bottomCenter * 2 + 1] = 0.0f;
+    mesh.colors[bottomCenter * 4] = 230; mesh.colors[bottomCenter * 4 + 1] = 225;
+    mesh.colors[bottomCenter * 4 + 2] = 210; mesh.colors[bottomCenter * 4 + 3] = 255;
+
+    int ii = 0;
+    for (int j = 0; j < heightSegs; j++) {
+        for (int i = 0; i < radialSegs; i++) {
+            int a = j * ringVerts + i;
+            int b = a + 1;
+            int c = (j + 1) * ringVerts + i;
+            int d = c + 1;
+            mesh.indices[ii++] = a;
+            mesh.indices[ii++] = c;
+            mesh.indices[ii++] = b;
+            mesh.indices[ii++] = b;
+            mesh.indices[ii++] = c;
+            mesh.indices[ii++] = d;
+        }
+    }
+    for (int i = 0; i < radialSegs; i++) {
+        mesh.indices[ii++] = topCenter;
+        mesh.indices[ii++] = topRingStart + ((i + 1) % radialSegs);
+        mesh.indices[ii++] = topRingStart + i;
+    }
+    for (int i = 0; i < radialSegs; i++) {
+        mesh.indices[ii++] = bottomCenter;
+        mesh.indices[ii++] = bottomRingStart + i;
+        mesh.indices[ii++] = bottomRingStart + ((i + 1) % radialSegs);
+    }
+
+    ComputeMeshNormals(&mesh);
+    return mesh;
+}
+
+Mesh ZombieMesh_CreatePelvis(float width, float height) {
+    int radialSegs = 32;
+    int heightSegs = 16;
+    int ringVerts = radialSegs + 1;
+    int bodyVerts = ringVerts * (heightSegs + 1);
+    int quadCount = radialSegs * heightSegs;
+    int triangleCount = quadCount * 2;
+    int topCenter = bodyVerts;
+    int bottomCenter = bodyVerts + 1;
+    int topRingStart = bottomCenter + 1;
+    int bottomRingStart = topRingStart + radialSegs;
+    int vertexCount = bottomRingStart + radialSegs;
+    int capTris = radialSegs * 2;
+    triangleCount += capTris;
+
+    Mesh mesh = { 0 };
+    mesh.vertexCount = vertexCount;
+    mesh.triangleCount = triangleCount;
+    mesh.vertices = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.texcoords = (float *)calloc(vertexCount * 2, sizeof(float));
+    mesh.normals = (float *)calloc(vertexCount * 3, sizeof(float));
+    mesh.colors = (unsigned char *)calloc(vertexCount * 4, sizeof(unsigned char));
+    mesh.indices = (unsigned short *)calloc(triangleCount * 3, sizeof(unsigned short));
+
+    for (int j = 0; j <= heightSegs; j++) {
+        float v = (float)j / heightSegs;
+        float y = v * height - height * 0.5f;
+        float t = v;
+        float r = width * 0.5f * (1.0f - 0.2f * t);
+        r *= (1.0f + 0.1f * sinf(t * PI));
+        for (int i = 0; i <= radialSegs; i++) {
+            float u = (float)i / radialSegs;
+            float theta = u * 2.0f * PI;
+            float x = r * cosf(theta);
+            float z = r * sinf(theta) * 0.6f;
+            int idx = j * ringVerts + i;
+            mesh.vertices[idx * 3] = x;
+            mesh.vertices[idx * 3 + 1] = y;
+            mesh.vertices[idx * 3 + 2] = z;
+            mesh.texcoords[idx * 2] = u;
+            mesh.texcoords[idx * 2 + 1] = v;
+            mesh.colors[idx * 4] = 235;
+            mesh.colors[idx * 4 + 1] = 225;
+            mesh.colors[idx * 4 + 2] = 210;
+            mesh.colors[idx * 4 + 3] = 255;
+        }
+    }
+
+    mesh.vertices[topCenter * 3] = 0;
+    mesh.vertices[topCenter * 3 + 1] = height * 0.5f;
+    mesh.vertices[topCenter * 3 + 2] = 0;
+    mesh.texcoords[topCenter * 2] = 0.5f;
+    mesh.texcoords[topCenter * 2 + 1] = 1.0f;
+    mesh.colors[topCenter * 4] = 235; mesh.colors[topCenter * 4 + 1] = 225;
+    mesh.colors[topCenter * 4 + 2] = 210; mesh.colors[topCenter * 4 + 3] = 255;
+
+    mesh.vertices[bottomCenter * 3] = 0;
+    mesh.vertices[bottomCenter * 3 + 1] = -height * 0.5f;
+    mesh.vertices[bottomCenter * 3 + 2] = 0;
+    mesh.texcoords[bottomCenter * 2] = 0.5f;
+    mesh.texcoords[bottomCenter * 2 + 1] = 0.0f;
+    mesh.colors[bottomCenter * 4] = 235; mesh.colors[bottomCenter * 4 + 1] = 225;
+    mesh.colors[bottomCenter * 4 + 2] = 210; mesh.colors[bottomCenter * 4 + 3] = 255;
+
+    int ii = 0;
+    for (int j = 0; j < heightSegs; j++) {
+        for (int i = 0; i < radialSegs; i++) {
+            int a = j * ringVerts + i;
+            int b = a + 1;
+            int c = (j + 1) * ringVerts + i;
+            int d = c + 1;
+            mesh.indices[ii++] = a;
+            mesh.indices[ii++] = c;
+            mesh.indices[ii++] = b;
+            mesh.indices[ii++] = b;
+            mesh.indices[ii++] = c;
+            mesh.indices[ii++] = d;
+        }
+    }
+    for (int i = 0; i < radialSegs; i++) {
+        mesh.indices[ii++] = topCenter;
+        mesh.indices[ii++] = topRingStart + ((i + 1) % radialSegs);
+        mesh.indices[ii++] = topRingStart + i;
+    }
+    for (int i = 0; i < radialSegs; i++) {
+        mesh.indices[ii++] = bottomCenter;
+        mesh.indices[ii++] = bottomRingStart + i;
+        mesh.indices[ii++] = bottomRingStart + ((i + 1) % radialSegs);
+    }
+
+    ComputeMeshNormals(&mesh);
+    return mesh;
+}
+

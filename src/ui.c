@@ -152,16 +152,16 @@ void UIUpdate(MenuState *menu, InputState *input, Game *game) {
 void UIRender(const MenuState *menu) {
     if (!menu->active) return;
     
-    DrawRectangle(0, 0, menu->screenWidth, menu->screenHeight, ColorAlpha(BLACK, 0.7f * menu->fadeAlpha));
+    DrawRectangle(0, 0, menu->screenWidth, menu->screenHeight, (Color){ 35, 35, 40, 200 });
     
     if (menu->showUploadPrompt) {
-        DrawRectangle(0, 0, menu->screenWidth, menu->screenHeight, ColorAlpha(BLACK, 0.9f));
-        DrawText("UPLOAD GALLERY", menu->screenWidth / 2 - MeasureText("UPLOAD GALLERY", 40) / 2, 20, 40, WHITE);
-        DrawText("Drag and drop images here to upload", menu->screenWidth / 2 - MeasureText("Drag and drop images here to upload", 20) / 2, 60, 20, GRAY);
-        DrawText("Press ESC to close", menu->screenWidth / 2 - MeasureText("Press ESC to close", 20) / 2, menu->screenHeight - 40, 20, GRAY);
+        DrawRectangle(0, 0, menu->screenWidth, menu->screenHeight, (Color){ 35, 35, 40, 230 });
+        DrawText("UPLOAD GALLERY", menu->screenWidth / 2 - MeasureText("UPLOAD GALLERY", 40) / 2, 20, 40, (Color){ 220, 210, 190, 255 });
+        DrawText("Drag and drop images here to upload", menu->screenWidth / 2 - MeasureText("Drag and drop images here to upload", 20) / 2, 60, 20, (Color){ 160, 155, 145, 255 });
+        DrawText("Press ESC to close", menu->screenWidth / 2 - MeasureText("Press ESC to close", 20) / 2, menu->screenHeight - 40, 20, (Color){ 160, 155, 145, 255 });
         
         if (menu->lastUploadError[0] != '\0') {
-            DrawText(menu->lastUploadError, menu->screenWidth / 2 - MeasureText(menu->lastUploadError, 20) / 2, 75, 20, RED);
+            DrawText(menu->lastUploadError, menu->screenWidth / 2 - MeasureText(menu->lastUploadError, 20) / 2, 75, 20, (Color){ 140, 50, 50, 255 });
         }
         
         int cols = menu->screenWidth / (UPLOAD_THUMB_SIZE + UPLOAD_GALLERY_PADDING);
@@ -177,14 +177,14 @@ void UIRender(const MenuState *menu) {
                 (Rectangle){ 0, 0, (float)menu->uploadedImages[i].width, (float)menu->uploadedImages[i].height },
                 (Rectangle){ x, y, (float)UPLOAD_THUMB_SIZE, (float)UPLOAD_THUMB_SIZE },
                 (Vector2){ 0, 0 }, 0.0f, WHITE);
-            DrawRectangleLines(x, y, UPLOAD_THUMB_SIZE, UPLOAD_THUMB_SIZE, WHITE);
+            DrawRectangleLines(x, y, UPLOAD_THUMB_SIZE, UPLOAD_THUMB_SIZE, (Color){ 40, 40, 45, 255 });
             
-            DrawRectangle(x + UPLOAD_THUMB_SIZE - 24, y, 24, 24, RED);
-            DrawText("X", x + UPLOAD_THUMB_SIZE - 18, y + 4, 16, WHITE);
+            DrawRectangle(x + UPLOAD_THUMB_SIZE - 24, y, 24, 24, (Color){ 120, 50, 50, 255 });
+            DrawText("X", x + UPLOAD_THUMB_SIZE - 18, y + 4, 16, (Color){ 220, 210, 190, 255 });
         }
         
         if (menu->uploadedImageCount == 0) {
-            DrawText("No images uploaded yet. Drag and drop images onto this window.", menu->screenWidth / 2 - 300, menu->screenHeight / 2 - 20, 20, WHITE);
+            DrawText("No images uploaded yet. Drag and drop images onto this window.", menu->screenWidth / 2 - 300, menu->screenHeight / 2 - 20, 20, (Color){ 160, 155, 145, 255 });
         }
         
         return;
@@ -196,15 +196,15 @@ void UIRender(const MenuState *menu) {
     const char *zombieModeText = (menu->zombieMode == ZOMBIE_MODE_MIXED) ? "MIXED" : "ALL IMAGES";
     const char *items[] = { "START GAME", TextFormat("MODE: %s", modeText), TextFormat("ZOMBIE MODE: %s", zombieModeText), "UPLOAD IMAGES", "QUIT" };
     
-    DrawText("Each zombie kill: +100 score | Kills counter tracks total dead zombies", menu->screenWidth / 2 - MeasureText("Each zombie kill: +100 score | Kills counter tracks total dead zombies", 20) / 2, 20, 20, GRAY);
+    DrawText("Each zombie kill: +100 score | Kills counter tracks total dead zombies", menu->screenWidth / 2 - MeasureText("Each zombie kill: +100 score | Kills counter tracks total dead zombies", 20) / 2, 20, 20, (Color){ 160, 155, 145, 255 });
     
     for (int i = 0; i < MENU_ITEM_COUNT; i++) {
         Rectangle btn = { menu->screenWidth / 2 - 150, startY + i * itemH, 300, 40 };
-        Color col = (i == menu->selectedItem) ? RED : LIGHTGRAY;
-        DrawRectangleRec(btn, ColorAlpha(col, 0.3f * menu->fadeAlpha));
-        DrawRectangleLinesEx(btn, 2, ColorAlpha(col, 0.8f * menu->fadeAlpha));
+        Color col = (i == menu->selectedItem) ? (Color){ 120, 50, 50, 255 } : (Color){ 180, 175, 165, 255 };
+        DrawRectangleRec(btn, (Color){ col.r, col.g, col.b, 50 });
+        DrawRectangleLinesEx(btn, 2, (Color){ col.r, col.g, col.b, 200 });
         int textW = MeasureText(items[i], 20);
-        DrawText(items[i], menu->screenWidth / 2 - textW / 2, startY + i * itemH + 10, 20, WHITE);
+        DrawText(items[i], menu->screenWidth / 2 - textW / 2, startY + i * itemH + 10, 20, (Color){ 220, 210, 190, 255 });
     }
 }
 

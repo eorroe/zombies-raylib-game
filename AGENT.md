@@ -134,7 +134,7 @@ When setting shader uniforms in `RendererDrawZombies()` or similar:
 
 **For EVERY visual change—without exception—you MUST complete the full screenshot workflow before considering the change finished.**
 
-This is not optional. A visual change is NOT complete until the screenshot workflow has been executed and the result has been judged against the reference.
+This is not optional. A visual change is NOT complete until the screenshot workflow has been executed, the result has been judged against the reference, AND the screenshots have been committed and pushed to the repository.
 
 **Required steps for every visual update:**
 1. Make the code change
@@ -142,8 +142,9 @@ This is not optional. A visual change is NOT complete until the screenshot workf
 3. Run headless with `xvfb-run -a -s "-screen 0 1280x720x24"` using the `workflow/` screenshot environment variables
 4. Capture a screenshot to `workflow/iteration_XX.png`
 5. **Apply the Judge Protocol** (systematic pixel analysis) to compare against the reference image
-6. Only declare success if the Judge Protocol confirms the visual change matches intent
-7. If the result does not match, iterate: adjust the code, rebuild, recapture, re-judge
+6. **COMMIT the screenshot to git** with a descriptive message
+7. **PUSH the commit to the `doodle-style` branch** so the user can verify without building
+8. Only declare success if the Judge Protocol confirms the visual change matches intent
 
 **What qualifies as a visual update:**
 - Shader changes (post-process, PBR, material)
@@ -156,6 +157,12 @@ This is not optional. A visual change is NOT complete until the screenshot workf
 
 **Do NOT skip the screenshot workflow for "small" or "obvious" visual changes.**
 
+**CRITICAL: Screenshots MUST be committed and pushed to the repository.**
+- The user must be able to view screenshots on GitHub without building or running the application
+- Never leave screenshots only in the local working directory
+- Always verify `git push origin doodle-style` succeeds before reporting completion
+- If push fails, fix the issue before declaring the update complete
+
 ### 6. Pre-Commit Rendering Checklist
 
 Before committing any rendering change:
@@ -165,7 +172,7 @@ Before committing any rendering change:
 - [ ] Ambient is ≤ 0.08 * albedo * ao
 - [ ] Model replacements match or exceed original scale
 - [ ] Build succeeds with zero errors
-- [ ] Screenshot taken and visually verified using the Judge Protocol (Section 5.1/5.2)
+- [ ] Screenshot taken and visually verified using the Judge Protocol (Section 5.3)
 
 ### 7. Doodle Style Rendering Rules
 
@@ -343,7 +350,7 @@ The post-process shader MUST include:
 
 After every visual change, you MUST:
 1. Build and capture a screenshot using the workflow below
-2. Apply the **Judge Protocol** (systematic pixel analysis algorithm in Section 5.2)
+2. Apply the **Judge Protocol** (systematic pixel analysis algorithm in Section 5.3)
 3. Compare the result against the reference image
 4. Do NOT declare the change complete until the Judge Protocol confirms it matches intent
 
@@ -434,7 +441,32 @@ The screenshot is taken at **frame 35** by default (`screenshotFrame = 35` in `s
 | HUD missing | HUD drawn inside texture mode, not on backbuffer |
 | Player/gun invisible on first load | `PlayerInit`/`WeaponInit` called before `RendererInit` |
 
-### Judge Protocol (Systematic Pixel Analysis Algorithm)
+### 5.2 Screenshot Commit and Push Requirements
+
+**All workflow screenshots MUST be committed and pushed to the repository.**
+
+The user must be able to verify visual changes on GitHub without building or running the application. Screenshots left only in the local working directory do not meet this requirement.
+
+**Commit requirements:**
+- Stage all `workflow/iteration_*.png` files before committing
+- Use a descriptive commit message that explains the visual change
+- Example: `feat(renderer): strengthen crosshatching and blue sketch outlines`
+- Commit MUST include both code changes AND screenshots together
+
+**Push requirements:**
+- Push to `origin/doodle-style` only
+- Verify push succeeds: `git push origin doodle-style`
+- If push fails with permission denied or other errors, fix before declaring completion
+- Never report "done" until `git push` returns success
+
+**Verification checklist before reporting completion:**
+- [ ] `workflow/iteration_XX.png` exists and is tracked by git
+- [ ] `git add workflow/iteration_XX.png` was executed
+- [ ] `git commit` includes the screenshot
+- [ ] `git push origin doodle-style` succeeded
+- [ ] Screenshot is visible on GitHub at https://github.com/eorroe/zombies-raylib-game/blob/doodle-style/workflow/iteration_XX.png
+
+### 5.3 Judge Protocol (Systematic Pixel Analysis Algorithm)
 
 The **Judge Protocol** is the mandatory verification method for all visual updates.
 

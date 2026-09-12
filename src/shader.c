@@ -173,7 +173,7 @@ static const char *postFragShader =
     "    float gx = -tl - 2.0*l - bl + tr + 2.0*r + br;\n"
     "    float gy = -tl - 2.0*t - tr + bl + 2.0*b + br;\n"
     "    float edge = sqrt(gx*gx + gy*gy);\n"
-    "    float edgeLine = smoothstep(0.08, 0.18, edge);\n"
+    "    float edgeLine = smoothstep(0.10, 0.20, edge);\n"
 
     "    vec3 inkDark   = vec3(0.08, 0.18, 0.52);\n"
     "    vec3 inkMedium = vec3(0.15, 0.35, 0.65);\n"

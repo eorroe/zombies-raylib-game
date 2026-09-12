@@ -186,6 +186,7 @@ pixels = list(img.getdata())
 print(f'Total pixels: {len(pixels)}')
 print(f'Size: {width}x{height}')
 print(f'Aspect ratio: {width/height:.2f}')
+print(f'Color mode: {img.mode}')
 ```
 
 #### 2. Overall Brightness
@@ -217,21 +218,26 @@ avg_r = sum(p[0] for p in pixels) / total
 avg_g = sum(p[1] for p in pixels) / total
 avg_b = sum(p[2] for p in pixels) / total
 print(f'Average RGB: ({avg_r:.1f}, {avg_g:.1f}, {avg_b:.1f})')
+print(f'R range: {min(p[0] for p in pixels)}-{max(p[0] for p in pixels)}')
+print(f'G range: {min(p[1] for p in pixels)}-{max(p[1] for p in pixels)}')
+print(f'B range: {min(p[2] for p in pixels)}-{max(p[2] for p in pixels)}')
 ```
 
 #### 4. Estimated Composition
 ```python
-# Paper: light colors with warm tint
-paper_pixels = sum(1 for p in pixels if (p[0]+p[1]+p[2])/3/255 > 0.75 and p[0] > p[1] and p[0] > p[2])
-# Blue ink: blue dominant
-blue_ink_pixels = sum(1 for p in pixels if p[2] > p[0] and p[2] > p[1] and p[2] > 100)
-# Dark ink: low luminance
-dark_ink_pixels = sum(1 for p in pixels if (p[0]+p[1]+p[2])/3/255 < 0.2)
+# Adjust these rules to match the target style being analyzed
+background_pixels = sum(1 for p in pixels if is_background(p))
+primary_ink_pixels = sum(1 for p in pixels if is_primary_ink(p))
+secondary_ink_pixels = sum(1 for p in pixels if is_secondary_ink(p))
+dark_ink_pixels = sum(1 for p in pixels if is_dark_ink(p))
 
-print(f'Paper: {paper_pixels/total*100:.1f}%')
-print(f'Blue ink: {blue_ink_pixels/total*100:.1f}%')
+print(f'Background: {background_pixels/total*100:.1f}%')
+print(f'Primary ink: {primary_ink_pixels/total*100:.1f}%')
+print(f'Secondary ink: {secondary_ink_pixels/total*100:.1f}%')
 print(f'Dark ink: {dark_ink_pixels/total*100:.1f}%')
 ```
+
+Define `is_background()`, `is_primary_ink()`, etc. based on the reference style.
 
 #### 5. Spatial Layout
 ```python
@@ -245,11 +251,11 @@ for row in range(grid_rows):
         cell_pixels = list(crop.getdata())
         cell_total = len(cell_pixels)
         
-        cell_paper = sum(1 for p in cell_pixels if (p[0]+p[1]+p[2])/3 > 200 and p[0] > p[1])
-        cell_blue = sum(1 for p in cell_pixels if p[2] > p[0] and p[2] > p[1] and p[2] > 100)
-        cell_dark = sum(1 for p in cell_pixels if (p[0]+p[1]+p[2])/3 < 100)
+        cell_background = sum(1 for p in cell_pixels if is_background(p))
+        cell_primary = sum(1 for p in cell_pixels if is_primary_ink(p))
+        cell_dark = sum(1 for p in cell_pixels if is_dark_ink(p))
         
-        print(f'Cell ({col},{row}): paper={cell_paper/cell_total*100:.1f}%, blue={cell_blue/cell_total*100:.1f}%, dark={cell_dark/cell_total*100:.1f}%')
+        print(f'Cell ({col},{row}): background={cell_background/cell_total*100:.1f}%, primary={cell_primary/cell_total*100:.1f}%, dark={cell_dark/cell_total*100:.1f}%')
 ```
 
 #### 6. Forms and Objects
@@ -263,19 +269,21 @@ Manually inspect the screenshot and document:
 ```python
 # Count edge-like transitions
 edges = 0
-blue_edges = 0
+primary_edges = 0
 for i in range(1, len(pixels) - 1):
     r1, g1, b1 = pixels[i-1]
     r2, g2, b2 = pixels[i+1]
     diff = abs(r1-r2) + abs(g1-g2) + abs(b1-b2)
-    if diff > 50:  # threshold depends on style
+    if diff > threshold:  # threshold depends on style
         edges += 1
-        if b1 > 100 and b1 > r1 and b1 > g1:
-            blue_edges += 1
+        if is_primary_ink((r1, g1, b1)) or is_primary_ink((r2, g2, b2)):
+            primary_edges += 1
 
 print(f'Total edge transitions: {edges:,} ({edges/total*100:.1f}%)')
-print(f'Blue-ish edges: {blue_edges:,} ({blue_edges/total*100:.1f}%)')
+print(f'Primary ink edges: {primary_edges:,} ({primary_edges/total*100:.1f}%)')
 ```
+
+Adjust the threshold and edge classification based on the target style.
 
 #### 8. Faces/Surfaces
 - Describe surface treatment (flat, textured, hatched, etc.)

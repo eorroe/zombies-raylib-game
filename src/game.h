@@ -15,16 +15,23 @@
 #include "input.h"
 #include "debug.h"
 
+typedef enum {
+    SCREENSHOT_MODE_NONE = 0,
+    SCREENSHOT_MODE_WORLD,
+    SCREENSHOT_MODE_ZOMBIE,
+    SCREENSHOT_MODE_PLAYER
+} ScreenshotMode;
+
 typedef struct Game {
     GameState state;
     GameMode mode;
     ZombieMode zombieMode;
+    ScreenshotMode screenshotMode;
     int score;
     int totalDeadZombies;
     int round;
     int zombiesRemaining;
     float gameTime;
-    bool scopeActive;
     bool firstShotFired;
     float firstShotGraceTimer;
     int nonImageDeathsSinceLastImage;
@@ -46,6 +53,7 @@ typedef struct Game {
     int bloodDecalCount;
     Vector3 muzzleFlashPos;
     float muzzleFlashTimer;
+    bool scopeActive;
     AudioManager audio;
     ProceduralTextures textures;
     ImageUpload imageUpload;
@@ -55,8 +63,13 @@ typedef struct Game {
     Model barrelModel;
     Model wallModel;
     Model buildingModel;
+    Model trainModel;
     Model floorModel;
     Model bloodDecalModel;
+    Model fenceModel;
+    Model containerModel;
+    Model platformModel;
+    Model rubbleModel;
     
     MenuState menu;
 } Game;

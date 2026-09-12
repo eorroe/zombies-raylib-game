@@ -22,15 +22,19 @@ typedef struct {
     Model stock;
     Model sight;
     Model trigger;
+    Model hand;
+    Model forearm;
     Texture2D metalTex;
     Texture2D darkMetalTex;
     Texture2D gripTex;
+    Texture2D camoTex;
+    Texture2D skinTex;
 } WeaponModels;
 
 static WeaponModels g_weaponModels;
 
-void WeaponInit(Weapon *weapon) {
-    weapon->position = (Vector3){ 0.3f, 0.8f, 0.2f };
+void WeaponInit(Weapon *weapon, Shader pbr) {
+    weapon->position = (Vector3){ 0.25f, 0.55f, 0.15f };
     weapon->direction = (Vector3){ 0, 0, 1 };
     weapon->ammo = MAX_AMMO;
     weapon->reloading = false;
@@ -40,72 +44,190 @@ void WeaponInit(Weapon *weapon) {
     weapon->muzzleFlashTimer = 0.0f;
     weapon->aimOffset = (Vector2){ 0 };
 
-    Mesh bodyMesh = GenMeshCube(0.12f, 0.15f, 0.35f);
+    Mesh bodyMesh = GenMeshCube(0.08f, 0.12f, 0.6f);
     g_weaponModels.body = LoadModelFromMesh(bodyMesh);
+    g_weaponModels.body.materials[0].shader = pbr;
 
-    Mesh barrelMesh = GenMeshCylinder(0.025f, 0.22f, 16);
+    Mesh barrelMesh = GenMeshCylinder(0.02f, 0.35f, 16);
     g_weaponModels.barrel = LoadModelFromMesh(barrelMesh);
+    g_weaponModels.barrel.materials[0].shader = pbr;
 
     for (int i = 0; i < 4; i++) {
-        Mesh ringMesh = GenMeshCylinder(0.03f, 0.008f, 16);
+        Mesh ringMesh = GenMeshCylinder(0.025f, 0.006f, 16);
         g_weaponModels.barrelRings[i] = LoadModelFromMesh(ringMesh);
+        g_weaponModels.barrelRings[i].materials[0].shader = pbr;
     }
 
-    Mesh gripMesh = GenMeshCylinder(0.035f, 0.09f, 8);
+    Mesh gripMesh = GenMeshCylinder(0.03f, 0.08f, 8);
     g_weaponModels.grip = LoadModelFromMesh(gripMesh);
+    g_weaponModels.grip.materials[0].shader = pbr;
 
-    Mesh magMesh = GenMeshCube(0.04f, 0.07f, 0.025f);
+    Mesh magMesh = GenMeshCube(0.035f, 0.06f, 0.02f);
     g_weaponModels.magazine = LoadModelFromMesh(magMesh);
+    g_weaponModels.magazine.materials[0].shader = pbr;
 
-    Mesh stockMesh = GenMeshCube(0.045f, 0.06f, 0.09f);
+    Mesh stockMesh = GenMeshCube(0.04f, 0.05f, 0.12f);
     g_weaponModels.stock = LoadModelFromMesh(stockMesh);
+    g_weaponModels.stock.materials[0].shader = pbr;
 
-    Mesh sightMesh = GenMeshCylinder(0.012f, 0.03f, 8);
+    Mesh sightMesh = GenMeshCylinder(0.01f, 0.025f, 8);
     g_weaponModels.sight = LoadModelFromMesh(sightMesh);
+    g_weaponModels.sight.materials[0].shader = pbr;
 
-    Mesh triggerMesh = GenMeshCube(0.01f, 0.015f, 0.025f);
+    Mesh triggerMesh = GenMeshCube(0.008f, 0.012f, 0.02f);
     g_weaponModels.trigger = LoadModelFromMesh(triggerMesh);
+    g_weaponModels.trigger.materials[0].shader = pbr;
 
-    Image metalImg = GenImageColor(256, 256, (Color){ 130, 125, 120, 255 });
-    for (int i = 0; i < 700; i++) {
+    Mesh handMesh = GenMeshSphere(0.04f, 8, 8);
+    g_weaponModels.hand = LoadModelFromMesh(handMesh);
+    g_weaponModels.hand.materials[0].shader = pbr;
+
+    Mesh forearmMesh = GenMeshCylinder(0.035f, 0.12f, 8);
+    g_weaponModels.forearm = LoadModelFromMesh(forearmMesh);
+    g_weaponModels.forearm.materials[0].shader = pbr;
+
+    Image metalImg = GenImageColor(256, 256, (Color){ 50, 55, 65, 255 });
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x, y, 4, 0.5f);
+            int shade = (int)(35 + n * 30);
+            if (shade > 65) shade = 65;
+            if (shade < 35) shade = 35;
+            unsigned char *data = (unsigned char *)metalImg.data;
+            int idx = (y * 256 + x) * 4;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)shade;
+            data[idx + 2] = (unsigned char)(shade + 2);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 800; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 100 + rand() % 50;
-        ImageDrawPixel(&metalImg, x, y, (Color){ shade, shade - 5, shade - 10, 255 });
+        int len = 5 + rand() % 40;
+        Color scratch = { 25, 25, 40, 100 };
+        ImageDrawLine(&metalImg, x, y, x + len, y + (rand() % 3 - 1), scratch);
+    }
+    for (int i = 0; i < 60; i++) {
+        int cx = rand() % 256;
+        int cy = rand() % 256;
+        int r = 2 + rand() % 8;
+        Color rust = { 60, 50, 80, 120 };
+        ImageDrawCircle(&metalImg, cx, cy, r, rust);
     }
     g_weaponModels.metalTex = LoadTextureFromImage(metalImg);
     UnloadImage(metalImg);
 
-    Image darkMetalImg = GenImageColor(256, 256, (Color){ 70, 68, 65, 255 });
+    Image darkMetalImg = GenImageColor(256, 256, (Color){ 30, 35, 45, 255 });
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x + 100, y + 100, 3, 0.4f);
+            int shade = (int)(20 + n * 25);
+            if (shade > 45) shade = 45;
+            if (shade < 20) shade = 20;
+            unsigned char *data = (unsigned char *)darkMetalImg.data;
+            int idx = (y * 256 + x) * 4;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)shade;
+            data[idx + 2] = (unsigned char)(shade + 2);
+            data[idx + 3] = 255;
+        }
+    }
     for (int i = 0; i < 500; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 50 + rand() % 30;
-        ImageDrawPixel(&darkMetalImg, x, y, (Color){ shade, shade - 3, shade - 5, 255 });
+        int len = 3 + rand() % 30;
+        Color scratch = { 10, 10, 20, 100 };
+        ImageDrawLine(&darkMetalImg, x, y, x + len, y + (rand() % 2 - 1), scratch);
+    }
+    for (int i = 0; i < 40; i++) {
+        int cx = rand() % 256;
+        int cy = rand() % 256;
+        int r = 2 + rand() % 6;
+        Color wear = { 30, 35, 45, 120 };
+        ImageDrawCircle(&darkMetalImg, cx, cy, r, wear);
     }
     g_weaponModels.darkMetalTex = LoadTextureFromImage(darkMetalImg);
     UnloadImage(darkMetalImg);
 
-    Image gripImg = GenImageColor(256, 256, (Color){ 100, 78, 60, 255 });
+    Image gripImg = GenImageColor(256, 256, (Color){ 45, 38, 55, 255 });
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x + 200, y + 200, 3, 0.6f);
+            int shade = (int)(35 + n * 30);
+            if (shade > 65) shade = 65;
+            if (shade < 35) shade = 35;
+            unsigned char *data = (unsigned char *)gripImg.data;
+            int idx = (y * 256 + x) * 4;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)(shade - 5);
+            data[idx + 2] = (unsigned char)(shade - 12);
+            data[idx + 3] = 255;
+        }
+    }
     for (int i = 0; i < 600; i++) {
         int x = rand() % 256;
         int y = rand() % 256;
-        int shade = 70 + rand() % 40;
-        ImageDrawPixel(&gripImg, x, y, (Color){ shade, shade - 10, shade - 20, 255 });
+        int shade = 35 + rand() % 30;
+        unsigned char *data = (unsigned char *)gripImg.data;
+        int idx = (y * 256 + x) * 4;
+        data[idx + 0] = (unsigned char)(shade - 10);
+        data[idx + 1] = (unsigned char)(shade - 5);
+        data[idx + 2] = (unsigned char)(shade + 5);
     }
     g_weaponModels.gripTex = LoadTextureFromImage(gripImg);
     UnloadImage(gripImg);
 
-    SetModelTexture(&g_weaponModels.body, g_weaponModels.metalTex);
+    Image camoImg = GenImageColor(256, 256, (Color){ 60, 80, 120, 255 });
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 256; x++) {
+            float n = FractalNoise(x, y, 3, 0.5f);
+            int idx = (y * 256 + x) * 4;
+            int shade = (int)(50 + n * 45);
+            if (shade > 95) shade = 95;
+            if (shade < 50) shade = 50;
+            unsigned char *data = (unsigned char *)camoImg.data;
+            data[idx + 0] = (unsigned char)shade;
+            data[idx + 1] = (unsigned char)(shade + 8);
+            data[idx + 2] = (unsigned char)(shade - 12);
+            data[idx + 3] = 255;
+        }
+    }
+    for (int i = 0; i < 300; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int shade = 50 + rand() % 45;
+        unsigned char *data = (unsigned char *)camoImg.data;
+        int idx = (y * 256 + x) * 4;
+        data[idx + 0] = (unsigned char)(shade - 20);
+        data[idx + 1] = (unsigned char)(shade - 5);
+        data[idx + 2] = (unsigned char)(shade + 15);
+    }
+    g_weaponModels.camoTex = LoadTextureFromImage(camoImg);
+    UnloadImage(camoImg);
+
+    Image skinImg = GenImageColor(256, 256, (Color){ 80, 120, 170, 255 });
+    for (int i = 0; i < 800; i++) {
+        int x = rand() % 256;
+        int y = rand() % 256;
+        int shade = 60 + rand() % 90;
+        ImageDrawPixel(&skinImg, x, y, (Color){ shade - 20, shade - 5, shade + 15, 255 });
+    }
+    g_weaponModels.skinTex = LoadTextureFromImage(skinImg);
+    UnloadImage(skinImg);
+
+    SetModelTexture(&g_weaponModels.body, g_weaponModels.camoTex);
     SetModelTexture(&g_weaponModels.barrel, g_weaponModels.darkMetalTex);
     SetModelTexture(&g_weaponModels.grip, g_weaponModels.gripTex);
     SetModelTexture(&g_weaponModels.magazine, g_weaponModels.darkMetalTex);
-    SetModelTexture(&g_weaponModels.stock, g_weaponModels.darkMetalTex);
+    SetModelTexture(&g_weaponModels.stock, g_weaponModels.camoTex);
     SetModelTexture(&g_weaponModels.sight, g_weaponModels.metalTex);
     SetModelTexture(&g_weaponModels.trigger, g_weaponModels.darkMetalTex);
     for (int i = 0; i < 4; i++) {
         SetModelTexture(&g_weaponModels.barrelRings[i], g_weaponModels.metalTex);
     }
+    SetModelTexture(&g_weaponModels.hand, g_weaponModels.skinTex);
+    SetModelTexture(&g_weaponModels.forearm, g_weaponModels.camoTex);
 }
 
 void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt) {
@@ -121,9 +243,9 @@ void WeaponUpdate(Weapon *weapon, Vector3 playerPos, InputState *input, float dt
     if (weapon->muzzleFlashTimer > 0) weapon->muzzleFlashTimer -= dt;
     
     weapon->position = playerPos;
-    weapon->position.x += 0.3f;
-    weapon->position.y += 0.8f;
-    weapon->position.z += 0.2f;
+    weapon->position.x += 0.25f;
+    weapon->position.y += 0.55f;
+    weapon->position.z += 0.15f;
     weapon->direction = (Vector3){ 0, 0, 1 };
     
     weapon->swayTimer += dt * 8.0f;
@@ -147,35 +269,41 @@ void WeaponRender(Weapon *weapon, Camera3D camera, float yaw) {
 
     float yawDeg = yaw * RAD2DEG;
 
-    Vector3 bodyPos = pos;
-    DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 70, 85, 170, 255 });
+    Vector3 forearmPos = Vector3Add(pos, (Vector3){ -0.15f, -0.12f, 0.05f });
+    DrawModelEx(g_weaponModels.forearm, forearmPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+    
+    Vector3 handPos = Vector3Add(pos, (Vector3){ -0.12f, -0.15f, 0.12f });
+    DrawModelEx(g_weaponModels.hand, handPos, (Vector3){ 0, 0, 1 }, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.15f });
-    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 50, 55, 65, 255 });
+    Vector3 bodyPos = pos;
+    DrawModelEx(g_weaponModels.body, bodyPos, up, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
+
+    Vector3 barrelPos = Vector3Add(pos, (Vector3){ 0, 0, 0.3f });
+    DrawModelEx(g_weaponModels.barrel, barrelPos, up, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
     for (int i = 0; i < 4; i++) {
         float t = (float)i / 3.0f;
-        Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.15f });
-        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 120, 115, 110, 255 });
+        Vector3 ringPos = Vector3Add(barrelPos, (Vector3){ 0, 0, t * 0.3f });
+        DrawModelEx(g_weaponModels.barrelRings[i], ringPos, up, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
     }
 
-    Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.07f, -0.015f });
-    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 100, 80, 60, 255 });
+    Vector3 gripPos = Vector3Add(pos, (Vector3){ 0, -0.06f, -0.02f });
+    DrawModelEx(g_weaponModels.grip, gripPos, (Vector3){ 1, 0, 0 }, 0.15f + yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.055f, 0.04f });
-    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 55, 60, 70, 255 });
+    Vector3 magPos = Vector3Add(pos, (Vector3){ 0, -0.04f, 0.02f });
+    DrawModelEx(g_weaponModels.magazine, magPos, up, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.15f });
-    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 65, 70, 75, 255 });
+    Vector3 stockPos = Vector3Add(pos, (Vector3){ 0, 0, -0.3f });
+    DrawModelEx(g_weaponModels.stock, stockPos, up, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 sightPos = Vector3Add(pos, (Vector3){ 0, 0.07f, 0.03f });
-    DrawModelEx(g_weaponModels.sight, sightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 40, 45, 255 });
+    Vector3 sightPos = Vector3Add(pos, (Vector3){ 0, 0.06f, 0.02f });
+    DrawModelEx(g_weaponModels.sight, sightPos, up, yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
-    Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.02f, 0.01f });
-    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, (Color){ 40, 40, 45, 255 });
+    Vector3 triggerPos = Vector3Add(pos, (Vector3){ 0, -0.015f, 0.01f });
+    DrawModelEx(g_weaponModels.trigger, triggerPos, (Vector3){ 1, 0, 0 }, 0.0f + yawDeg, (Vector3){ 1, 1, 1 }, WHITE);
 
     if (weapon->muzzleFlashTimer > 0) {
-        DrawSphere(barrelPos, 0.12f, YELLOW);
+        DrawSphere(barrelPos, 0.1f, YELLOW);
     }
 }
 
@@ -228,4 +356,10 @@ void WeaponShutdown(Weapon *weapon) {
     UnloadModel(g_weaponModels.magazine);
     UnloadModel(g_weaponModels.stock);
     UnloadModel(g_weaponModels.sight);
+    UnloadModel(g_weaponModels.trigger);
+    UnloadModel(g_weaponModels.hand);
+    UnloadModel(g_weaponModels.forearm);
+    for (int i = 0; i < 4; i++) {
+        UnloadModel(g_weaponModels.barrelRings[i]);
+    }
 }

@@ -123,6 +123,7 @@ Mesh ZombieMesh_CreateTorso(float width, float height, float depth) {
             float r = TorsoRadius(ny, theta, width, height, depth);
             float ct = cosf(theta);
             float st = sinf(theta);
+            float side = fabsf(ct);
 
             float detail = 0.0f;
             detail += 0.010f * sinf(theta * 8.0f + ny * 6.0f) * (1.0f - fabsf(ny));
@@ -154,17 +155,17 @@ Mesh ZombieMesh_CreateTorso(float width, float height, float depth) {
             mesh.texcoords[vi * 2 + 1] = v;
 
             if (ny < -0.55f && torn > 0.015f) {
+                mesh.colors[vi * 4] = 50;
+                mesh.colors[vi * 4 + 1] = 45;
+                mesh.colors[vi * 4 + 2] = 40;
+            } else if (ny > 0.55f && side > 0.65f) {
                 mesh.colors[vi * 4] = 60;
                 mesh.colors[vi * 4 + 1] = 55;
-                mesh.colors[vi * 4 + 2] = 50;
-            } else if (ny > 0.55f && side > 0.65f) {
-                mesh.colors[vi * 4] = 70;
-                mesh.colors[vi * 4 + 1] = 65;
-                mesh.colors[vi * 4 + 2] = 55;
+                mesh.colors[vi * 4 + 2] = 48;
             } else {
-                mesh.colors[vi * 4] = 100;
-                mesh.colors[vi * 4 + 1] = 180;
-                mesh.colors[vi * 4 + 2] = 170;
+                mesh.colors[vi * 4] = 80;
+                mesh.colors[vi * 4 + 1] = 70;
+                mesh.colors[vi * 4 + 2] = 60;
             }
             mesh.colors[vi * 4 + 3] = 255;
             vi++;
@@ -357,21 +358,21 @@ Mesh ZombieMesh_CreateHead(float radius) {
             mesh.texcoords[idx * 2 + 1] = v;
 
             if ((dL < eyeR_r || dR < eyeR_r)) {
-                mesh.colors[idx * 4] = 25;
-                mesh.colors[idx * 4 + 1] = 22;
-                mesh.colors[idx * 4 + 2] = 20;
-            } else if (dM < mouthR && z > radius * 0.5f) {
-                mesh.colors[idx * 4] = 35;
+                mesh.colors[idx * 4] = 20;
                 mesh.colors[idx * 4 + 1] = 18;
-                mesh.colors[idx * 4 + 2] = 15;
+                mesh.colors[idx * 4 + 2] = 16;
+            } else if (dM < mouthR && z > radius * 0.5f) {
+                mesh.colors[idx * 4] = 30;
+                mesh.colors[idx * 4 + 1] = 15;
+                mesh.colors[idx * 4 + 2] = 12;
             } else if (dJ < jawR && z > 0) {
-                mesh.colors[idx * 4] = 70;
-                mesh.colors[idx * 4 + 1] = 60;
-                mesh.colors[idx * 4 + 2] = 50;
+                mesh.colors[idx * 4] = 55;
+                mesh.colors[idx * 4 + 1] = 48;
+                mesh.colors[idx * 4 + 2] = 40;
             } else {
-                mesh.colors[idx * 4] = 100;
-                mesh.colors[idx * 4 + 1] = 90;
-                mesh.colors[idx * 4 + 2] = 80;
+                mesh.colors[idx * 4] = 75;
+                mesh.colors[idx * 4 + 1] = 65;
+                mesh.colors[idx * 4 + 2] = 55;
             }
             mesh.colors[idx * 4 + 3] = 255;
         }
@@ -438,9 +439,9 @@ Mesh ZombieMesh_CreateJaw(float radius) {
             mesh.vertices[idx * 3 + 2] = z;
             mesh.texcoords[idx * 2] = u;
             mesh.texcoords[idx * 2 + 1] = v;
-            mesh.colors[idx * 4] = 100;
-            mesh.colors[idx * 4 + 1] = 90;
-            mesh.colors[idx * 4 + 2] = 80;
+            mesh.colors[idx * 4] = 75;
+            mesh.colors[idx * 4 + 1] = 65;
+            mesh.colors[idx * 4 + 2] = 55;
             mesh.colors[idx * 4 + 3] = 255;
         }
     }
@@ -542,16 +543,16 @@ Mesh ZombieMesh_CreateLimb(float radius, float length) {
     mesh.vertices[topCenter * 3 + 2] = 0;
     mesh.texcoords[topCenter * 2] = 0.5f;
     mesh.texcoords[topCenter * 2 + 1] = 1.0f;
-    mesh.colors[topCenter * 4] = 150; mesh.colors[topCenter * 4 + 1] = 130;
-    mesh.colors[topCenter * 4 + 2] = 100; mesh.colors[topCenter * 4 + 3] = 255;
+    mesh.colors[topCenter * 4] = 100; mesh.colors[topCenter * 4 + 1] = 88;
+    mesh.colors[topCenter * 4 + 2] = 70; mesh.colors[topCenter * 4 + 3] = 255;
 
     mesh.vertices[bottomCenter * 3] = 0;
     mesh.vertices[bottomCenter * 3 + 1] = -length * 0.5f;
     mesh.vertices[bottomCenter * 3 + 2] = 0;
     mesh.texcoords[bottomCenter * 2] = 0.5f;
     mesh.texcoords[bottomCenter * 2 + 1] = 0.0f;
-    mesh.colors[bottomCenter * 4] = 150; mesh.colors[bottomCenter * 4 + 1] = 130;
-    mesh.colors[bottomCenter * 4 + 2] = 100; mesh.colors[bottomCenter * 4 + 3] = 255;
+    mesh.colors[bottomCenter * 4] = 100; mesh.colors[bottomCenter * 4 + 1] = 88;
+    mesh.colors[bottomCenter * 4 + 2] = 70; mesh.colors[bottomCenter * 4 + 3] = 255;
 
     for (int i = 0; i < radialSegs; i++) {
         float u = (float)i / radialSegs;
@@ -563,8 +564,8 @@ Mesh ZombieMesh_CreateLimb(float radius, float length) {
         mesh.vertices[idx * 3 + 2] = r * sinf(theta);
         mesh.texcoords[idx * 2] = u;
         mesh.texcoords[idx * 2 + 1] = 1.0f;
-        mesh.colors[idx * 4] = 100; mesh.colors[idx * 4 + 1] = 90;
-        mesh.colors[idx * 4 + 2] = 80; mesh.colors[idx * 4 + 3] = 255;
+        mesh.colors[idx * 4] = 80; mesh.colors[idx * 4 + 1] = 70;
+        mesh.colors[idx * 4 + 2] = 55; mesh.colors[idx * 4 + 3] = 255;
 
         r = radius * 0.85f;
         idx = bottomRingStart + i;
@@ -573,8 +574,8 @@ Mesh ZombieMesh_CreateLimb(float radius, float length) {
         mesh.vertices[idx * 3 + 2] = r * sinf(theta);
         mesh.texcoords[idx * 2] = u;
         mesh.texcoords[idx * 2 + 1] = 0.0f;
-        mesh.colors[idx * 4] = 100; mesh.colors[idx * 4 + 1] = 90;
-        mesh.colors[idx * 4 + 2] = 80; mesh.colors[idx * 4 + 3] = 255;
+        mesh.colors[idx * 4] = 80; mesh.colors[idx * 4 + 1] = 70;
+        mesh.colors[idx * 4 + 2] = 55; mesh.colors[idx * 4 + 3] = 255;
     }
 
     int ii = 0;
@@ -637,9 +638,9 @@ Mesh ZombieMesh_CreateHand(float scale) {
     mesh.indices = (unsigned short *)calloc(triangleCount * 3, sizeof(unsigned short));
 
     int vi = 0;
-    float palmW = 0.08f * scale;
-    float palmH = 0.12f * scale;
-    float palmD = 0.04f * scale;
+    float palmW = 0.07f * scale;
+    float palmH = 0.11f * scale;
+    float palmD = 0.035f * scale;
 
     for (int j = 0; j <= palmHSegs; j++) {
         float v = (float)j / palmHSegs;
@@ -647,8 +648,8 @@ Mesh ZombieMesh_CreateHand(float scale) {
         for (int i = 0; i <= palmSegs; i++) {
             float u = (float)i / palmSegs;
             float theta = u * 2.0f * PI;
-            float rx = palmW * (1.0f - 0.15f * v);
-            float rz = palmD * (1.0f + 0.1f * sinf(v * PI));
+            float rx = palmW * (1.0f - 0.18f * v);
+            float rz = palmD * (1.0f + 0.12f * sinf(v * PI));
             float x = rx * cosf(theta);
             float z = rz * sinf(theta);
             mesh.vertices[vi * 3] = x;
@@ -656,9 +657,9 @@ Mesh ZombieMesh_CreateHand(float scale) {
             mesh.vertices[vi * 3 + 2] = z;
             mesh.texcoords[vi * 2] = u;
             mesh.texcoords[vi * 2 + 1] = v;
-            mesh.colors[vi * 4] = 90;
-            mesh.colors[vi * 4 + 1] = 80;
-            mesh.colors[vi * 4 + 2] = 70;
+            mesh.colors[vi * 4] = 70;
+            mesh.colors[vi * 4 + 1] = 62;
+            mesh.colors[vi * 4 + 2] = 52;
             mesh.colors[vi * 4 + 3] = 255;
             vi++;
         }
@@ -666,13 +667,14 @@ Mesh ZombieMesh_CreateHand(float scale) {
 
     int fingerBase = vi;
     for (int f = 0; f < fingerCount; f++) {
-        float fx = (f - (fingerCount - 1) * 0.5f) * palmW * 0.5f;
+        float fx = (f - (fingerCount - 1) * 0.5f) * palmW * 0.45f;
         float fy = palmH * 0.5f;
-        float fz = palmD * 0.5f;
+        float fz = palmD * 0.6f;
+        float fingerLen = palmH * 1.1f * (1.0f - 0.15f * fabsf(f - 1.5f) / 1.5f);
         for (int j = 0; j <= fingerHSegs; j++) {
             float v = (float)j / fingerHSegs;
-            float y = fy + v * palmH * 0.8f;
-            float r = 0.012f * scale * (1.0f - 0.3f * v);
+            float y = fy + v * fingerLen;
+            float r = 0.009f * scale * (1.0f - 0.35f * v);
             for (int i = 0; i <= fingerSegs; i++) {
                 float u = (float)i / fingerSegs;
                 float theta = u * 2.0f * PI;
@@ -683,9 +685,9 @@ Mesh ZombieMesh_CreateHand(float scale) {
                 mesh.vertices[vi * 3 + 2] = z;
                 mesh.texcoords[vi * 2] = u;
                 mesh.texcoords[vi * 2 + 1] = v;
-                mesh.colors[vi * 4] = 90;
-                mesh.colors[vi * 4 + 1] = 80;
-                mesh.colors[vi * 4 + 2] = 70;
+                mesh.colors[vi * 4] = 65;
+                mesh.colors[vi * 4 + 1] = 58;
+                mesh.colors[vi * 4 + 2] = 48;
                 mesh.colors[vi * 4 + 3] = 255;
                 vi++;
             }
@@ -694,13 +696,14 @@ Mesh ZombieMesh_CreateHand(float scale) {
 
     int thumbBase = vi;
     {
-        float tx = -palmW * 0.7f;
+        float tx = -palmW * 0.75f;
         float ty = 0;
-        float tz = palmD * 0.3f;
+        float tz = palmD * 0.35f;
+        float thumbLen = palmH * 0.9f;
         for (int j = 0; j <= thumbHSegs; j++) {
             float v = (float)j / thumbHSegs;
-            float y = ty + v * palmH * 0.6f;
-            float r = 0.014f * scale * (1.0f - 0.25f * v);
+            float y = ty + v * thumbLen;
+            float r = 0.011f * scale * (1.0f - 0.3f * v);
             for (int i = 0; i <= thumbSegs; i++) {
                 float u = (float)i / thumbSegs;
                 float theta = u * 2.0f * PI;
@@ -711,9 +714,9 @@ Mesh ZombieMesh_CreateHand(float scale) {
                 mesh.vertices[vi * 3 + 2] = z;
                 mesh.texcoords[vi * 2] = u;
                 mesh.texcoords[vi * 2 + 1] = v;
-                mesh.colors[vi * 4] = 90;
-                mesh.colors[vi * 4 + 1] = 80;
-                mesh.colors[vi * 4 + 2] = 70;
+                mesh.colors[vi * 4] = 65;
+                mesh.colors[vi * 4 + 1] = 58;
+                mesh.colors[vi * 4 + 2] = 48;
                 mesh.colors[vi * 4 + 3] = 255;
                 vi++;
             }
@@ -820,9 +823,9 @@ Mesh ZombieMesh_CreateFoot(float scale) {
             mesh.vertices[vi * 3 + 2] = z;
             mesh.texcoords[vi * 2] = u;
             mesh.texcoords[vi * 2 + 1] = v;
-            mesh.colors[vi * 4] = 90;
-            mesh.colors[vi * 4 + 1] = 80;
-            mesh.colors[vi * 4 + 2] = 70;
+            mesh.colors[vi * 4] = 75;
+            mesh.colors[vi * 4 + 1] = 68;
+            mesh.colors[vi * 4 + 2] = 58;
             mesh.colors[vi * 4 + 3] = 255;
             vi++;
         }
@@ -847,9 +850,9 @@ Mesh ZombieMesh_CreateFoot(float scale) {
                 mesh.vertices[vi * 3 + 2] = z;
                 mesh.texcoords[vi * 2] = u;
                 mesh.texcoords[vi * 2 + 1] = v;
-                mesh.colors[vi * 4] = 90;
-                mesh.colors[vi * 4 + 1] = 80;
-                mesh.colors[vi * 4 + 2] = 70;
+                mesh.colors[vi * 4] = 70;
+                mesh.colors[vi * 4 + 1] = 63;
+                mesh.colors[vi * 4 + 2] = 52;
                 mesh.colors[vi * 4 + 3] = 255;
                 vi++;
             }

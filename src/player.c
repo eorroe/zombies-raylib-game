@@ -147,30 +147,26 @@ void PlayerUpdate(Player *player, InputState *input, float dt) {
     player->pitch = Clamp(player->pitch, -PI / 2.0f + 0.1f, PI / 2.0f - 0.1f);
 }
 
-static void DrawStickLimb(Vector3 start, Vector3 end, float radius, Color color) {
+static void DrawStickLimb(Vector3 start, Vector3 end, float startRadius, float endRadius, Color color, float wobbleAmp) {
     Vector3 dir = Vector3Subtract(end, start);
     float len = Vector3Length(dir);
     if (len < 0.001f) return;
-    
-    Vector3 mid = Vector3Add(start, Vector3Scale(dir, 0.5f));
-    
-    Vector3 up = (Vector3){ 0, 1, 0 };
-    Vector3 axis = Vector3Normalize(dir);
-    float dot = Vector3DotProduct(up, axis);
-    if (dot > 1.0f) dot = 1.0f;
-    if (dot < -1.0f) dot = -1.0f;
-    
-    float angle = acosf(dot) * RAD2DEG;
-    Vector3 rotationAxis = Vector3CrossProduct(up, axis);
-    if (Vector3Length(rotationAxis) < 0.001f) {
-        rotationAxis = (Vector3){ 1, 0, 0 };
-    } else {
-        rotationAxis = Vector3Normalize(rotationAxis);
-    }
-    
-    DrawCylinderEx(start, end, radius, radius, 6, color);
-    DrawSphere(start, radius * 1.2f, color);
-    DrawSphere(end, radius * 1.2f, color);
+
+    float wobX = sinf(start.x * 12.0f + start.y * 8.0f + start.z * 10.0f) * wobbleAmp;
+    float wobY = cosf(start.z * 14.0f + start.x * 6.0f + start.y * 9.0f) * wobbleAmp;
+    float wobZ = sinf(start.y * 11.0f + start.z * 7.0f + start.x * 13.0f) * wobbleAmp;
+
+    Vector3 s1 = (Vector3){ start.x + wobX * 0.5f, start.y + wobY * 0.5f, start.z + wobZ * 0.5f };
+    Vector3 e1 = (Vector3){ end.x + wobX, end.y + wobY, end.z + wobZ };
+    Vector3 s2 = (Vector3){ start.x - wobX * 0.5f, start.y - wobY * 0.5f, start.z - wobZ * 0.5f };
+    Vector3 e2 = (Vector3){ end.x - wobX, end.y - wobY, end.z - wobZ };
+
+    DrawCylinderEx(s1, e1, startRadius, endRadius, 6, color);
+    DrawCylinderEx(s2, e2, startRadius * 0.85f, endRadius * 0.85f, 6, color);
+
+    float jointR = (startRadius + endRadius) * 0.6f;
+    DrawSphere(s1, jointR, color);
+    DrawSphere(e1, jointR, color);
 }
 
 void PlayerRender(Player *player, Shader shader) {
@@ -231,26 +227,28 @@ void PlayerRender(Player *player, Shader shader) {
     Vector3 leftFootPos = Vector3Add(leftHip, Vector3Scale(leftAxis, -PLAYER_LEG_LENGTH));
     Vector3 rightFootPos = Vector3Add(rightHip, Vector3Scale(rightAxis, -PLAYER_LEG_LENGTH));
     
+    float wobbleAmp = 0.005f;
+
     // Draw head
     DrawSphere(helmetPos, 0.25f, (Color){ 20, 30, 60, 255 });
     DrawSphere(headPos, 0.2f, (Color){ 80, 120, 170, 255 });
-    
+
     // Draw torso
-    DrawStickLimb(leftShoulder, leftHip, 0.04f, (Color){ 60, 100, 160, 255 });
-    DrawStickLimb(rightShoulder, rightHip, 0.04f, (Color){ 60, 100, 160, 255 });
-    DrawStickLimb(leftShoulder, rightShoulder, 0.03f, (Color){ 60, 100, 160, 255 });
-    
+    DrawStickLimb(leftShoulder, leftHip, 0.04f, 0.04f, (Color){ 60, 100, 160, 255 }, wobbleAmp);
+    DrawStickLimb(rightShoulder, rightHip, 0.04f, 0.04f, (Color){ 60, 100, 160, 255 }, wobbleAmp);
+    DrawStickLimb(leftShoulder, rightShoulder, 0.03f, 0.03f, (Color){ 60, 100, 160, 255 }, wobbleAmp);
+
     // Draw arms
-    DrawStickLimb(leftShoulder, leftElbow, 0.025f, (Color){ 60, 100, 160, 255 });
-    DrawStickLimb(leftElbow, leftHandPos, 0.02f, (Color){ 80, 120, 170, 255 });
-    DrawStickLimb(rightShoulder, rightElbow, 0.025f, (Color){ 60, 100, 160, 255 });
-    DrawStickLimb(rightElbow, rightHandPos, 0.02f, (Color){ 80, 120, 170, 255 });
-    
+    DrawStickLimb(leftShoulder, leftElbow, 0.02f, 0.028f, (Color){ 60, 100, 160, 255 }, wobbleAmp);
+    DrawStickLimb(leftElbow, leftHandPos, 0.013f, 0.02f, (Color){ 80, 120, 170, 255 }, wobbleAmp);
+    DrawStickLimb(rightShoulder, rightElbow, 0.02f, 0.028f, (Color){ 60, 100, 160, 255 }, wobbleAmp);
+    DrawStickLimb(rightElbow, rightHandPos, 0.013f, 0.02f, (Color){ 80, 120, 170, 255 }, wobbleAmp);
+
     // Draw legs
-    DrawStickLimb(leftHip, leftKnee, 0.03f, (Color){ 30, 50, 100, 255 });
-    DrawStickLimb(leftKnee, leftFootPos, 0.025f, (Color){ 30, 50, 100, 255 });
-    DrawStickLimb(rightHip, rightKnee, 0.03f, (Color){ 30, 50, 100, 255 });
-    DrawStickLimb(rightKnee, rightFootPos, 0.025f, (Color){ 30, 50, 100, 255 });
+    DrawStickLimb(leftHip, leftKnee, 0.025f, 0.032f, (Color){ 30, 50, 100, 255 }, wobbleAmp);
+    DrawStickLimb(leftKnee, leftFootPos, 0.018f, 0.025f, (Color){ 30, 50, 100, 255 }, wobbleAmp);
+    DrawStickLimb(rightHip, rightKnee, 0.025f, 0.032f, (Color){ 30, 50, 100, 255 }, wobbleAmp);
+    DrawStickLimb(rightKnee, rightFootPos, 0.018f, 0.025f, (Color){ 30, 50, 100, 255 }, wobbleAmp);
     
     // Draw joints
     DrawSphere(leftShoulder, 0.04f, (Color){ 60, 100, 160, 255 });

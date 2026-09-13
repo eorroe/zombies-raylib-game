@@ -214,8 +214,8 @@ void RendererDrawScene(Game *game) {
     
     for (int bx = -2; bx <= 2; bx++) {
         for (int bz = 0; bz <= 3; bz++) {
-            float baseX = bx * 12.0f;
-            float baseZ = bz * 14.0f + 6.0f;
+            float baseX = bx * 18.0f;
+            float baseZ = bz * 18.0f + 8.0f;
             if (fabsf(baseX) < 1.5f && baseZ < 2.0f) continue;
 
             float h = 3.0f + ((bx + bz) % 4) * 1.8f;
@@ -231,7 +231,7 @@ void RendererDrawScene(Game *game) {
                     if ((wx + wy) % 2 == 0) continue;
                     float winX = baseX + wx * 0.9f;
                     float winZ = baseZ - 2.56f;
-                    float winY = wy * 1.1f;
+                    float winY = h * 0.5f + wy * 1.1f;
                     DrawCube((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 90, 110, 150, 220 });
                     DrawCubeWires((Vector3){ winX, winY, winZ }, 0.6f, 0.8f, 0.05f, (Color){ 40, 40, 45, 255 });
 
@@ -248,7 +248,7 @@ void RendererDrawScene(Game *game) {
                 for (int wy = -1; wy <= 1; wy++) {
                     float fireX = baseX - 2.0f;
                     float fireZ = baseZ + 2.56f;
-                    float fireY = wy * 1.5f;
+                    float fireY = h * 0.5f + wy * 1.5f;
                     DrawCube((Vector3){ fireX, fireY, fireZ }, 0.08f, 0.8f, 0.4f, (Color){ 70, 65, 60, 255 });
                     DrawCubeWires((Vector3){ fireX, fireY, fireZ }, 0.08f, 0.8f, 0.4f, (Color){ 40, 40, 45, 255 });
                     DrawCube((Vector3){ fireX - 0.2f, fireY + 0.2f, fireZ }, 0.25f, 0.08f, 0.35f, (Color){ 90, 85, 80, 255 });
@@ -266,7 +266,7 @@ void RendererDrawScene(Game *game) {
 
             for (int w = 0; w < 3; w++) {
                 float sx = baseX - 1.4f + w * 1.4f;
-                float sy = -h * 0.35f;
+                float sy = h * 0.5f;
                 DrawCube((Vector3){ sx, sy, baseZ + 2.56f }, 0.7f, 1.1f, 0.05f, (Color){ 100, 80, 60, 255 });
                 DrawCubeWires((Vector3){ sx, sy, baseZ + 2.56f }, 0.7f, 1.1f, 0.05f, (Color){ 40, 40, 45, 255 });
             }

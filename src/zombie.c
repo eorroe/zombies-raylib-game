@@ -199,30 +199,26 @@ void ZombieUpdate(Zombie *zombie, Vector3 playerPos, float dt, bool firstShotFir
     if (zombie->damageFlashTimer > 0.0f) zombie->damageFlashTimer -= dt;
 }
 
-static void DrawStickLimb(Vector3 start, Vector3 end, float radius, Color color) {
+static void DrawStickLimb(Vector3 start, Vector3 end, float startRadius, float endRadius, Color color, float wobbleAmp) {
     Vector3 dir = Vector3Subtract(end, start);
     float len = Vector3Length(dir);
     if (len < 0.001f) return;
-    
-    Vector3 mid = Vector3Add(start, Vector3Scale(dir, 0.5f));
-    
-    Vector3 up = (Vector3){ 0, 1, 0 };
-    Vector3 axis = Vector3Normalize(dir);
-    float dot = Vector3DotProduct(up, axis);
-    if (dot > 1.0f) dot = 1.0f;
-    if (dot < -1.0f) dot = -1.0f;
-    
-    float angle = acosf(dot) * RAD2DEG;
-    Vector3 rotationAxis = Vector3CrossProduct(up, axis);
-    if (Vector3Length(rotationAxis) < 0.001f) {
-        rotationAxis = (Vector3){ 1, 0, 0 };
-    } else {
-        rotationAxis = Vector3Normalize(rotationAxis);
-    }
-    
-    DrawCylinderEx(start, end, radius, radius, 6, color);
-    DrawSphere(start, radius * 1.2f, color);
-    DrawSphere(end, radius * 1.2f, color);
+
+    float wobX = sinf(start.x * 12.0f + start.y * 8.0f + start.z * 10.0f) * wobbleAmp;
+    float wobY = cosf(start.z * 14.0f + start.x * 6.0f + start.y * 9.0f) * wobbleAmp;
+    float wobZ = sinf(start.y * 11.0f + start.z * 7.0f + start.x * 13.0f) * wobbleAmp;
+
+    Vector3 s1 = (Vector3){ start.x + wobX * 0.5f, start.y + wobY * 0.5f, start.z + wobZ * 0.5f };
+    Vector3 e1 = (Vector3){ end.x + wobX, end.y + wobY, end.z + wobZ };
+    Vector3 s2 = (Vector3){ start.x - wobX * 0.5f, start.y - wobY * 0.5f, start.z - wobZ * 0.5f };
+    Vector3 e2 = (Vector3){ end.x - wobX, end.y - wobY, end.z - wobZ };
+
+    DrawCylinderEx(s1, e1, startRadius, endRadius, 6, color);
+    DrawCylinderEx(s2, e2, startRadius * 0.85f, endRadius * 0.85f, 6, color);
+
+    float jointR = (startRadius + endRadius) * 0.6f;
+    DrawSphere(s1, jointR, color);
+    DrawSphere(e1, jointR, color);
 }
 
 static Vector3 RotateY(Vector3 v, float angle) {
@@ -290,23 +286,25 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     Vector3 headFinal = (Vector3){ headPos.x, headY, headPos.z };
     Vector3 torsoFinal = (Vector3){ torsoPos.x, bodyY, torsoPos.z };
     
+    float wobbleAmp = 0.006f;
+
     // Draw head
     DrawSphere(headFinal, zombie->headRadius * 0.5f, headColor);
-    
+
     // Draw torso as lines between shoulders and hips
     Vector3 shoulderL = Vector3Add(torsoFinal, RotateY((Vector3){ -zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 }, zombie->facingAngle));
     Vector3 shoulderR = Vector3Add(torsoFinal, RotateY((Vector3){ zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 }, zombie->facingAngle));
     Vector3 hipL = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY((Vector3){ -zombie->torsoWidth * 0.35f, 0, 0 }, zombie->facingAngle));
     Vector3 hipR = Vector3Add((Vector3){ zombie->position.x, hipY, zombie->position.z }, RotateY((Vector3){ zombie->torsoWidth * 0.35f, 0, 0 }, zombie->facingAngle));
-    
-    DrawStickLimb(shoulderL, hipL, 0.04f, shirtColor);
-    DrawStickLimb(shoulderR, hipR, 0.04f, shirtColor);
-    DrawStickLimb(shoulderL, shoulderR, 0.03f, shirtColor);
-    
+
+    DrawStickLimb(shoulderL, hipL, 0.04f, 0.04f, shirtColor, wobbleAmp);
+    DrawStickLimb(shoulderR, hipR, 0.04f, 0.04f, shirtColor, wobbleAmp);
+    DrawStickLimb(shoulderL, shoulderR, 0.03f, 0.03f, shirtColor, wobbleAmp);
+
     // Draw neck
     Vector3 neckPos = Vector3Add(headFinal, (Vector3){ 0, -zombie->headRadius * 0.5f, 0 });
-    DrawStickLimb(neckPos, shoulderL, 0.02f, skinColor);
-    DrawStickLimb(neckPos, shoulderR, 0.02f, skinColor);
+    DrawStickLimb(neckPos, shoulderL, 0.018f, 0.022f, skinColor, wobbleAmp);
+    DrawStickLimb(neckPos, shoulderR, 0.018f, 0.022f, skinColor, wobbleAmp);
 
     Vector3 shoulderLOffset = (Vector3){ -zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 };
     Vector3 shoulderROffset = (Vector3){ zombie->torsoWidth * 0.6f, zombie->torsoHeight * 0.35f, 0 };
@@ -344,17 +342,17 @@ void ZombieRender(Zombie *zombie, Camera3D camera, Texture2D *headTextures, int 
     Vector3 legDirL = RotateY((Vector3){ -0.2f, -1.0f, 0 }, zombie->facingAngle);
     Vector3 legDirR = RotateY((Vector3){ 0.2f, -1.0f, 0 }, zombie->facingAngle);
 
-    DrawStickLimb(shoulderL, Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen)), 0.025f, shirtColor);
-    DrawStickLimb(Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen)), Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen + zombie->armLowerLen)), 0.02f, skinColor);
+    DrawStickLimb(shoulderL, Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen)), 0.018f, 0.022f, shirtColor, wobbleAmp);
+    DrawStickLimb(Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen)), Vector3Add(shoulderL, Vector3Scale(armDirL, zombie->armUpperLen + zombie->armLowerLen)), 0.013f, 0.018f, skinColor, wobbleAmp);
 
-    DrawStickLimb(shoulderR, Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen)), 0.025f, shirtColor);
-    DrawStickLimb(Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen)), Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen + zombie->armLowerLen)), 0.02f, skinColor);
+    DrawStickLimb(shoulderR, Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen)), 0.018f, 0.022f, shirtColor, wobbleAmp);
+    DrawStickLimb(Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen)), Vector3Add(shoulderR, Vector3Scale(armDirR, zombie->armUpperLen + zombie->armLowerLen)), 0.013f, 0.018f, skinColor, wobbleAmp);
 
-    DrawStickLimb(hipL, Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen)), 0.03f, pantsColor);
-    DrawStickLimb(Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen)), Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen + zombie->legLowerLen)), 0.025f, pantsColor);
+    DrawStickLimb(hipL, Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen)), 0.025f, 0.03f, pantsColor, wobbleAmp);
+    DrawStickLimb(Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen)), Vector3Add(hipL, Vector3Scale(legDirL, zombie->legUpperLen + zombie->legLowerLen)), 0.018f, 0.025f, pantsColor, wobbleAmp);
 
-    DrawStickLimb(hipR, Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen)), 0.03f, pantsColor);
-    DrawStickLimb(Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen)), Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen + zombie->legLowerLen)), 0.025f, pantsColor);
+    DrawStickLimb(hipR, Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen)), 0.025f, 0.03f, pantsColor, wobbleAmp);
+    DrawStickLimb(Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen)), Vector3Add(hipR, Vector3Scale(legDirR, zombie->legUpperLen + zombie->legLowerLen)), 0.018f, 0.025f, pantsColor, wobbleAmp);
 
     Vector3 leftHandPos = Vector3Add(shoulderL, Vector3Add(Vector3Scale(armDirL, zombie->armUpperLen), (Vector3){ 0, 0, climbReach * 0.5f }));
     Vector3 rightHandPos = Vector3Add(shoulderR, Vector3Add(Vector3Scale(armDirR, zombie->armUpperLen), (Vector3){ 0, 0, climbReach * 0.5f }));

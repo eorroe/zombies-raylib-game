@@ -8,7 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#ifndef _WIN32
 #include <unistd.h>
+#else
+#include <direct.h>
+#define getcwd _getcwd
+#endif
 
 static void SpawnZombie(Game *game, Vector3 pos, ZombieType type, int texIdx) {
     if (game->zombieCount >= MAX_ZOMBIES) return;

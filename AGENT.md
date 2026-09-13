@@ -47,13 +47,13 @@ This applies to **every** visual update, including:
 
 ### 1. Branch Policy
 
-**ONLY work on the `doodle-style` branch in this session.**
+**All commits MUST be made to `remotes/origin/HEAD`.**
 
-- All commits MUST be made to `doodle-style`
-- NEVER create, push, or update any other branch
-- NEVER push to `main`, `master`, or any branch other than `doodle-style`
-- If you find yourself on another branch, switch to `doodle-style` immediately
-- Before committing, verify: `git branch --show-current` must output `doodle-style`
+- Commit to the branch that `remotes/origin/HEAD` points to
+- NEVER create, push, or update any branch other than `remotes/origin/HEAD`
+- NEVER push to `main`, `master`, or any branch not covered by `remotes/origin/HEAD`
+- If you find yourself on another branch, switch to the branch tracked by `remotes/origin/HEAD` immediately
+- Before committing, verify: `git branch --show-current` matches `remotes/origin/HEAD`
 
 ### 2. Render Texture Lifecycle
 
